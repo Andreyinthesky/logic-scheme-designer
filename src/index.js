@@ -38,6 +38,17 @@ const graphData = {
         cursor: "move"
       }
     },
+    {
+      id: "node3",
+      shape: "input",
+      x: 300,
+      y: 300,
+      style: {
+        cursor: "move"
+      },
+      label : "0",
+      anchorPoints: [[1, 0.5]],
+    },
   ]
 };
 

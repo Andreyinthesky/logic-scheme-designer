@@ -1,5 +1,65 @@
 import G6 from "@antv/g6";
 
+
+const defineInput = () => {
+  const rightOffset = 10;
+
+  G6.registerNode("input", {
+    draw(cfg, group) {
+      cfg.size = [60, 50];
+
+      const shape = group.addShape("path", {
+        attrs: {
+          ...cfg.style,
+          path: [["M", (cfg.size[0]) / 2, 0], ["l", -rightOffset, 0]],
+          stroke: cfg.color || "#000",
+          lineWidth: 3,
+        }
+      })
+
+      group.addShape("circle", {
+        attrs: {
+          ...cfg.style,
+          ...this.getCircleParams(cfg),
+          stroke: cfg.color || "#000",
+          lineWidth: cfg.lineWidth || 6,
+          fill: cfg.fill || "#fff",
+        },
+      });
+
+      if (cfg.label) {
+        const text = group.addShape("text", {
+          attrs: {
+            x: -rightOffset,
+            y: 4,
+            textAlign: "center",
+            textBaseline: "middle",
+            text: cfg.label,
+            fontWeight: "bold",
+            fontSize: 50,
+            fontFamily: "Segoe UI, sans-serif",
+            fill: cfg.color || "#000",
+          },
+        });
+      }
+      
+      return shape;
+    },
+
+    getCircleParams(cfg) {
+      const width = cfg.size[0];
+
+      const circleParams = {
+        x: -rightOffset,
+        y: 0,
+        r: width / 2,
+      };
+
+      return circleParams;
+    },
+  });
+}
+
 const defineWire = () => {
   const normalize = (sign) => {
     return Math.abs(sign) === 1 ? sign : 1;
@@ -38,6 +98,7 @@ const defineWire = () => {
 
 export default function init() {
   defineWire();
+  defineInput();
 
   G6.registerBehavior("click-add-edge", {
     getEvents() {
