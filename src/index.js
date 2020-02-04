@@ -1,103 +1,18 @@
-import "./index.css"; 
-import G6 from "@antv/g6";
+import "./index.css";
+import init from "./init.js";
 
-import AND_GATE from "./svg_elems/AND_ANSI.svg"; 
-import BUFFER_GATE from "./svg_elems/Buffer_ANSI.svg"; 
-import NAND_GATE from "./svg_elems/NAND_ANSI.svg"; 
-import NOR_GATE from "./svg_elems/NOR_ANSI.svg"; 
-import NOT_GATE from "./svg_elems/NOT_ANSI.svg"; 
-import OR_GATE from "./svg_elems/OR_ANSI.svg"; 
-import XNOR_GATE from "./svg_elems/XNOR_ANSI.svg"; 
-import XOR_GATE from "./svg_elems/XOR_ANSI.svg"; 
+import AND_GATE from "./assets/svg_elements/AND_ANSI.svg";
+import BUFFER_GATE from "./assets/svg_elements/Buffer_ANSI.svg";
+import NAND_GATE from "./assets/svg_elements/NAND_ANSI.svg";
+import NOR_GATE from "./assets/svg_elements/NOR_ANSI.svg";
+import NOT_GATE from "./assets/svg_elements/NOT_ANSI.svg";
+import OR_GATE from "./assets/svg_elements/OR_ANSI.svg";
+import XNOR_GATE from "./assets/svg_elements/XNOR_ANSI.svg";
+import XOR_GATE from "./assets/svg_elements/XOR_ANSI.svg";
 
 let scale = 1.0;
 
-G6.registerBehavior("click-add-edge", {
-  getEvents() {
-    return {
-      "node:click": "onClick",
-      mousemove: "onMousemove",
-      "edge:click": "onEdgeClick",
-      "edge:mousedown": "onEdgeMousedown"
-    };
-  },
-  onClick(ev) {
-    const node = ev.item;
-    const graph = this.graph;
-    const point = {
-      x: ev.x,
-      y: ev.y
-    };
-    const anchorIndex = node.getLinkPoint(point).anchorIndex;
-    const nodeModel = node.getModel();
-
-    //FIXME: CHECK THE SAME NODE AND EDGE
-    if (this.addingEdge && this.edge) {
-      const edgeModel = this.edge.getModel();
-      const hasSameEdge = node.getEdges().find(item => {
-        const edge = item.getModel();
-        const { sourceAnchor } = edgeModel;
-        console.log(edge.sourceAnchor, sourceAnchor);
-        console.log(edge.targetAnchor, anchorIndex);
-        return (
-          (edge.sourceAnchor === sourceAnchor && edge.targetAnchor === anchorIndex) ||
-          (edge.targetAnchor === sourceAnchor && edge.sourceAnchor === anchorIndex)
-        );
-      }) !== undefined;
-      const hasSameNodeAndAnchor =
-        nodeModel.id === edgeModel.source && edgeModel.sourceAnchor === anchorIndex;
-
-      console.log(hasSameEdge, hasSameNodeAndAnchor);
-      if (hasSameEdge || hasSameNodeAndAnchor) return;
-
-      graph.updateItem(this.edge, {
-        target: nodeModel.id,
-        targetAnchor: anchorIndex
-      });
-      this.edge = null;
-      this.addingEdge = false;
-    } else {
-      this.edge = graph.addItem("edge", {
-        source: nodeModel.id,
-        sourceAnchor: anchorIndex,
-        shape: "polyline",
-        target: point,
-        style: {
-          lineWidth: 3
-        }
-      });
-      this.addingEdge = true;
-    }
-  },
-  onMousemove(ev) {
-    const point = {
-      x: ev.x,
-      y: ev.y
-    };
-    if (this.addingEdge && this.edge) {
-      this.graph.updateItem(this.edge, {
-        target: point
-      });
-    }
-  },
-  onEdgeClick(ev) {
-    const currentEdge = ev.item;
-    if (this.addingEdge && this.edge == currentEdge) {
-      graph.removeItem(this.edge);
-      this.edge = null;
-      this.addingEdge = false;
-    }
-  },
-  onEdgeMousedown(ev) {
-    const nativeEvent = ev.event;
-    if (this.addingEdge) {
-      return;
-    }
-    if (nativeEvent.which == 3) graph.removeItem(ev.item);
-  }
-});
-
-const data = {
+const graphData = {
   nodes: [
     {
       id: "node1",
@@ -122,32 +37,24 @@ const data = {
       style: {
         cursor: "move"
       }
-    }
+    },
   ]
 };
 
-const graph = new G6.Graph({
-  container: "mountNode",
-  // renderer: "svg",
-  width: 1000,
-  height: 400,
-  maxZoom: 3,
-  minZoom: 0.2,
-  groupType: "rect",
-  modes: {
-    default: ["drag-node", "click-add-edge"]
-  }
-});
+const graph = init();
 
-graph.read(data);
+graph.read(graphData);
 
 graph.getNodes().forEach((n, i) => {
   addAnchors(n);
 });
 
 function addAnchors(node) {
-  const group = node.getContainer();
   const model = node.getModel();
+
+  if (!model.anchorPoints) return;
+
+  const group = node.getContainer();
   const id = model.id;
   for (let i = 0; i < model.anchorPoints.length; i++) {
     let { x, y } = node.getLinkPointByAnchor(i);
@@ -182,6 +89,7 @@ graph.on("node:mouseover", event => {
   }
   graph.paint();
 });
+
 graph.on("node:mouseout", event => {
   console.log("hover node");
   // USE STATES
@@ -199,8 +107,8 @@ graph.on("node:mouseout", event => {
 
 graph.on("wheel", ev => {
   const { deltaY } = ev;
-  if ((deltaY > 0 && scale <= graph.get('minZoom')) || (deltaY < 0 && scale >= graph.get('maxZoom')))
-   return;
+  if ((deltaY > 0 && scale <= graph.get("minZoom")) || (deltaY < 0 && scale >= graph.get("maxZoom")))
+    return;
   scale = parseFloat((scale + (deltaY < 0 ? 0.1 : -0.1)).toFixed(2));
   console.log("scale", scale);
   graph.zoomTo(scale);
@@ -218,9 +126,7 @@ graph.on("click", ev => {
 
 let dragCanvas = false;
 let dragCanvasCoord;
-graph.on("mousedown", ev => {
-  console.log("drag start");
-  if (ev.target.isKeyShape) return;
+graph.on("canvas:mousedown", ev => {
   dragCanvas = true;
   dragCanvasCoord = { x: ev.x, y: ev.y };
 });
@@ -236,7 +142,7 @@ graph.on("mouseup", ev => {
   dragCanvas = false;
 });
 
-graph.on("mouseout", ev => {
+graph.on("canvas:mouseout", ev => {
   console.log("end drag");
   dragCanvas = false;
 });

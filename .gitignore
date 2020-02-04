@@ -1,6 +1,7 @@
 #dirs
 /node_modules
 /dist
+/src/model/
 
 #files
 package-lock.json
