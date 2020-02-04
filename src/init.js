@@ -1,6 +1,44 @@
 import G6 from "@antv/g6";
 
+const defineWire = () => {
+  const normalize = (sign) => {
+    return Math.abs(sign) === 1 ? sign : 1;
+  };
+
+  G6.registerEdge("wire", {
+    draw(cfg, group) {
+      const {
+        startPoint,
+        endPoint
+      } = cfg;
+      const shape = group.addShape("path", {
+        attrs: {
+          stroke: "#F00",
+          lineWidth: 3,
+          lineAppendWidth: 9,
+          path: (endPoint.x - startPoint.x < 0 ?
+            [
+              ["M", startPoint.x, startPoint.y],
+              ["L", startPoint.x, startPoint.y + normalize(Math.sign(endPoint.y - startPoint.y)) * 25],
+              ["L", endPoint.x, startPoint.y + normalize(Math.sign(endPoint.y - startPoint.y)) * 25],
+              ["L", endPoint.x, endPoint.y]
+            ] :
+            [
+              ["M", startPoint.x, startPoint.y],
+              ["L", endPoint.x, startPoint.y],
+              ["L", endPoint.x, endPoint.y]
+            ]),
+        }
+      });
+
+      return shape;
+    }
+  })
+};
+
 export default function init() {
+  defineWire();
+
   G6.registerBehavior("click-add-edge", {
     getEvents() {
       return {
@@ -61,7 +99,7 @@ export default function init() {
         this.edge = graph.addItem("edge", {
           source: targetNodeModel.id,
           sourceAnchor: targetNodeAnchorIndex,
-          shape: "polyline",
+          shape: "wire",
           target: point,
           style: {
             lineWidth: 3
