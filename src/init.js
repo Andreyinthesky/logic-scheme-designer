@@ -1,5 +1,72 @@
 import G6 from "@antv/g6";
 
+const defineOutput = () => {
+  const leftOffset = 10;
+
+  G6.registerNode("output", {
+    draw(cfg, group) {
+      const size = cfg.size || this.getDefaultSize();
+      const width = size[0];
+
+      const shape = group.addShape("path", {
+        attrs: {
+          ...cfg.style,
+          path: [["M", -width / 2, 0], ["l", leftOffset, 0]],
+          stroke: cfg.color || "#000",
+          lineWidth: 3,
+        }
+      })
+
+      group.addShape("path", {
+        attrs: {
+          ...cfg.style,
+          path: this.getPath(cfg),
+          stroke: cfg.color || "#000",
+          lineWidth: cfg.lineWidth || 6,
+          fill: cfg.fill || "#fff",
+        },
+      });
+
+      if (cfg.label) {
+        const text = group.addShape("text", {
+          attrs: {
+            x: leftOffset / 2,
+            y: 4,
+            textAlign: "center",
+            textBaseline: "middle",
+            text: cfg.label,
+            fontWeight: "bold",
+            fontSize: 50,
+            fontFamily: "Segoe UI, sans-serif",
+            fill: cfg.color || "#000",
+          },
+        });
+      }
+
+      return shape;
+    },
+
+    getPath(cfg) {
+      const size = cfg.size || this.getDefaultSize();
+      const width = size[0];
+      const height = size[1];
+
+      const path = [
+        ["M", -width / 2 + leftOffset, height / 2],
+        ["L", width / 2, height / 2],
+        ["L", width / 2, -height / 2],
+        ["L", -width / 2 + leftOffset, -height / 2],
+        ["Z"]
+      ];
+
+      return path;
+    },
+
+    getDefaultSize() {
+      return [60, 60];
+    },
+  });
+};
 
 const defineInput = () => {
   const rightOffset = 10;
@@ -42,7 +109,7 @@ const defineInput = () => {
           },
         });
       }
-      
+
       return shape;
     },
 
@@ -99,6 +166,7 @@ const defineWire = () => {
 export default function init() {
   defineWire();
   defineInput();
+  defineOutput();
 
   G6.registerBehavior("click-add-edge", {
     getEvents() {

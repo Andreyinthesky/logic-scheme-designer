@@ -49,6 +49,17 @@ const graphData = {
       label : "0",
       anchorPoints: [[1, 0.5]],
     },
+    {
+      id: "node4",
+      shape: "output",
+      x: 550,
+      y: 300,
+      style: {
+        cursor: "move"
+      },
+      label: "0",
+      anchorPoints: [[0, 0.5]],
+    },
   ]
 };
 
