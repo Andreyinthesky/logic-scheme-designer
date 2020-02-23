@@ -1,75 +1,41 @@
 import "./index.css";
 import init from "./init.js";
 
-import AND_GATE from "./assets/svg_elements/AND_ANSI.svg";
-import BUFFER_GATE from "./assets/svg_elements/Buffer_ANSI.svg";
-import NAND_GATE from "./assets/svg_elements/NAND_ANSI.svg";
-import NOR_GATE from "./assets/svg_elements/NOR_ANSI.svg";
-import NOT_GATE from "./assets/svg_elements/NOT_ANSI.svg";
-import OR_GATE from "./assets/svg_elements/OR_ANSI.svg";
-import XNOR_GATE from "./assets/svg_elements/XNOR_ANSI.svg";
-import XOR_GATE from "./assets/svg_elements/XOR_ANSI.svg";
+import Input from "./model/Input";
+import Output from "./model/Output";
+import AndGate from "./model/gates/AndGate";
+import OrGate from "./model/gates/OrGate";
+import NotGate from "./model/gates/NotGate";
+import XorGate from "./model/gates/XorGate";
 
 let scale = 1.0;
 
 const graphData = {
   nodes: [
-    {
-      id: "node1",
-      shape: "image",
-      x: 250,
-      y: 300,
-      size: [100, 50],
-      anchorPoints: [[1, 0.5], [0, 0.685], [0, 0.315]],
-      img: AND_GATE,
-      style: {
-        cursor: "move"
-      }
-    },
-    {
-      id: "node2",
-      shape: "image",
-      x: 100,
-      y: 200,
-      size: [100, 50],
-      anchorPoints: [[1, 0.5], [0, 0.5]],
-      img: NOT_GATE,
-      style: {
-        cursor: "move"
-      }
-    },
-    {
-      id: "node3",
-      shape: "input",
-      x: 300,
-      y: 300,
-      style: {
-        cursor: "move"
-      },
-      label : "0",
-      anchorPoints: [[1, 0.5]],
-    },
-    {
-      id: "node4",
-      shape: "output",
-      x: 550,
-      y: 300,
-      style: {
-        cursor: "move"
-      },
-      label: "0",
-      anchorPoints: [[0, 0.5]],
-    },
+    new AndGate("node1", { x: 250, y: 300 }),
+    new OrGate("node2", { x: 100, y: 200 }),
+    new Input("node3", { x: 300, y: 300 }),
+    new Output("node4", { x: 550, y: 300 }),
   ]
 };
 
 const graph = init();
 
-graph.read(graphData);
+// function Scheme() {
+//   this.customProp = 1;
+//   this.customFunc = function () {
+//     console.log("I'm custom method!");
+//   };
+// }
 
-graph.getNodes().forEach((n, i) => {
-  addAnchors(n);
+// graph.logicSchemeModel = new Scheme();
+
+graphData.nodes.forEach(nodeData => {
+  const newNode = graph.addItem("node", nodeData);
+  addAnchors(newNode);
 });
+
+// console.log(graph);
 
 function addAnchors(node) {
   const model = node.getModel();
@@ -175,55 +141,65 @@ document.getElementById("fit-btn").addEventListener("click", event => {
   graph.translate(leftTopCorner.x * scale, leftTopCorner.y * scale);
 });
 
-let nodeId = 5;
+let nextNodeId = 5;
 document.getElementById("select-gate").addEventListener("click", event => {
-  let nodeData = {};
+  let nodeData = null;
+  const nodePosition = graph.getPointByCanvas(100, 100);
+
   switch (event.target.id) {
-    case "buffer":
-      nodeData.img = BUFFER_GATE;
-      nodeData.anchorPoints = [[1, 0.5], [0, 0.5]];
-      break;
     case "and":
-      nodeData.img = AND_GATE;
-      nodeData.anchorPoints = [[1, 0.5], [0, 0.685], [0, 0.315]];
+      nodeData = new AndGate(null, nodePosition);
       break;
     case "or":
-      nodeData.img = OR_GATE;
-      nodeData.anchorPoints = [[1, 0.5], [0, 0.685], [0, 0.315]];
+      nodeData = new OrGate(null, nodePosition);
       break;
     case "xor":
-      nodeData.img = XOR_GATE;
-      nodeData.anchorPoints = [[1, 0.5], [0, 0.685], [0, 0.315]];
+      nodeData = new XorGate(null, nodePosition);
       break;
     case "not":
-      nodeData.img = NOT_GATE;
-      nodeData.anchorPoints = [[1, 0.5], [0, 0.5]];
-      break;
-    case "nand":
-      nodeData.img = NAND_GATE;
-      nodeData.anchorPoints = [[1, 0.5], [0, 0.685], [0, 0.315]];
-      break;
-    case "nor":
-      nodeData.img = NOR_GATE;
-      nodeData.anchorPoints = [[1, 0.5], [0, 0.685], [0, 0.315]];
-      break;
-    case "nxor":
-      nodeData.img = XNOR_GATE;
-      nodeData.anchorPoints = [[1, 0.5], [0, 0.685], [0, 0.315]];
+      nodeData = new NotGate(null, nodePosition);
       break;
     default:
       return;
   }
-  nodeData.id = "node" + nodeId++;
-  nodeData.shape = "image";
-  let { x, y } = graph.getPointByCanvas(100, 100);
-  nodeData.x = x;
-  nodeData.y = y;
-  nodeData.size = [100, 50];
-  nodeData.style = {
-    cursor: "move"
-  };
+
+  nodeData.id = "node" + nextNodeId++;
+
   const newNode = graph.addItem("node", nodeData);
   addAnchors(newNode);
-  // graph.paint();
+});
+
+function createLogicSchemeModel() {
+  const visitedEdges = {};
+
+  graph.getNodes().forEach(node => {
+    const nodeModel = node.getModel();
+    const nodeEdges = node.getEdges();
+
+    for (let edge of nodeEdges) {
+      const edgeModel = edge.getModel();
+      const edgeId = edgeModel.id;
+
+      console.log(edgeModel);
+      console.log(edgeId);
+
+      if (visitedEdges[edgeId])
+        continue;
+
+      console.log(nodeModel.getInputAnchors, nodeModel.getOutputAnchors);
+
+      const anchor = (edgeModel.target === node ? edgeModel.endPoint : edgeModel.startPoint).anchorIndex;
+      console.log(anchor);
+      //check anchor is output connector
+
+      console.log(nodeModel.getOutputAnchors().includes(anchor));
+
+      visitedEdges[edgeId] = edge;
+    }
+  });
+  console.log(visitedEdges);
+}
+
+document.getElementById("test-mode-btn").addEventListener("click", () => {
+  createLogicSchemeModel();
 });

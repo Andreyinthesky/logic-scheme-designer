@@ -25,6 +25,7 @@ const registerChangeInputStateBehavior = () => {
 
 const registerClickAddEdgeBehavior = () => {
   G6.registerBehavior("click-add-edge", {
+    nextEdgeIndex: 1,
     getEvents() {
       return {
         "node:click": "onClick",
@@ -50,9 +51,7 @@ const registerClickAddEdgeBehavior = () => {
           const {
             sourceAnchor
           } = edgeModel;
-          console.log(edge.sourceAnchor, sourceAnchor);
-          console.log(edge.targetAnchor, targetNodeAnchorIndex);
-          console.log(edgeModel.source, targetNodeModel.id);
+
           return (
             (
               edgeModel.source === edge.source &&
@@ -78,10 +77,12 @@ const registerClickAddEdgeBehavior = () => {
           target: targetNodeModel.id,
           targetAnchor: targetNodeAnchorIndex
         });
+
         this.edge = null;
         this.addingEdge = false;
       } else {
         this.edge = graph.addItem("edge", {
+          id: ("edge" + this.nextEdgeIndex++),
           source: targetNodeModel.id,
           sourceAnchor: targetNodeAnchorIndex,
           shape: "wire",
