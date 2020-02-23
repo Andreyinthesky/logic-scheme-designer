@@ -13,7 +13,7 @@ let scale = 1.0;
 const graphData = {
   nodes: [
     new AndGate("node1", { x: 250, y: 300 }),
-    new OrGate("node2", { x: 100, y: 200 }),
+    new NotGate("node2", { x: 100, y: 200 }),
     new Input("node3", { x: 300, y: 300 }),
     new Output("node4", { x: 550, y: 300 }),
   ]
@@ -171,33 +171,42 @@ document.getElementById("select-gate").addEventListener("click", event => {
 
 function createLogicSchemeModel() {
   const visitedEdges = {};
+  const elements = {};
 
   graph.getNodes().forEach(node => {
     const nodeModel = node.getModel();
-    const nodeEdges = node.getEdges();
+    const nodeId = nodeModel.id;
 
-    for (let edge of nodeEdges) {
+    console.log(node.getEdges());
+
+    for (let edge of node.getEdges()) {
       const edgeModel = edge.getModel();
       const edgeId = edgeModel.id;
 
-      console.log(edgeModel);
-      console.log(edgeId);
-
-      if (visitedEdges[edgeId])
+      if (visitedEdges[edgeId]) {
         continue;
+      }
 
-      console.log(nodeModel.getInputAnchors, nodeModel.getOutputAnchors);
+      const startNodeAnchorIndex = (edgeModel.target === nodeId ? edgeModel.targetAnchor : edgeModel.sourceAnchor);
+      const endNodeAnchorIndex = (edgeModel.target === nodeId ? edgeModel.sourceAnchor : edgeModel.targetAnchor);
+      console.log(startNodeAnchorIndex, endNodeAnchorIndex);
 
-      const anchor = (edgeModel.target === node ? edgeModel.endPoint : edgeModel.startPoint).anchorIndex;
-      console.log(anchor);
-      //check anchor is output connector
+      //check that anchor is output
+      const isOutputAnchor = nodeModel.getOutputAnchors().includes(startNodeAnchorIndex);
+      if (isOutputAnchor) {
+        const outElement = (edgeModel.target === nodeId ? edge.getSource() : edge.getTarget());
 
-      console.log(nodeModel.getOutputAnchors().includes(anchor));
+        if (!elements[nodeId]) {
+          elements[nodeId] = { node: nodeId, output: [] };
+        }
 
-      visitedEdges[edgeId] = edge;
+        elements[nodeId].output.push({ inputIndex: endNodeAnchorIndex, element: outElement.get("id") });
+        visitedEdges[edgeId] = edge;
+      }
     }
   });
   console.log(visitedEdges);
+  console.log(elements);
 }
 
 document.getElementById("test-mode-btn").addEventListener("click", () => {

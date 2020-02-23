@@ -13,11 +13,11 @@ export default class XorGate extends BaseElement {
   }
 
   getInputAnchors() {
-    return this.anchorPoints.slice(0, 2).map((_, i) => i);
+    return this.anchorPoints.map((_, i) => i).slice(0, 2);
   }
 
   getOutputAnchors() {
-    return this.anchorPoints.slice(2, 3).map((_, i) => i);
+    return this.anchorPoints.map((_, i) => i).slice(2, 3);
   }
 
   evaluate(in1, in2) { !in1 && in2 || in1 && !in2 };

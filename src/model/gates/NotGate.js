@@ -13,11 +13,11 @@ export default class NotGate extends BaseElement {
   }
 
   getInputAnchors() {
-    return this.anchorPoints.slice(0, 1).map((_, i) => i);
+    return this.anchorPoints.map((_, i) => i).slice(0, 1);
   }
 
   getOutputAnchors() {
-    return this.anchorPoints.slice(1, 2).map((_, i) => i);
+    return this.anchorPoints.map((_, i) => i).slice(1, 2);
   }
 
   evaluate(in1) { return !in1; }
