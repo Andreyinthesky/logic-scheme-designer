@@ -1,32 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Logic Scheme Designer. Demo</title>
 </head>
+
 <body>
   <h1>Logic Scheme Designer. Demo</h1>
   <h2 id="show-scale">Масштаб: 100%</h2>
   <button id="fit-btn">Установить точку (0,0)</button>
-  <div id="select-gate">
-    <table>
-      <tr>
-        <td id="buffer">БУФЕР</td>
-        <td id="and">И</td>
-        <td id="or">ИЛИ</td>
-        <td id="xor">ИСКЛ.ИЛИ</td>
-      </tr>
-      <tr>
-        <td id="not">ИНВЕРТОР</td>
-        <td id="nand">И-НЕ</td>
-        <td id="nor">ИЛИ-НЕ</td>
-        <td id="nxor">ИСКЛ.ИЛИ-НЕ</td>
-      </tr>
-    </table>
-  </div>
   <button id="test-mode-btn">Тест</button>
-  <div id="mountNode"></div>
-</body>
-</html>
 
+  <div class="editor-area">
+    <div id="select-gate">
+      <table>
+        <tr><td id="buffer">БУФЕР</td></tr>
+        <tr><td id="and">И</td></tr>
+        <tr><td id="or">ИЛИ</td></tr>
+        <tr><td id="xor">ИСКЛ.ИЛИ</td></tr>
+        <tr><td id="not">ИНВЕРТОР</td></tr>
+        <tr><td id="nand">И-НЕ</td></tr>
+        <tr><td id="nor">ИЛИ-НЕ</td></tr>
+        <tr><td id="nxor">ИСКЛ.ИЛИ-НЕ</td></tr>
+      </table>
+    </div>
+    <div id="mountNode"></div>
+  </div>
+</body>
+
+</html>
