@@ -15,8 +15,9 @@ const registerChangeInputStateBehavior = () => {
         const nodeModel = ev.item.getModel();
 
         if (nodeModel.shape == "input") {
-          const inputState = parseInt(nodeModel.label);
-          this.graph.updateItem(ev.item, { label: (1 - inputState).toString() });
+          // const inputState = parseInt(nodeModel.label);
+          // this.graph.updateItem(ev.item, { label: (1 - inputState).toString() });
+          this.graph.setItemState(ev.item, "enable", !ev.item.hasState("enable"));
         }
       }
     }
@@ -124,7 +125,7 @@ const registerClickAddEdgeBehavior = () => {
 };
 
 const defineOutput = () => {
-  const leftOffset = 10;
+  const leftOffset = 25;
 
   G6.registerNode("output", {
     draw(cfg, group) {
@@ -166,6 +167,20 @@ const defineOutput = () => {
         });
       }
 
+      //add background for better interaction
+      const marginX = -10;
+      group.addShape("rect", {
+        attrs: {
+          x: -size[0] / 2 + marginX,
+          y: -size[1] / 2,
+          width: size[0],
+          height: size[1],
+          fill: "white",
+          // fill: "red",
+          opacity: 0,
+        }
+      });
+
       return shape;
     },
 
@@ -186,13 +201,13 @@ const defineOutput = () => {
     },
 
     getDefaultSize() {
-      return [60, 60];
+      return [75, 60];
     },
   });
 };
 
 const defineInput = () => {
-  const rightOffset = 10;
+  const rightOffset = 25;
 
   G6.registerNode("input", {
     draw(cfg, group) {
@@ -217,21 +232,33 @@ const defineInput = () => {
         },
       });
 
-      if (cfg.label) {
-        const text = group.addShape("text", {
-          attrs: {
-            x: -rightOffset,
-            y: 4,
-            textAlign: "center",
-            textBaseline: "middle",
-            text: cfg.label,
-            fontWeight: "bold",
-            fontSize: 50,
-            fontFamily: "Segoe UI, sans-serif",
-            fill: cfg.color || "#000",
-          },
-        });
-      }
+      group.addShape("text", {
+        attrs: {
+          x: -rightOffset,
+          y: 4,
+          textAlign: "center",
+          textBaseline: "middle",
+          text: "0",
+          fontWeight: "bold",
+          fontSize: 50,
+          fontFamily: "Segoe UI, sans-serif",
+          fill: cfg.color || "#000",
+        },
+      });
+
+      //add background for better interaction
+      const marginX = 10;
+      group.addShape("rect", {
+        attrs: {
+          x: -cfg.size[0] / 2,
+          y: -cfg.size[1] / 2,
+          width: cfg.size[0] + marginX,
+          height: cfg.size[1],
+          // fill: "red",
+          fill: "white",
+          opacity: 0,
+        }
+      })
 
       return shape;
     },
@@ -246,6 +273,22 @@ const defineInput = () => {
       };
 
       return circleParams;
+    },
+
+    setState(name, value, item) {
+      const group = item.getContainer();
+      const shape = group.get('children')[1];
+      const label = group.get('children')[2];
+
+      if (name === 'enable') {
+        if (value) {
+          shape.attr('fill', 'red');
+          label.attr("text", "1");
+        } else {
+          shape.attr('fill', 'white');
+          label.attr("text", "0");
+        }
+      }
     },
   });
 }
