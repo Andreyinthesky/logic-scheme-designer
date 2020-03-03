@@ -142,7 +142,7 @@ document.getElementById("fit-btn").addEventListener("click", event => {
 });
 
 let nextNodeId = 5;
-document.getElementById("select-gate").addEventListener("click", event => {
+document.getElementById("select-obj").addEventListener("click", event => {
   let nodeData = null;
   const nodePosition = graph.getPointByCanvas(100, 100);
 
@@ -158,6 +158,12 @@ document.getElementById("select-gate").addEventListener("click", event => {
       break;
     case "not":
       nodeData = new NotGate(null, nodePosition);
+      break;
+    case "input":
+      nodeData = new Input(null, nodePosition);
+      break;
+    case "output":
+      nodeData = new Output(null, nodePosition);
       break;
     default:
       return;
@@ -281,6 +287,7 @@ let rankedElements;
 document.getElementById("testMode-btn").addEventListener("click", () => {
   if (testModeActivated) {
     document.getElementById("doTact-btn").disabled = true;
+    document.getElementById("discard-inputs-btn").disabled = true;
     document.getElementById("testMode-btn").classList.remove("active");
     testModeActivated = false;
     return;
@@ -290,6 +297,7 @@ document.getElementById("testMode-btn").addEventListener("click", () => {
   rankedElements = rankElements(logicSchemeModel);
   testModeActivated = true;
   document.getElementById("doTact-btn").disabled = false;
+  document.getElementById("discard-inputs-btn").disabled = false;
   document.getElementById("testMode-btn").classList.add("active");
 });
 

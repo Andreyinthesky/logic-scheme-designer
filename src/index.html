@@ -12,23 +12,28 @@
     <h1>Logic Scheme Designer. Demo</h1>
   </header>
   <div class="tools-panel">
-    <span class="scale-control">
-      <button class="down-scale">-</button>
-      <h2 id="show-scale">Масштаб: 100%</h2>
-      <button class="up-scale">+</button>
-    </span>
     <button id="fit-btn">Установить точку (0,0)</button>
+
+    <div class="scale-control">
+      <button class="down-scale">-</button>
+      <span id="show-scale">Масштаб: 100%</span>
+      <button class="up-scale">+</button>
+    </div>
+
     <button id="testMode-btn">Режим тестирования</button>
     <button id="doTact-btn" disabled>Сделать такт</button>
+    <button id="discard-inputs-btn" disabled>Сбросить входы</button>
   </div>
 
   <div class="editor-area">
-    <div id="select-gate">
-      <div>ЗАДЕРЖКА</div>
-      <div>И</div>
-      <div>ИЛИ</div>
-      <div>ИСКЛ.ИЛИ</div>
-      <div>НЕ</div>
+    <div id="select-obj">
+      <div id="delay" class="gate">ЭЛ. ЗАДЕРЖКИ</div>
+      <div id="and" class="gate">И</div>
+      <div id="or" class="gate">ИЛИ</div>
+      <div id="xor" class="gate">ИСКЛ.ИЛИ</div>
+      <div id="not" class="gate">НЕ</div>
+      <div id="input" class="io">ВХОД</div>
+      <div id="output" class="io">ВЫХОД</div>
     </div>
     <div id="mountNode"></div>
   </div>
