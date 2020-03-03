@@ -1,12 +1,12 @@
 import BaseElement from "./BaseElement";
 
 export default class Output extends BaseElement {
-  constructor(id, position, value) {
+  constructor(id, position) {
     super(id, position);
 
-    this.value = value || 0;
+    this.input = [false];
     this.shape = "output";
-    this.label = this.value.toString();
+    this.label = "0";
     this.anchorPoints = [[0, 0.5]];
   }
 

@@ -8,23 +8,27 @@
 </head>
 
 <body>
-  <h1>Logic Scheme Designer. Demo</h1>
-  <h2 id="show-scale">Масштаб: 100%</h2>
-  <button id="fit-btn">Установить точку (0,0)</button>
-  <button id="test-mode-btn">Тест</button>
+  <header>
+    <h1>Logic Scheme Designer. Demo</h1>
+  </header>
+  <div class="tools-panel">
+    <span class="scale-control">
+      <button class="down-scale">-</button>
+      <h2 id="show-scale">Масштаб: 100%</h2>
+      <button class="up-scale">+</button>
+    </span>
+    <button id="fit-btn">Установить точку (0,0)</button>
+    <button id="testMode-btn">Режим тестирования</button>
+    <button id="doTact-btn" disabled>Сделать такт</button>
+  </div>
 
   <div class="editor-area">
     <div id="select-gate">
-      <table>
-        <tr><td id="buffer">БУФЕР</td></tr>
-        <tr><td id="and">И</td></tr>
-        <tr><td id="or">ИЛИ</td></tr>
-        <tr><td id="xor">ИСКЛ.ИЛИ</td></tr>
-        <tr><td id="not">ИНВЕРТОР</td></tr>
-        <tr><td id="nand">И-НЕ</td></tr>
-        <tr><td id="nor">ИЛИ-НЕ</td></tr>
-        <tr><td id="nxor">ИСКЛ.ИЛИ-НЕ</td></tr>
-      </table>
+      <div>ЗАДЕРЖКА</div>
+      <div>И</div>
+      <div>ИЛИ</div>
+      <div>ИСКЛ.ИЛИ</div>
+      <div>НЕ</div>
     </div>
     <div id="mountNode"></div>
   </div>

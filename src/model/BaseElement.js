@@ -6,6 +6,8 @@ export default class BaseElement {
     this.style = {
       cursor: "move"
     };
+    this.input = [];
+    this.output = [];
   }
 
   getInputAnchors() {

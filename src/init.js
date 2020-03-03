@@ -15,9 +15,10 @@ const registerChangeInputStateBehavior = () => {
         const nodeModel = ev.item.getModel();
 
         if (nodeModel.shape == "input") {
-          // const inputState = parseInt(nodeModel.label);
-          // this.graph.updateItem(ev.item, { label: (1 - inputState).toString() });
-          this.graph.setItemState(ev.item, "enable", !ev.item.hasState("enable"));
+          const isEnable = ev.item.hasState("enable");
+
+          nodeModel.input = nodeModel.input.map(v => !isEnable);
+          this.graph.setItemState(ev.item, "enable", !isEnable);
         }
       }
     }
@@ -151,21 +152,19 @@ const defineOutput = () => {
         },
       });
 
-      if (cfg.label) {
-        const text = group.addShape("text", {
-          attrs: {
-            x: leftOffset / 2,
-            y: 4,
-            textAlign: "center",
-            textBaseline: "middle",
-            text: cfg.label,
-            fontWeight: "bold",
-            fontSize: 50,
-            fontFamily: "Segoe UI, sans-serif",
-            fill: cfg.color || "#000",
-          },
-        });
-      }
+      const text = group.addShape("text", {
+        attrs: {
+          x: leftOffset / 2,
+          y: 4,
+          textAlign: "center",
+          textBaseline: "middle",
+          text: "0",
+          fontWeight: "bold",
+          fontSize: 50,
+          fontFamily: "Segoe UI, sans-serif",
+          fill: cfg.color || "#000",
+        },
+      });
 
       //add background for better interaction
       const marginX = -10;
@@ -202,6 +201,19 @@ const defineOutput = () => {
 
     getDefaultSize() {
       return [75, 60];
+    },
+
+    setState(name, value, item) {
+      const group = item.getContainer();
+      const label = group.get("children")[2];
+
+      if (name === "enable") {
+        if (value) {
+          label.attr("text", "1");
+        } else {
+          label.attr("text", "0");
+        }
+      }
     },
   });
 };
@@ -277,15 +289,15 @@ const defineInput = () => {
 
     setState(name, value, item) {
       const group = item.getContainer();
-      const shape = group.get('children')[1];
-      const label = group.get('children')[2];
+      const shape = group.get("children")[1];
+      const label = group.get("children")[2];
 
-      if (name === 'enable') {
+      if (name === "enable") {
         if (value) {
-          shape.attr('fill', 'red');
+          shape.attr("fill", "red");
           label.attr("text", "1");
         } else {
-          shape.attr('fill', 'white');
+          shape.attr("fill", "white");
           label.attr("text", "0");
         }
       }

@@ -10,6 +10,7 @@ export default class AndGate extends BaseElement {
     this.img = AND_GATE;
     this.size = [100, 50];
     this.anchorPoints = [[0, 0.685], [0, 0.315], [1, 0.5]];
+    this.input = [false, false];
   }
 
   getInputAnchors() {
@@ -20,5 +21,5 @@ export default class AndGate extends BaseElement {
     return this.anchorPoints.map((_, i) => i).slice(2, 3);
   }
 
-  evaluate(in1, in2) { return in1 && in2 };
+  evaluate() { return this.input[0] && this.input[1] };
 }

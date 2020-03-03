@@ -169,6 +169,15 @@ document.getElementById("select-gate").addEventListener("click", event => {
   addAnchors(newNode);
 });
 
+const initElement = (element) => {
+  if (!(element instanceof Input)) {
+    element.input = element.input.map(v => false);
+  }
+
+  element.output = [];
+  element.rank = null;
+}
+
 function createLogicSchemeModel() {
   const visitedEdges = {};
   const elements = {};
@@ -176,8 +185,7 @@ function createLogicSchemeModel() {
   graph.getNodes().forEach(node => {
     const nodeModel = node.getModel();
     const nodeId = nodeModel.id;
-
-    console.log(node.getEdges());
+    initElement(nodeModel);
 
     for (let edge of node.getEdges()) {
       const edgeModel = edge.getModel();
@@ -189,26 +197,113 @@ function createLogicSchemeModel() {
 
       const startNodeAnchorIndex = (edgeModel.target === nodeId ? edgeModel.targetAnchor : edgeModel.sourceAnchor);
       const endNodeAnchorIndex = (edgeModel.target === nodeId ? edgeModel.sourceAnchor : edgeModel.targetAnchor);
-      console.log(startNodeAnchorIndex, endNodeAnchorIndex);
 
-      //check that anchor is output
       const isOutputAnchor = nodeModel.getOutputAnchors().includes(startNodeAnchorIndex);
       if (isOutputAnchor) {
         const outElement = (edgeModel.target === nodeId ? edge.getSource() : edge.getTarget());
 
         if (!elements[nodeId]) {
-          elements[nodeId] = { node: nodeId, output: [] };
+          elements[nodeId] = nodeModel;
         }
 
-        elements[nodeId].output.push({ inputIndex: endNodeAnchorIndex, element: outElement.get("id") });
+        const outElementId = outElement.get("id");
+        if (!elements[outElementId]) {
+          elements[outElementId] = outElement.getModel();
+        }
+
+        elements[nodeId].output.push({
+          inputIndex: endNodeAnchorIndex,
+          element: elements[outElementId],
+        });
         visitedEdges[edgeId] = edge;
       }
     }
   });
-  console.log(visitedEdges);
-  console.log(elements);
+
+  return Object.values(elements);
 }
 
-document.getElementById("test-mode-btn").addEventListener("click", () => {
-  createLogicSchemeModel();
+function rankElements(elements) {
+  const queue = elements.filter(element => element instanceof Input);
+
+  queue.forEach(element => element.rank = 0);
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+    const output = current.output;
+
+    output && output.forEach(outputObj => {
+      const output = outputObj.element;
+
+      if (output.rank < current.rank + 1) {
+        output.rank = current.rank + 1;
+      }
+
+      queue.push(output);
+    });
+  }
+
+  const rankedElements = [];
+  elements.forEach(element => {
+    const rank = element.rank;
+
+    if (!rankedElements[rank])
+      rankedElements[rank] = [];
+
+    rankedElements[rank].push(element);
+  });
+
+  return rankedElements;
+}
+
+function evalScheme(rankedElements) {
+  console.log("start eval");
+  const maxRank = rankedElements.length - 1;
+
+  for (let rank = 0; rank <= maxRank; rank++) {
+    rankedElements[rank].forEach(element => {
+      const outputs = element.output;
+
+      outputs && outputs.forEach(outputObj => {
+        const output = outputObj.element;
+        output.input[outputObj.inputIndex] = element.evaluate();
+      });
+    });
+  }
+
+  console.log("end eval");
+}
+
+
+let testModeActivated = false;
+let logicSchemeModel;
+let rankedElements;
+document.getElementById("testMode-btn").addEventListener("click", () => {
+  if (testModeActivated) {
+    document.getElementById("doTact-btn").disabled = true;
+    document.getElementById("testMode-btn").classList.remove("active");
+    testModeActivated = false;
+    return;
+  }
+
+  logicSchemeModel = createLogicSchemeModel();
+  rankedElements = rankElements(logicSchemeModel);
+  testModeActivated = true;
+  document.getElementById("doTact-btn").disabled = false;
+  document.getElementById("testMode-btn").classList.add("active");
+});
+
+document.getElementById("doTact-btn").addEventListener("click", () => {
+  console.log("do tact");
+
+  evalScheme(rankedElements);
+
+  logicSchemeModel
+    .filter(element => element instanceof Output)
+    .forEach(outElement => {
+      const outElementValue = outElement.input[0];
+      const outElementNode = graph.findById(outElement.id);
+
+      graph.setItemState(outElementNode, "enable", outElementValue);
+    })
 });
