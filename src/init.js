@@ -181,6 +181,23 @@ const defineOutput = () => {
         }
       });
 
+      //label text
+      const labelTextOffsetX = 12;
+      const labelTextOffsetY = -10;
+      group.addShape("text", {
+        attrs: {
+          x: labelTextOffsetX,
+          y: size[1] + labelTextOffsetY,
+          textAlign: "center",
+          textBaseline: "middle",
+          text: "ВЫХОД-1",
+          fontWeight: "bold",
+          fontSize: 14,
+          fontFamily: "Times New Roman, serif",
+          fill: cfg.color || "#000",
+        },
+      });
+
       return shape;
     },
 
@@ -271,7 +288,23 @@ const defineInput = () => {
           fill: "white",
           opacity: 0,
         }
-      })
+      });
+
+      //label text
+      const labelTextOffsetX = -22;
+      group.addShape("text", {
+        attrs: {
+          x: labelTextOffsetX,
+          y: cfg.size[1],
+          textAlign: "center",
+          textBaseline: "middle",
+          text: "ВХОД-1",
+          fontWeight: "bold",
+          fontSize: 14,
+          fontFamily: "Times New Roman, serif",
+          fill: cfg.color || "#000",
+        },
+      });
 
       return shape;
     },
@@ -415,7 +448,8 @@ export default function init() {
     minZoom: 0.2,
     groupType: "rect",
     modes: {
-      default: ["drag-node", "click-add-edge", "change-input-state"]
+      default: ["drag-node", "click-add-edge", ],
+      testScheme: ["change-input-state", ],
     }
   });
 }

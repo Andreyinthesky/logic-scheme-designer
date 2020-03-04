@@ -3,6 +3,7 @@ import init from "./init.js";
 
 import Input from "./model/Input";
 import Output from "./model/Output";
+import DelayGate from "./model/gates/DelayGate";
 import AndGate from "./model/gates/AndGate";
 import OrGate from "./model/gates/OrGate";
 import NotGate from "./model/gates/NotGate";
@@ -12,30 +13,20 @@ let scale = 1.0;
 
 const graphData = {
   nodes: [
-    new AndGate("node1", { x: 250, y: 300 }),
+    new AndGate("node1", { x: 150, y: 300 }),
     new NotGate("node2", { x: 100, y: 200 }),
     new Input("node3", { x: 300, y: 300 }),
     new Output("node4", { x: 550, y: 300 }),
+    new DelayGate("node5", { x: 650, y: 200 }),
   ]
 };
 
 const graph = init();
 
-// function Scheme() {
-//   this.customProp = 1;
-//   this.customFunc = function () {
-//     console.log("I'm custom method!");
-//   };
-// }
-
-// graph.logicSchemeModel = new Scheme();
-
 graphData.nodes.forEach(nodeData => {
   const newNode = graph.addItem("node", nodeData);
   addAnchors(newNode);
 });
-
-// console.log(graph);
 
 function addAnchors(node) {
   const model = node.getModel();
@@ -141,12 +132,15 @@ document.getElementById("fit-btn").addEventListener("click", event => {
   graph.translate(leftTopCorner.x * scale, leftTopCorner.y * scale);
 });
 
-let nextNodeId = 5;
+let nextNodeId = 10;
 document.getElementById("select-obj").addEventListener("click", event => {
   let nodeData = null;
   const nodePosition = graph.getPointByCanvas(100, 100);
 
   switch (event.target.id) {
+    case "delay":
+      nodeData = new DelayGate(null, nodePosition);
+      break;
     case "and":
       nodeData = new AndGate(null, nodePosition);
       break;
@@ -290,15 +284,17 @@ document.getElementById("testMode-btn").addEventListener("click", () => {
     document.getElementById("discard-inputs-btn").disabled = true;
     document.getElementById("testMode-btn").classList.remove("active");
     testModeActivated = false;
+    graph.setMode("default");
     return;
   }
 
   logicSchemeModel = createLogicSchemeModel();
   rankedElements = rankElements(logicSchemeModel);
-  testModeActivated = true;
   document.getElementById("doTact-btn").disabled = false;
   document.getElementById("discard-inputs-btn").disabled = false;
   document.getElementById("testMode-btn").classList.add("active");
+  testModeActivated = true;
+  graph.setMode("testScheme");
 });
 
 document.getElementById("doTact-btn").addEventListener("click", () => {
