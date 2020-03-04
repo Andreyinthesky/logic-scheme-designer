@@ -1,4 +1,5 @@
 import G6 from "@antv/g6";
+import DELAY_GATE from "./assets/svg_elements/Buffer_ANSI.svg";
 
 const registerChangeInputStateBehavior = () => {
   G6.registerBehavior("change-input-state", {
@@ -303,7 +304,61 @@ const defineInput = () => {
       }
     },
   });
-}
+};
+
+const defineDelayElement = () => {
+  G6.registerNode("delay", {
+    draw(cfg, group) {
+      cfg.size = [100, 50];
+
+      const shape = group.addShape("image", {
+        attrs: {
+          x: 0,
+          y: 0,
+          img: DELAY_GATE,
+          width: cfg.size[0],
+          height: cfg.size[1],
+        }
+      });
+
+      // z mark
+      const zMarkOffsetX = 15;
+      const zMarkOffsetY = -15;
+      group.addShape("text", {
+        attrs: {
+          x: cfg.size[0] / 2 + zMarkOffsetX,
+          y: cfg.size[1] / 2 + zMarkOffsetY,
+          textAlign: "center",
+          textBaseline: "middle",
+          text: "Z",
+          fontWeight: "bold",
+          fontSize: 14,
+          fontFamily: "Segoe UI, sans-serif",
+          fill: cfg.color || "#000",
+        },
+      });
+
+      //state
+      const stateTextOffsetX = -6;
+      const stateTextOffsetY = 1;
+      group.addShape("text", {
+        attrs: {
+          x: cfg.size[0] / 2 + stateTextOffsetX,
+          y: cfg.size[1] / 2 + stateTextOffsetY,
+          textAlign: "center",
+          textBaseline: "middle",
+          text: "0",
+          fontWeight: "bold",
+          fontSize: 20,
+          fontFamily: "Segoe UI, sans-serif",
+          fill: cfg.color || "#000",
+        },
+      });
+
+      return shape;
+    },
+  });
+};
 
 const defineWire = () => {
   const normalize = (sign) => {
@@ -345,13 +400,16 @@ export default function init() {
   defineWire();
   defineInput();
   defineOutput();
+  defineDelayElement();
 
   registerClickAddEdgeBehavior();
   registerChangeInputStateBehavior();
 
+  const mountNode = document.getElementById("mountNode");
+
   return new G6.Graph({
     container: "mountNode",
-    width: 1000,
+    width: mountNode.offsetWidth,
     height: 400,
     maxZoom: 3,
     minZoom: 0.2,
