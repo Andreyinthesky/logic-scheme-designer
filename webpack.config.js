@@ -8,6 +8,7 @@ module.exports = {
     path: path.resolve(__dirname, "dist"),
     filename: "bundle.js"
   },
+  devtool: `source-map`,
   devServer: {
     port: 8020
   },
@@ -20,6 +21,10 @@ module.exports = {
       {
         test: /\.svg$/,
         use: ["file-loader"]
+      },
+      {
+        test: /[\.eot|\.ttf|\.woff|\.woff2]$/,
+        use: ["file-loader"],
       }
     ]
   },

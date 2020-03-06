@@ -1,7 +1,21 @@
-@import "/node_modules/normalize.css/normalize.css";
+@import "~normalize.css";
+@import "../node_modules/@fortawesome/fontawesome-free/css/all.min.css";
+
+* {
+  box-sizing: border-box;
+}
 
 html {
   font-family: Roboto, Arial, sans-serif;
+}
+
+header {
+  padding: 8px 0;
+}
+
+h1 {
+  margin: 0;
+  padding: 0;
 }
 
 body {
@@ -10,6 +24,15 @@ body {
 
 button:hover {
   cursor: pointer;
+}
+
+ul, li {
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  list-style: none;
 }
 
 .tools-panel {
@@ -33,16 +56,22 @@ button:hover {
 
 span#show-scale {
   font-weight: bold;
+  max-width: 20px;
 }
 
 #mountNode {
   display: inline-block;
-  border: 2px dashed black;
+  border: 1px solid #000;
+  box-shadow: 1px -1px 2px 2px #000a;
   width: 1000px;
+
+  position: absolute !important;
+  top: 0px;
+  left: 320px;
 }
 
 .editor-area {
-  display: flex;
+  position: relative;
   margin-top: 50px;
 }
 
@@ -65,7 +94,7 @@ span#show-scale {
 }
 
 #testMode-btn.active {
-  background-color: #41905b;
+  background-color: #41705b;
 }
 
 #testMode-btn:hover {
@@ -89,38 +118,46 @@ span#show-scale {
 #discard-inputs-btn[disabled] {
   background-color: rgb(165, 133, 121);
   color: rgb(66, 57, 50);
-}
-
-#select-obj div {
-  min-width: 150px;
-  padding: 20px;
-  cursor: pointer;
-  border: 1px solid;
-  background-color: rgb(74, 127, 241);
-  color: white;
-  text-align: center;
-}
-
-#select-obj .gate {
-  background-color: rgb(74, 127, 241);
-}
-
-#select-obj .gate:hover {
-  background-color: rgb(20, 90, 241);
-}
-
-#select-obj .io {
-  background-color: rgb(204, 47, 40);
-}
-
-#select-obj .io:hover {
-  background-color: rgb(164, 27, 40);
+  cursor: default;
 }
 
 #select-obj {
   display: flex;
+  width: 300px;
   flex-direction: column;
   font-size: 14px;
   margin-right: 20px;
   border: 2px solid black;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 8px;
+  background-color: #41ac5b;
+  position: relative;
+}
+
+.card-header .toggle {
+  padding: 8px;
+  cursor: pointer;
+}
+
+ul.card-body {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+ul.card-body li {
+  width: 148px;
+  text-align: center;
+  border: 1px solid #000;
+  padding: 8px;
+}
+
+.obj .img {
+  height: 50px;
+  background-color: #41705b;
 }
