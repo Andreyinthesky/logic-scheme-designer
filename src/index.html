@@ -12,12 +12,20 @@
     <h1>Logic Scheme Designer. Demo</h1>
   </header>
   <div class="tools-panel">
-    <button id="fit-btn">Установить точку (0,0)</button>
+    <button id="fit-btn">
+      <i class="fas fa-compress"></i>
+      В начало координат
+    </button>
 
     <div class="scale-control">
-      <button class="down-scale">-</button>
-      <span id="show-scale">Масштаб: 100%</span>
-      <button class="up-scale">+</button>
+      <button class="down-scale">
+        <i class="fas fa-minus"></i>
+      </button>
+      <i class="fas fa-search"></i>
+      <span id="show-scale"> 100%</span>
+      <button class="up-scale">
+        <i class="fas fa-plus"></i>
+      </button>
     </div>
 
     <button id="testMode-btn">Режим тестирования</button>
@@ -26,15 +34,48 @@
   </div>
 
   <div class="editor-area">
-    <div id="select-obj">
-      <div id="delay" class="gate">ЭЛ. ЗАДЕРЖКИ</div>
+    <ul id="select-obj" class="obj-list">
+      <li class="card">
+        <div class="card-header">
+          <span class="card-title">Базовые элементы</span>
+          <i class="fas fa-caret-down toggle"></i>
+        </div>
+        <ul class="card-body">
+          <li class="obj">
+            <div class="img">Картинка</div>
+            <span class="name">И</span>
+          </li>
+          <li class="obj">
+            <div class="img">Картинка</div>
+            <span class="name">Элемент</span>
+          </li>
+          <li class="obj">
+            <div class="img">Картинка</div>
+            <span class="name">Элемент</span>
+          </li>
+        </ul>
+      </li>
+      <li class="card">
+        <div class="card-header">
+          <span class="card-title">Вход/Выход</span>
+          <i class="fas fa-caret-down toggle"></i>
+        </div>
+        <ul class="card-body">
+          <li class="obj">
+            <div class="img">Картинка</div>
+            <span class="name">Элемент</span>
+          </li>
+        </ul>
+      </li>
+    </ul>
+
+    <!-- <div id="delay" class="gate">ЭЛ. ЗАДЕРЖКИ</div>
       <div id="and" class="gate">И</div>
       <div id="or" class="gate">ИЛИ</div>
       <div id="xor" class="gate">ИСКЛ.ИЛИ</div>
       <div id="not" class="gate">НЕ</div>
       <div id="input" class="io">ВХОД</div>
-      <div id="output" class="io">ВЫХОД</div>
-    </div>
+      <div id="output" class="io">ВЫХОД</div> -->
     <div id="mountNode"></div>
   </div>
 </body>
