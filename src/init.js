@@ -11,8 +11,8 @@ export default function init() {
     minZoom: 0.2,
     groupType: "rect",
     modes: {
-      default: ["drag-node", "click-add-edge", ],
-      testScheme: ["change-input-state", ],
+      default: ["drag-node", "click-add-edge", "drag-canvas"],
+      testScheme: ["change-input-state", "drag-canvas"],
     }
   });
 }

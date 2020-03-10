@@ -99,33 +99,6 @@ graph.on("wheel", ev => {
     "%";
 });
 
-graph.on("click", ev => {
-  console.log("click canvas");
-});
-
-let dragCanvas = false;
-let dragCanvasCoord;
-graph.on("canvas:mousedown", ev => {
-  dragCanvas = true;
-  dragCanvasCoord = { x: ev.x, y: ev.y };
-});
-
-graph.on("mousemove", ev => {
-  if (!dragCanvas || !dragCanvasCoord) return;
-  console.log("drag canvas");
-  graph.translate((ev.x - dragCanvasCoord.x) * scale, (ev.y - dragCanvasCoord.y) * scale);
-});
-
-graph.on("mouseup", ev => {
-  console.log("end drag");
-  dragCanvas = false;
-});
-
-graph.on("canvas:mouseout", ev => {
-  console.log("end drag");
-  dragCanvas = false;
-});
-
 document.getElementById("fit-btn").addEventListener("click", event => {
   console.log("try to move to (0,0)");
   const leftTopCorner = graph.getPointByCanvas(0, 0);
