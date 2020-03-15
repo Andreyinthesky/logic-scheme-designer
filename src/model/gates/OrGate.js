@@ -3,9 +3,10 @@ import BaseElement from "../BaseElement";
 import OR_GATE from "../../assets/svg_elements/OR_ANSI.svg";
 
 export default class OrGate extends BaseElement {
-  constructor(id, position) {
-    super(id, position);
+  constructor(index, position) {
+    super("or" + index, position);
 
+    this.index = index;
     this.shape = "image";
     this.img = OR_GATE;
     this.size = [100, 50];

@@ -3,9 +3,10 @@ import BaseElement from "../BaseElement";
 import XOR_GATE from "../../assets/svg_elements/XOR_ANSI.svg";
 
 export default class XorGate extends BaseElement {
-  constructor(id, position) {
-    super(id, position);
+  constructor(index, position) {
+    super("xor" + index, position);
 
+    this.index = index;
     this.shape = "image";
     this.img = XOR_GATE;
     this.size = [100, 50];

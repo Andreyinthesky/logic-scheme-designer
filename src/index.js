@@ -1,5 +1,6 @@
 import "./index.css";
 import init from "./init.js";
+import EditorObjIndexer from "./indexer";
 
 import Input from "./model/Input";
 import Output from "./model/Output";
@@ -10,18 +11,20 @@ import NotGate from "./model/gates/NotGate";
 import XorGate from "./model/gates/XorGate";
 
 let scale = 1.0;
+const graph = init();
+
+graph.indexer = new EditorObjIndexer();
+
 
 const graphData = {
   nodes: [
-    new AndGate("node1", { x: 150, y: 300 }),
-    new NotGate("node2", { x: 100, y: 200 }),
-    new Input("node3", { x: 300, y: 300 }),
-    new Output("node4", { x: 550, y: 300 }),
-    new DelayGate("node5", { x: 650, y: 200 }),
+    new AndGate(graph.indexer.getNextIndex("and"), { x: 150, y: 300 }),
+    new NotGate(graph.indexer.getNextIndex("not"), { x: 100, y: 200 }),
+    new Input(graph.indexer.getNextIndex("input"), { x: 300, y: 300 }),
+    new Output(graph.indexer.getNextIndex("output"), { x: 550, y: 300 }),
+    new DelayGate(graph.indexer.getNextIndex("delay"), { x: 650, y: 200 }),
   ]
 };
-
-const graph = init();
 
 graphData.nodes.forEach(nodeData => {
   const newNode = graph.addItem("node", nodeData);
@@ -105,38 +108,35 @@ document.getElementById("fit-btn").addEventListener("click", event => {
   graph.translate(leftTopCorner.x * scale, leftTopCorner.y * scale);
 });
 
-let nextNodeId = 10;
 document.getElementById("select-obj").addEventListener("click", event => {
   let nodeData = null;
   const nodePosition = graph.getPointByCanvas(100, 100);
 
   switch (event.target.id) {
     case "delay":
-      nodeData = new DelayGate(null, nodePosition);
+      nodeData = new DelayGate(graph.indexer.getNextIndex("delay"), nodePosition);
       break;
     case "and":
-      nodeData = new AndGate(null, nodePosition);
+      nodeData = new AndGate(graph.indexer.getNextIndex("and"), nodePosition);
       break;
     case "or":
-      nodeData = new OrGate(null, nodePosition);
+      nodeData = new OrGate(graph.indexer.getNextIndex("or"), nodePosition);
       break;
     case "xor":
-      nodeData = new XorGate(null, nodePosition);
+      nodeData = new XorGate(graph.indexer.getNextIndex("xor"), nodePosition);
       break;
     case "not":
-      nodeData = new NotGate(null, nodePosition);
+      nodeData = new NotGate(graph.indexer.getNextIndex("not"), nodePosition);
       break;
     case "input":
-      nodeData = new Input(null, nodePosition);
+      nodeData = new Input(graph.indexer.getNextIndex("input"), nodePosition);
       break;
     case "output":
-      nodeData = new Output(null, nodePosition);
+      nodeData = new Output(graph.indexer.getNextIndex("output"), nodePosition);
       break;
     default:
       return;
   }
-
-  nodeData.id = "node" + nextNodeId++;
 
   const newNode = graph.addItem("node", nodeData);
   addAnchors(newNode);

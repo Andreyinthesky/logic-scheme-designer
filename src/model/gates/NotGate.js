@@ -3,9 +3,10 @@ import BaseElement from "../BaseElement";
 import NOT_GATE from "../../assets/svg_elements/NOT_ANSI.svg";
 
 export default class NotGate extends BaseElement {
-  constructor(id, position) {
-    super(id, position);
+  constructor(index, position) {
+    super("not" + index, position);
 
+    this.index = index;
     this.shape = "image";
     this.img = NOT_GATE;
     this.size = [100, 50];

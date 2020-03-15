@@ -1,6 +1,5 @@
 
 const clickAddEdgeBehaviour = {
-  nextEdgeIndex: 1,
   getEvents() {
     return {
       "node:click": "onClick",
@@ -57,7 +56,7 @@ const clickAddEdgeBehaviour = {
       this.addingEdge = false;
     } else {
       this.edge = graph.addItem("edge", {
-        id: ("edge" + this.nextEdgeIndex++),
+        id: ("wire" + this.graph.indexer.getNextIndex("wire")),
         source: targetNodeModel.id,
         sourceAnchor: targetNodeAnchorIndex,
         shape: "wire",

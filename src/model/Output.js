@@ -1,9 +1,10 @@
 import BaseElement from "./BaseElement";
 
 export default class Output extends BaseElement {
-  constructor(id, position) {
-    super(id, position);
+  constructor(index, position) {
+    super("output" + index, position);
 
+    this.index = index;
     this.input = [false];
     this.shape = "output";
     this.label = "0";

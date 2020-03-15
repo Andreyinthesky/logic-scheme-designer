@@ -3,9 +3,10 @@ import BaseElement from "../BaseElement";
 import AND_GATE from "../../assets/svg_elements/AND_ANSI.svg";
 
 export default class AndGate extends BaseElement {
-  constructor(id, position) {
-    super(id, position);
+  constructor(index, position) {
+    super("and" + index, position);
 
+    this.index = index;
     this.shape = "image";
     this.img = AND_GATE;
     this.size = [100, 50];
