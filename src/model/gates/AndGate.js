@@ -1,15 +1,12 @@
 import BaseElement from "../BaseElement";
 
-import AND_GATE from "../../assets/svg_elements/AND_ANSI.svg";
-
 export default class AndGate extends BaseElement {
   constructor(index, position) {
     super("and" + index, position);
 
     this.index = index;
-    this.shape = "image";
-    this.img = AND_GATE;
-    this.size = [100, 50];
+    this.shape = "and";
+    this.label = `И-${index}`;
     this.anchorPoints = [[0, 0.685], [0, 0.315], [1, 0.5]];
     this.input = [false, false];
   }

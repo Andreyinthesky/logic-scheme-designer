@@ -7,7 +7,7 @@ export default class Input extends BaseElement {
     this.index = index;
     this.input = [false];
     this.shape = "input";
-    this.label = "0";
+    this.label = `ВХОД-${index}`;
     this.anchorPoints = [[1, 0.5]];
   }
 

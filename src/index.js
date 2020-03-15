@@ -21,6 +21,8 @@ const graphData = {
     new AndGate(graph.indexer.getNextIndex("and"), { x: 150, y: 300 }),
     new NotGate(graph.indexer.getNextIndex("not"), { x: 100, y: 200 }),
     new Input(graph.indexer.getNextIndex("input"), { x: 300, y: 300 }),
+    new OrGate(graph.indexer.getNextIndex("or"), { x: 450, y: 300 }),
+    new XorGate(graph.indexer.getNextIndex("xor"), { x: 350, y: 100 }),
     new Output(graph.indexer.getNextIndex("output"), { x: 550, y: 300 }),
     new DelayGate(graph.indexer.getNextIndex("delay"), { x: 650, y: 200 }),
   ]

@@ -1,5 +1,5 @@
-const rightOffset = 25;
-const defaultSize = [60, 50];
+const connectorOffset = 25;
+const defaultSize = [75, 50];
 
 const input = {
   draw(cfg, group) {
@@ -10,7 +10,7 @@ const input = {
     const shape = group.addShape("path", {
       attrs: {
         ...cfg.style,
-        path: [["M", width / 2, 0], ["l", -rightOffset, 0]],
+        path: [["M", width / 2, 0], ["l", -connectorOffset, 0]],
         stroke: cfg.color || "#000",
         lineWidth: 3,
       }
@@ -28,13 +28,13 @@ const input = {
 
     group.addShape("text", {
       attrs: {
-        x: -rightOffset,
-        y: 4,
+        x: -width / 2 + height / 2,
+        y: 3,
         textAlign: "center",
         textBaseline: "middle",
         text: "0",
         fontWeight: "bold",
-        fontSize: 50,
+        fontSize: 40,
         fontFamily: "Segoe UI, sans-serif",
         fill: cfg.color || "#000",
       },
@@ -54,14 +54,13 @@ const input = {
     });
 
     //label text
-    const labelTextOffsetX = -22;
     group.addShape("text", {
       attrs: {
-        x: labelTextOffsetX,
-        y: height,
+        x: -width / 2 + height / 2,
+        y: height / 2 + 7,
         textAlign: "center",
-        textBaseline: "middle",
-        text: "ВХОД-1",
+        textBaseline: "top",
+        text: cfg.label,
         fontWeight: "bold",
         fontSize: 14,
         fontFamily: "Times New Roman, serif",
@@ -74,11 +73,12 @@ const input = {
 
   getCircleParams(cfg) {
     const width = cfg.size[0];
+    const height = cfg.size[1];
 
     const circleParams = {
-      x: -rightOffset,
+      x: -width / 2 + height / 2,
       y: 0,
-      r: width / 2,
+      r: height / 2,
     };
 
     return circleParams;

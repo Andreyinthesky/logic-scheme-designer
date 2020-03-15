@@ -7,7 +7,7 @@ export default class Output extends BaseElement {
     this.index = index;
     this.input = [false];
     this.shape = "output";
-    this.label = "0";
+    this.label = `ВЫХОД-${index}`;
     this.anchorPoints = [[0, 0.5]];
   }
 

@@ -3,15 +3,32 @@ import DELAY_GATE from "../../assets/svg_elements/Buffer_ANSI.svg";
 const delay = {
   draw(cfg, group) {
     cfg.size = [100, 50];
+    const width = cfg.size[0];
+    const height = cfg.size[1];
 
     const shape = group.addShape("image", {
       attrs: {
-        x: 0,
-        y: 0,
+        x: -width / 2,
+        y: -height / 2,
         img: DELAY_GATE,
-        width: cfg.size[0],
-        height: cfg.size[1],
+        width: width,
+        height: height,
       }
+    });
+
+    //label text
+    group.addShape("text", {
+      attrs: {
+        x: 0,
+        y: height / 2,
+        textAlign: "center",
+        textBaseline: "top",
+        text: cfg.label,
+        fontWeight: "bold",
+        fontSize: 14,
+        fontFamily: "Times New Roman, serif",
+        fill: cfg.color || "#000",
+      },
     });
 
     // z mark
@@ -19,8 +36,8 @@ const delay = {
     const zMarkOffsetY = -15;
     group.addShape("text", {
       attrs: {
-        x: cfg.size[0] / 2 + zMarkOffsetX,
-        y: cfg.size[1] / 2 + zMarkOffsetY,
+        x: zMarkOffsetX,
+        y: zMarkOffsetY,
         textAlign: "center",
         textBaseline: "middle",
         text: "Z",
@@ -36,8 +53,8 @@ const delay = {
     const stateTextOffsetY = 1;
     group.addShape("text", {
       attrs: {
-        x: cfg.size[0] / 2 + stateTextOffsetX,
-        y: cfg.size[1] / 2 + stateTextOffsetY,
+        x: stateTextOffsetX,
+        y: stateTextOffsetY,
         textAlign: "center",
         textBaseline: "middle",
         text: "0",

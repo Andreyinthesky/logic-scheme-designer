@@ -1,5 +1,5 @@
-const leftOffset = 25;
-const defaultSize = [75, 60];
+const connectorOffset = 25;
+const defaultSize = [65, 50];
 
 const output = {
   draw(cfg, group) {
@@ -10,7 +10,7 @@ const output = {
     const shape = group.addShape("path", {
       attrs: {
         ...cfg.style,
-        path: [["M", -width / 2, 0], ["l", leftOffset, 0]],
+        path: [["M", -width / 2, 0], ["l", connectorOffset, 0]],
         stroke: cfg.color || "#000",
         lineWidth: 3,
       }
@@ -28,25 +28,25 @@ const output = {
 
     const text = group.addShape("text", {
       attrs: {
-        x: leftOffset / 2,
-        y: 4,
+        x: connectorOffset / 2,
+        y: 3,
         textAlign: "center",
         textBaseline: "middle",
         text: "0",
         fontWeight: "bold",
-        fontSize: 50,
+        fontSize: 40,
         fontFamily: "Segoe UI, sans-serif",
         fill: cfg.color || "#000",
       },
     });
 
     //add background for better interaction
-    const marginX = -10;
+    const marginX = 10;
     group.addShape("rect", {
       attrs: {
-        x: -width / 2 + marginX,
+        x: -width / 2 - marginX,
         y: -height / 2,
-        width: width,
+        width: width + marginX,
         height: height,
         fill: "white",
         opacity: 0,
@@ -54,15 +54,13 @@ const output = {
     });
 
     //label text
-    const labelTextOffsetX = 12;
-    const labelTextOffsetY = -10;
     group.addShape("text", {
       attrs: {
-        x: labelTextOffsetX,
-        y: height + labelTextOffsetY,
+        x: width / 2 - (width - connectorOffset) / 2,
+        y: height / 2 + 7,
         textAlign: "center",
-        textBaseline: "middle",
-        text: "ВЫХОД-1",
+        textBaseline: "top",
+        text: cfg.label,
         fontWeight: "bold",
         fontSize: 14,
         fontFamily: "Times New Roman, serif",
@@ -78,10 +76,10 @@ const output = {
     const height = cfg.size[1];
 
     const path = [
-      ["M", -width / 2 + leftOffset, height / 2],
+      ["M", -width / 2 + connectorOffset, height / 2],
       ["L", width / 2, height / 2],
       ["L", width / 2, -height / 2],
-      ["L", -width / 2 + leftOffset, -height / 2],
+      ["L", -width / 2 + connectorOffset, -height / 2],
       ["Z"]
     ];
 

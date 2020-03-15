@@ -7,6 +7,7 @@ export default class DelayGate extends BaseElement {
 
     this.index = index;
     this.shape = "delay";
+    this.label = `ЗАДЕРЖ-${index}`;
     this.anchorPoints = [[0, 0.5], [1, 0.5]];
     this.input = [false];
   }
