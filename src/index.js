@@ -18,13 +18,13 @@ graph.indexer = new EditorObjIndexer();
 
 const graphData = {
   nodes: [
-    new AndGate(graph.indexer.getNextIndex("and"), { x: 150, y: 300 }),
-    new NotGate(graph.indexer.getNextIndex("not"), { x: 100, y: 200 }),
-    new Input(graph.indexer.getNextIndex("input"), { x: 300, y: 300 }),
-    new OrGate(graph.indexer.getNextIndex("or"), { x: 450, y: 300 }),
-    new XorGate(graph.indexer.getNextIndex("xor"), { x: 350, y: 100 }),
-    new Output(graph.indexer.getNextIndex("output"), { x: 550, y: 300 }),
-    new DelayGate(graph.indexer.getNextIndex("delay"), { x: 650, y: 200 }),
+    new AndGate(graph.indexer.getNextIndex("and"), { x: 250, y: 100 }),
+    new NotGate(graph.indexer.getNextIndex("not"), { x: 150, y: 50 }),
+    new Input(graph.indexer.getNextIndex("input"), { x: 150, y: 150 }),
+    new OrGate(graph.indexer.getNextIndex("or"), { x: 250, y: 200 }),
+    new XorGate(graph.indexer.getNextIndex("xor"), { x: 150, y: 250 }),
+    new Output(graph.indexer.getNextIndex("output"), { x: 250, y: 300 }),
+    new DelayGate(graph.indexer.getNextIndex("delay"), { x: 150, y: 350 }),
   ]
 };
 
@@ -110,11 +110,40 @@ document.getElementById("fit-btn").addEventListener("click", event => {
   graph.translate(leftTopCorner.x * scale, leftTopCorner.y * scale);
 });
 
-document.getElementById("select-obj").addEventListener("click", event => {
+document.getElementById("delay").addEventListener("click", evt => {
+  addNode("delay");
+});
+
+document.getElementById("and").addEventListener("click", evt => {
+  addNode("and");
+});
+
+document.getElementById("or").addEventListener("click", evt => {
+  addNode("or");
+});
+
+document.getElementById("xor").addEventListener("click", evt => {
+  addNode("xor");
+});
+
+document.getElementById("not").addEventListener("click", evt => {
+  addNode("not");
+});
+
+document.getElementById("input").addEventListener("click", evt => {
+  addNode("input");
+});
+
+document.getElementById("output").addEventListener("click", evt => {
+  addNode("output");
+});
+
+
+function addNode(type) {
   let nodeData = null;
   const nodePosition = graph.getPointByCanvas(100, 100);
 
-  switch (event.target.id) {
+  switch (type) {
     case "delay":
       nodeData = new DelayGate(graph.indexer.getNextIndex("delay"), nodePosition);
       break;
@@ -142,7 +171,7 @@ document.getElementById("select-obj").addEventListener("click", event => {
 
   const newNode = graph.addItem("node", nodeData);
   addAnchors(newNode);
-});
+};
 
 const initElement = (element) => {
   if (!(element instanceof Input)) {

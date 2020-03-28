@@ -4,63 +4,111 @@
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Logic Scheme Designer. Demo</title>
+  <title>Конструктор логических схем</title>
 </head>
 
 <body>
   <header>
-    <h1>Logic Scheme Designer. Demo</h1>
-  </header>
-  <div class="tools-panel">
-    <button id="fit-btn">
-      <i class="fas fa-compress"></i>
-      В начало координат
-    </button>
+    <h1>Конструктор логических схем</h1>
 
-    <div class="scale-control">
-      <button class="down-scale">
-        <i class="fas fa-minus"></i>
+    <div class="tools-panel">
+      <button class="" title="Отменить (Undo)">
+        <i class="fas fa-reply"></i>
       </button>
-      <i class="fas fa-search"></i>
-      <span id="show-scale"> 100%</span>
-      <button class="up-scale">
-        <i class="fas fa-plus"></i>
+      <button class="" title="Повторить (Redo)">
+        <i class="fas fa-share"></i>
       </button>
+      <button title="Удалить (Delete)">
+        <i class="fas fa-trash-alt"></i>
+      </button>
+      <button id="fit-btn" title="В начало координат (Go to origin)">
+        <i class="fas fa-compress"></i>
+      </button>
+
+      <div class="scale-control">
+        <button title="Масштаб (Scale)">
+          <i class="fas fa-search"></i>
+          <i class="fas fa-angle-down"></i>
+        </button>
+        <button class="down-scale" title="Уменьшить масштаб (Down scale)">
+          <i class="fas fa-search-minus"></i>
+        </button>
+        <button class="up-scale" title="Увеличить масштаб (Up scale)">
+          <i class="fas fa-search-plus"></i>
+        </button>
+      </div>
+
+      <div class="scheme-control">
+        <button id="testMode-btn">Режим тестирования</button>
+        <button id="doTact-btn" disabled>Сделать такт</button>
+        <button id="discard-inputs-btn" disabled>Сбросить входы</button>
+      </div>
     </div>
 
-    <button id="testMode-btn">Режим тестирования</button>
-    <button id="doTact-btn" disabled>Сделать такт</button>
-    <button id="discard-inputs-btn" disabled>Сбросить входы</button>
-  </div>
+    <div class="app-control">
+      <button>
+        <i class="fas fa-cloud-upload-alt"></i>
+        Загрузить...
+      </button>
+      <button>
+        <i class="fas fa-download"></i>
+        Экспорт в файл
+      </button>
+    </div>
+  </header>
 
   <div class="editor-area">
     <ul id="select-obj" class="obj-list">
       <li class="card">
         <div class="card-header">
           <span class="card-title">Базовые элементы</span>
-          <i class="fas fa-caret-down toggle"></i>
+          <i class="fas fa-caret-up toggle"></i>
         </div>
         <ul class="card-body">
-          <li class="obj">
-            <div class="img">Картинка</div>
+          <li id="and" class="obj and-gate">
+            <div class="img"></div>
             <span class="name">И</span>
           </li>
-          <li class="obj">
-            <div class="img">Картинка</div>
-            <span class="name">Элемент</span>
+          <li id="or" class="obj or-gate">
+            <div class="img"></div>
+            <span class="name">ИЛИ</span>
           </li>
-          <li class="obj">
+          <li id="not" class="obj not-gate">
+            <div class="img"></div>
+            <span class="name">НЕ</span>
+          </li>
+          <li id="xor" class="obj xor-gate">
+            <div class="img"></div>
+            <span class="name">ИСКЛ.ИЛИ</span>
+          </li>
+          <li id="delay" class="obj delay-gate">
             <div class="img">Картинка</div>
-            <span class="name">Элемент</span>
+            <span class="name">ЭЛ.ЗАДЕРЖКИ</span>
           </li>
         </ul>
       </li>
       <li class="card">
         <div class="card-header">
           <span class="card-title">Вход/Выход</span>
-          <i class="fas fa-caret-down toggle"></i>
+          <i class="fas fa-caret-up toggle"></i>
         </div>
         <ul class="card-body">
+          <li id="input" class="obj input">
+            <div class="img">Картинка</div>
+            <span class="name">ВХОД</span>
+          </li>
+          <li id="output" class="obj output">
+            <div class="img">Картинка</div>
+            <span class="name">ВЫХОД</span>
+          </li>
+        </ul>
+      </li>
+      <li class="card">
+        <div class="card-header">
+          <span class="card-title">Скрытый</span>
+          <i class="fas fa-caret-down toggle"></i>
+        </div>
+        <ul class="card-body" style="display: none;">
           <li class="obj">
             <div class="img">Картинка</div>
             <span class="name">Элемент</span>
@@ -69,14 +117,50 @@
       </li>
     </ul>
 
-    <!-- <div id="delay" class="gate">ЭЛ. ЗАДЕРЖКИ</div>
-      <div id="and" class="gate">И</div>
-      <div id="or" class="gate">ИЛИ</div>
-      <div id="xor" class="gate">ИСКЛ.ИЛИ</div>
-      <div id="not" class="gate">НЕ</div>
-      <div id="input" class="io">ВХОД</div>
-      <div id="output" class="io">ВЫХОД</div> -->
-    <div id="mountNode"></div>
+    <!-- context menu -->
+    <div class="context-menu">
+      <ul class="context-menu__list">
+        <li>
+          <i class="fas fa-trash-alt"></i>
+          Удалить
+        </li>
+        <li>
+          <i class="fas fa-exchange-alt"></i>
+          Повернуть на 180&#176;
+        </li>
+      </ul>
+    </div>
+
+    <!-- messages -->
+    <div class="msg-list" style="display: none;">
+      <ul>
+        <li class="msg error">
+          <span class="msg-close"><i class="fas fa-times"></i></span>
+          <div class="msg-text">Текст сообщения Текст сообщения Текст сообщения Текст сообщения Текст сообщения Текст сообщения</div>
+          <button class="focus"><i class="fas fa-share-square"></i>Перейти</button>
+        </li>
+        <li class="msg warning">
+          <span class="msg-close"><i class="fas fa-times"></i></span>
+          <div class="msg-text">Текст сообщения</div>
+          <button class="focus"><i class="fas fa-share-square"></i>Перейти</button>
+        </li>
+        <li class="msg success">
+          <span class="msg-close"><i class="fas fa-times"></i></span>
+          <div class="msg-text">Текст сообщения</div>
+        </li>
+        <li class="msg">
+          <span class="msg-close"><i class="fas fa-times"></i></span>
+          <div class="msg-text">Текст сообщения</div>
+        </li>
+      </ul>
+    </div>
+    <div id="mountNode">
+      <span class="show-scale">
+        Масштаб:
+        <span id="show-scale"> 100%</span>
+      </span>
+    </div>
+
   </div>
 </body>
 
