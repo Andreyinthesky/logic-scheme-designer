@@ -265,6 +265,18 @@ ul.card-body li:hover {
   background-image: url(assets/svg_elements/XOR_ANSI.svg);
 }
 
+.obj.delay-gate .img {
+  background-image: url(assets/svg_elements/Delay.svg);
+}
+
+.obj.input .img {
+  background-image: url(assets/svg_elements/Input.svg);
+}
+
+.obj.output .img {
+  background-image: url(assets/svg_elements/Output.svg);
+}
+
 /* MESSAGES */
 
 .msg-list {
