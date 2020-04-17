@@ -15,8 +15,18 @@ const clickAddEdgeBehaviour = {
       x: ev.x,
       y: ev.y
     };
+    const anchorPoint = targetNode.getLinkPoint(point);
+
+    const distanceToAnchorPoint = Math.sqrt(Math.pow(point.x - anchorPoint.x, 2) + Math.pow(point.y - anchorPoint.y, 2));
+    console.log(distanceToAnchorPoint);
+
+    if (distanceToAnchorPoint > 16) {
+      return;
+    }
+
     const targetNodeModel = targetNode.getModel();
-    const targetNodeAnchorIndex = targetNode.getLinkPoint(point).anchorIndex;
+    const targetNodeAnchorIndex = anchorPoint.anchorIndex;
+    
 
     if (this.addingEdge && this.edge) {
       const edgeModel = this.edge.getModel();
@@ -41,11 +51,11 @@ const clickAddEdgeBehaviour = {
           )
         );
       }) !== undefined;
-      const hasSameNodeAndAnchor =
-        targetNodeModel.id === edgeModel.source && edgeModel.sourceAnchor === targetNodeAnchorIndex;
+      const hasSameNode =
+        targetNodeModel.id === edgeModel.source;
 
-      console.log(hasSameEdge, hasSameNodeAndAnchor);
-      if (hasSameEdge || hasSameNodeAndAnchor) return;
+      console.log(hasSameEdge, hasSameNode);
+      if (hasSameEdge || hasSameNode) return;
 
       graph.updateItem(this.edge, {
         target: targetNodeModel.id,
