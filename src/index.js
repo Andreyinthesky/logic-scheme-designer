@@ -228,7 +228,9 @@ function createLogicSchemeModel() {
 }
 
 function rankElements(elements) {
-  const queue = elements.filter(element => element instanceof Input);
+  const inputs = elements.filter(element => element instanceof Input);
+  const delays = elements.filter(element => element instanceof DelayGate);
+  const queue = inputs.concat(delays);
 
   queue.forEach(element => element.rank = 0);
 
@@ -239,6 +241,10 @@ function rankElements(elements) {
     output && output.forEach(outputObj => {
       const output = outputObj.element;
 
+      if (delays.includes(output)) {
+        return;
+      }
+
       if (output.rank < current.rank + 1) {
         output.rank = current.rank + 1;
       }
@@ -248,8 +254,12 @@ function rankElements(elements) {
   }
 
   const rankedElements = [];
+  rankedElements[0] = delays.concat(inputs);
   elements.forEach(element => {
     const rank = element.rank;
+
+    if (rank === 0)
+      return;
 
     if (!rankedElements[rank])
       rankedElements[rank] = [];
@@ -307,7 +317,7 @@ document.getElementById("doTact-btn").addEventListener("click", () => {
   evalScheme(rankedElements);
 
   logicSchemeModel
-    .filter(element => element instanceof Output)
+    .filter(element => element instanceof Output || element instanceof DelayGate)
     .forEach(outElement => {
       const outElementValue = outElement.input[0];
       const outElementNode = graph.findById(outElement.id);

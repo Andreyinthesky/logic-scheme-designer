@@ -67,6 +67,19 @@ const delay = {
 
     return shape;
   },
+
+  setState(name, value, item) {
+    const group = item.getContainer();
+    const label = group.get("children")[3];
+
+    if (name === "enable") {
+      if (value) {
+        label.attr("text", "1");
+      } else {
+        label.attr("text", "0");
+      }
+    }
+  },
 };
 
 export default delay;
