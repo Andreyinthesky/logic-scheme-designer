@@ -138,8 +138,13 @@ document.getElementById("output").addEventListener("click", evt => {
   addNode("output");
 });
 
+let testModeActivated = false;
 
 function addNode(type) {
+  if (testModeActivated) {
+    return;
+  }
+  
   let nodeData = null;
   const nodePosition = graph.getPointByCanvas(100, 100);
 
@@ -289,7 +294,6 @@ function evalScheme(rankedElements) {
 }
 
 
-let testModeActivated = false;
 let logicSchemeModel;
 let rankedElements;
 document.getElementById("testMode-btn").addEventListener("click", () => {
