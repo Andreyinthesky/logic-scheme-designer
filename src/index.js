@@ -235,18 +235,23 @@ function createLogicSchemeModel() {
 function rankElements(elements) {
   const inputs = elements.filter(element => element instanceof Input);
   const delays = elements.filter(element => element instanceof DelayGate);
-  const queue = inputs.concat(delays);
+  const stack = inputs.concat(delays);
 
-  queue.forEach(element => element.rank = 0);
+  stack.forEach(element => element.rank = 0);
 
-  while (queue.length > 0) {
-    const current = queue.shift();
+  while (stack.length > 0) {
+    const current = stack.pop();
     const output = current.output;
 
-    output && output.forEach(outputObj => {
+    for (let outputObj of output) {
       const output = outputObj.element;
 
       if (delays.includes(output)) {
+        continue;
+      }
+
+      if (output.rank > 0 && output.rank < current.rank) {
+        console.log("cycle is exist!");
         return;
       }
 
@@ -254,22 +259,20 @@ function rankElements(elements) {
         output.rank = current.rank + 1;
       }
 
-      queue.push(output);
-    });
+      stack.push(output);
+    }
   }
 
   const rankedElements = [];
   rankedElements[0] = delays.concat(inputs);
   elements.forEach(element => {
-    const rank = element.rank;
-
-    if (rank === 0)
+    if (element.rank === 0)
       return;
 
-    if (!rankedElements[rank])
-      rankedElements[rank] = [];
+    if (!rankedElements[element.rank])
+      rankedElements[element.rank] = [];
 
-    rankedElements[rank].push(element);
+    rankedElements[element.rank].push(element);
   });
 
   return rankedElements;
@@ -308,6 +311,11 @@ document.getElementById("testMode-btn").addEventListener("click", () => {
 
   logicSchemeModel = createLogicSchemeModel();
   rankedElements = rankElements(logicSchemeModel);
+
+  if (!rankedElements) {
+    return;
+  }
+
   document.getElementById("doTact-btn").disabled = false;
   document.getElementById("discard-inputs-btn").disabled = false;
   document.getElementById("testMode-btn").classList.add("active");
