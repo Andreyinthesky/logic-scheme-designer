@@ -1,3 +1,4 @@
+const SELECT_ANCHOR_RADIUS = 16;
 
 const clickAddEdgeBehaviour = {
   getEvents() {
@@ -16,56 +17,33 @@ const clickAddEdgeBehaviour = {
       y: ev.y
     };
     const anchorPoint = targetNode.getLinkPoint(point);
-
     const distanceToAnchorPoint = Math.sqrt(Math.pow(point.x - anchorPoint.x, 2) + Math.pow(point.y - anchorPoint.y, 2));
-    console.log(distanceToAnchorPoint);
 
-    if (distanceToAnchorPoint > 16) {
+    if (distanceToAnchorPoint > SELECT_ANCHOR_RADIUS) {
       return;
     }
 
     const targetNodeModel = targetNode.getModel();
     const targetNodeAnchorIndex = anchorPoint.anchorIndex;
-    
 
-    if (this.addingEdge && this.edge) {
-      const edgeModel = this.edge.getModel();
-      const hasSameEdge = targetNode.getEdges().find(item => {
-        const edge = item.getModel();
-        const {
-          sourceAnchor
-        } = edgeModel;
+    if (this.addingEdge && this.drivenEdge) {
+      const drivenEdgeModel = this.drivenEdge.getModel();
+      const hasSameEdge = this.findExistingEdge(targetNode, targetNodeAnchorIndex, drivenEdgeModel) !== undefined;
+      const isDrivenToSameNode = targetNodeModel.id === drivenEdgeModel.source;
+      const isDrivenBetweenInputAndOutput = targetNodeModel.getInputAnchors().includes(targetNodeAnchorIndex)
+        !== this.sourceNode.getModel().getInputAnchors().includes(drivenEdgeModel.sourceAnchor)
 
-        return (
-          (
-            edgeModel.source === edge.source &&
-            edge.sourceAnchor === sourceAnchor &&
-            targetNodeModel.id === edge.target &&
-            edge.targetAnchor === targetNodeAnchorIndex
-          ) ||
-          (
-            edgeModel.source === edge.target &&
-            edge.targetAnchor === sourceAnchor &&
-            targetNodeModel.id === edge.source &&
-            edge.sourceAnchor === targetNodeAnchorIndex
-          )
-        );
-      }) !== undefined;
-      const hasSameNode =
-        targetNodeModel.id === edgeModel.source;
+      if (hasSameEdge || isDrivenToSameNode || !isDrivenBetweenInputAndOutput) return;
 
-      console.log(hasSameEdge, hasSameNode);
-      if (hasSameEdge || hasSameNode) return;
-
-      graph.updateItem(this.edge, {
+      graph.updateItem(this.drivenEdge, {
         target: targetNodeModel.id,
         targetAnchor: targetNodeAnchorIndex
       });
 
-      this.edge = null;
+      this.drivenEdge = null;
       this.addingEdge = false;
     } else {
-      this.edge = graph.addItem("edge", {
+      this.drivenEdge = graph.addItem("edge", {
         id: ("wire" + this.graph.indexer.getNextIndex("wire")),
         source: targetNodeModel.id,
         sourceAnchor: targetNodeAnchorIndex,
@@ -76,6 +54,7 @@ const clickAddEdgeBehaviour = {
         }
       });
       this.addingEdge = true;
+      this.sourceNode = targetNode;
     }
   },
   onMousemove(ev) {
@@ -83,17 +62,17 @@ const clickAddEdgeBehaviour = {
       x: ev.x,
       y: ev.y
     };
-    if (this.addingEdge && this.edge) {
-      this.graph.updateItem(this.edge, {
+    if (this.addingEdge && this.drivenEdge) {
+      this.graph.updateItem(this.drivenEdge, {
         target: point
       });
     }
   },
   onEdgeClick(ev) {
     const currentEdge = ev.item;
-    if (this.addingEdge && this.edge == currentEdge) {
-      this.graph.removeItem(this.edge);
-      this.edge = null;
+    if (this.addingEdge && this.drivenEdge == currentEdge) {
+      this.graph.removeItem(this.drivenEdge);
+      this.drivenEdge = null;
       this.addingEdge = false;
     }
   },
@@ -103,6 +82,31 @@ const clickAddEdgeBehaviour = {
       return;
     }
     if (nativeEvent.which == 3) this.graph.removeItem(ev.item);
+  },
+  findExistingEdge(targetNode, targetNodeAnchorIndex, drivenEdgeModel) {
+    const targetNodeModel = targetNode.getModel();
+
+    return targetNode.getEdges().find(item => {
+      const edge = item.getModel();
+      const {
+        sourceAnchor
+      } = drivenEdgeModel;
+
+      return (
+        (
+          drivenEdgeModel.source === edge.source &&
+          edge.sourceAnchor === sourceAnchor &&
+          targetNodeModel.id === edge.target &&
+          edge.targetAnchor === targetNodeAnchorIndex
+        ) ||
+        (
+          drivenEdgeModel.source === edge.target &&
+          edge.targetAnchor === sourceAnchor &&
+          targetNodeModel.id === edge.source &&
+          edge.sourceAnchor === targetNodeAnchorIndex
+        )
+      );
+    })
   }
 };
 
