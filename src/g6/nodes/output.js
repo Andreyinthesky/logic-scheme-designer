@@ -1,9 +1,7 @@
 const connectorOffset = 25;
-const defaultSize = [65, 50];
 
 const output = {
   draw(cfg, group) {
-    cfg.size = defaultSize;
     const width = cfg.size[0];
     const height = cfg.size[1];
 
@@ -22,7 +20,7 @@ const output = {
         path: this.getPath(cfg),
         stroke: cfg.color || "#000",
         lineWidth: cfg.lineWidth || 6,
-        fill: cfg.fill || "#fff",
+        // fill: cfg.fill || "#fff",
       },
     });
 

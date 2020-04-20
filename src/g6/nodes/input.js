@@ -1,9 +1,7 @@
 const connectorOffset = 25;
-const defaultSize = [75, 50];
 
 const input = {
   draw(cfg, group) {
-    cfg.size = defaultSize;
     const width = cfg.size[0];
     const height = cfg.size[1];
 
@@ -22,7 +20,7 @@ const input = {
         ...this.getCircleParams(cfg),
         stroke: cfg.color || "#000",
         lineWidth: cfg.lineWidth || 6,
-        fill: cfg.fill || "#fff",
+        // fill: cfg.fill || "#fff",
       },
     });
 
@@ -94,7 +92,7 @@ const input = {
         shape.attr("fill", "red");
         label.attr("text", "1");
       } else {
-        shape.attr("fill", "white");
+        shape.attr("fill", null);
         label.attr("text", "0");
       }
     }

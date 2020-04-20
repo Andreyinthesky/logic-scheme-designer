@@ -2,7 +2,6 @@ import AND_GATE from "../../assets/svg_elements/AND_ANSI.svg";
 
 const and = {
   draw(cfg, group) {
-    cfg.size = [100, 50];
     const width = cfg.size[0];
     const height = cfg.size[1];
 

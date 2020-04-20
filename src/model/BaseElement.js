@@ -5,6 +5,7 @@ export default class BaseElement {
     this.y = position.y || 0;
     this.input = [];
     this.output = [];
+    this.size = [100, 50];
   }
 
   getInputAnchors() {

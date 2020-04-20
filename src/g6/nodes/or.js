@@ -2,7 +2,6 @@ import OR_GATE from "../../assets/svg_elements/OR_ANSI.svg";
 
 const or = {
   draw(cfg, group) {
-    cfg.size = [100, 50];
     const width = cfg.size[0];
     const height = cfg.size[1];
 

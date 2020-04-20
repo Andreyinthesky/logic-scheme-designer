@@ -9,6 +9,7 @@ export default class Output extends BaseElement {
     this.shape = "output";
     this.label = `ВЫХОД-${index}`;
     this.anchorPoints = [[0, 0.5]];
+    this.size = [65, 50];
   }
 
   getInputAnchors() {
