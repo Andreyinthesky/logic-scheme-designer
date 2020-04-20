@@ -1,6 +1,9 @@
 import NOT_GATE from "../../assets/svg_elements/NOT_ANSI.svg";
+import base from "./base";
 
 const not = {
+  ...base,
+
   draw(cfg, group) {
     const width = cfg.size[0];
     const height = cfg.size[1];

@@ -1,6 +1,10 @@
+import base from "./base";
+
 const connectorOffset = 25;
 
 const input = {
+  ...base,
+
   draw(cfg, group) {
     const width = cfg.size[0];
     const height = cfg.size[1];

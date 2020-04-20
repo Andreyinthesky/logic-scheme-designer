@@ -1,6 +1,9 @@
 import DELAY_GATE from "../../assets/svg_elements/Buffer_ANSI.svg";
+import base from "./base";
 
 const delay = {
+  ...base,
+
   draw(cfg, group) {
     const width = cfg.size[0];
     const height = cfg.size[1];

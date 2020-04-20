@@ -1,6 +1,9 @@
 import XOR_GATE from "../../assets/svg_elements/XOR_ANSI.svg";
+import base from "./base";
 
 const xor = {
+  ...base,
+
   draw(cfg, group) {
     const width = cfg.size[0];
     const height = cfg.size[1];
