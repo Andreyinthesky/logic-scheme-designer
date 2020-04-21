@@ -89,6 +89,7 @@ const output = {
   },
 
   setState(name, value, item) {
+    base.setState(name, value, item);
     const group = item.getContainer();
     const label = group.get("children")[2];
 

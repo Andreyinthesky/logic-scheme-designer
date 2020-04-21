@@ -1,8 +1,25 @@
 const PADDING = 10;
 
 export default {
+  setState(name, value, item) {
+    if (name === "select") {
+      let group = item.getContainer();
+      let children = group.get("children");
+      for (let i = 0, len = children.length; i < len; i++) {
+        let child = children[i];
+        if (child._attrs && child.attr("name") === "frame") {
+          if (value) {
+            child.show();
+          } else {
+            child.hide();
+          }
+        }
+      }
+    }
+
+  },
   afterDraw(cfg, group) {
-    const {id} = cfg;
+    const { id } = cfg;
     let [width, height] = cfg.size;
     width += PADDING;
     height += PADDING;

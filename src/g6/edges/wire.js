@@ -26,11 +26,23 @@ const wire = {
             ["L", endPoint.x, startPoint.y],
             ["L", endPoint.x, endPoint.y]
           ]),
+        shadowColor: "#00f",
       }
     });
 
     return shape;
-  }
+  },
+  setState(name, value, item) {
+    const shape = item.getKeyShape();
+
+    if (name === "select") {
+      if (value) {
+        shape.attr("shadowBlur", 4);
+      } else {
+        shape.attr("shadowBlur", 0);
+      }
+    }
+  },
 };
 
 export default wire;

@@ -87,6 +87,7 @@ const input = {
   },
 
   setState(name, value, item) {
+    base.setState(name, value, item);
     const group = item.getContainer();
     const shape = group.get("children")[1];
     const label = group.get("children")[2];

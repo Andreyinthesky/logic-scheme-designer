@@ -4,9 +4,11 @@ const clickAddEdgeBehaviour = {
   getEvents() {
     return {
       "node:click": "onClick",
+      "node:mousedown" : "onNodeMousedown",
       mousemove: "onMousemove",
       "edge:click": "onEdgeClick",
-      "edge:mousedown": "onEdgeMousedown"
+      "edge:mousedown": "onEdgeMousedown",
+      "canvas:mousedown" : "onCanvasMousedown",
     };
   },
   onClick(ev) {
@@ -20,6 +22,12 @@ const clickAddEdgeBehaviour = {
     const distanceToAnchorPoint = Math.sqrt(Math.pow(point.x - anchorPoint.x, 2) + Math.pow(point.y - anchorPoint.y, 2));
 
     if (distanceToAnchorPoint > SELECT_ANCHOR_RADIUS) {
+      // if (!this.addingEdge) {
+      //   this.deselectAllObjects();
+      //   const isSelect = targetNode.hasState("select");
+      //   this.graph.setItemState(targetNode, "select", !isSelect);
+      // }
+
       return;
     }
 
@@ -43,6 +51,7 @@ const clickAddEdgeBehaviour = {
       this.drivenEdge = null;
       this.addingEdge = false;
     } else {
+      this.deselectAllObjects();
       this.drivenEdge = graph.addItem("edge", {
         id: ("wire" + this.graph.indexer.getNextIndex("wire")),
         source: targetNodeModel.id,
@@ -57,6 +66,17 @@ const clickAddEdgeBehaviour = {
       this.sourceNode = targetNode;
     }
   },
+  onNodeMousedown(ev) {
+    const nativeEvent = ev.event;
+    if (this.addingEdge) {
+      return;
+    }
+
+    if (nativeEvent.which == 3) {
+      this.deselectAllObjects();
+      this.graph.setItemState(ev.item, "select", true);
+    } 
+  },
   onMousemove(ev) {
     const point = {
       x: ev.x,
@@ -69,11 +89,17 @@ const clickAddEdgeBehaviour = {
     }
   },
   onEdgeClick(ev) {
-    const currentEdge = ev.item;
-    if (this.addingEdge && this.drivenEdge == currentEdge) {
+    const clickedEdge = ev.item;
+    if (this.addingEdge && this.drivenEdge == clickedEdge) {
       this.graph.removeItem(this.drivenEdge);
       this.drivenEdge = null;
       this.addingEdge = false;
+      return;
+    }
+
+    if (!this.addingEdge) {
+      this.deselectAllObjects();
+      this.graph.setItemState(clickedEdge, "select", true);
     }
   },
   onEdgeMousedown(ev) {
@@ -82,6 +108,9 @@ const clickAddEdgeBehaviour = {
       return;
     }
     if (nativeEvent.which == 3) this.graph.removeItem(ev.item);
+  },
+  onCanvasMousedown() {
+    this.deselectAllObjects();
   },
   findExistingEdge(targetNode, targetNodeAnchorIndex, drivenEdgeModel) {
     const targetNodeModel = targetNode.getModel();
@@ -107,7 +136,16 @@ const clickAddEdgeBehaviour = {
         )
       );
     })
-  }
+  },
+  deselectAllObjects() {
+    this.graph.getEdges().forEach(edge => {
+      this.graph.setItemState(edge, "select", false);
+    });
+
+    this.graph.getNodes().forEach(node => {
+      this.graph.setItemState(node, "select", false);
+    });
+  },
 };
 
 export default clickAddEdgeBehaviour;
