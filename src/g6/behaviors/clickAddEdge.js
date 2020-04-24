@@ -22,11 +22,11 @@ const clickAddEdgeBehaviour = {
     const distanceToAnchorPoint = Math.sqrt(Math.pow(point.x - anchorPoint.x, 2) + Math.pow(point.y - anchorPoint.y, 2));
 
     if (distanceToAnchorPoint > SELECT_ANCHOR_RADIUS) {
-      // if (!this.addingEdge) {
-      //   this.deselectAllObjects();
-      //   const isSelect = targetNode.hasState("select");
-      //   this.graph.setItemState(targetNode, "select", !isSelect);
-      // }
+      if (!this.addingEdge) {
+        this.deselectAllObjects();
+        const isSelect = targetNode.hasState("select");
+        this.graph.setItemState(targetNode, "select", !isSelect);
+      }
 
       return;
     }
@@ -75,7 +75,20 @@ const clickAddEdgeBehaviour = {
     if (nativeEvent.which == 3) {
       this.deselectAllObjects();
       this.graph.setItemState(ev.item, "select", true);
-    } 
+
+      // ROTATION
+      // const isRotate = ev.item.hasState("rotate");
+      // this.graph.setItemState(ev.item, "rotate", !isRotate);
+      
+      // const nodeModel = ev.item.getModel();
+      // const xPos = nodeModel.x;
+      // const yPos = nodeModel.y;
+      
+      // // UPDATE NODE
+      // ev.item.updatePosition({x: xPos, y: yPos});
+      // ev.item.getEdges().forEach(edge => edge.refresh());
+      // this.graph.paint();
+    }
   },
   onMousemove(ev) {
     const point = {

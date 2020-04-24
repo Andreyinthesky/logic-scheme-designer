@@ -35,6 +35,23 @@ const not = {
 
     return shape;
   },
+
+  setState(name, value, item) {
+    base.setState(name, value, item);
+
+    if (name === "rotate") {
+      const shape = item.getKeyShape();
+      const model = item.getModel();
+
+      if (value) {
+        shape.rotate(Math.PI);
+        model.anchorPoints = [[1, 0.5], [0, 0.5]];
+      } else {
+        shape.rotate(-Math.PI);
+        model.anchorPoints = [[0, 0.5], [1, 0.5]];
+      }
+    }
+  },
 };
 
 export default not;
