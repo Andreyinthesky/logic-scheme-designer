@@ -139,12 +139,12 @@ function addNode(type) {
 };
 
 const initElement = (element) => {
-  if (!(element instanceof Input)) {
-    element.input = element.input.map(v => false);
-  }
+  const elementModel = element.getModel();
+  elementModel.input = elementModel.input.map(v => false);
+  elementModel.output = [];
+  elementModel.rank = null;
 
-  element.output = [];
-  element.rank = null;
+  graph.setItemState(element, "enable", false);
 }
 
 function createLogicSchemeModel() {
@@ -154,7 +154,7 @@ function createLogicSchemeModel() {
   graph.getNodes().forEach(node => {
     const nodeModel = node.getModel();
     const nodeId = nodeModel.id;
-    initElement(nodeModel);
+    initElement(node);
 
     for (let edge of node.getEdges()) {
       const edgeModel = edge.getModel();
