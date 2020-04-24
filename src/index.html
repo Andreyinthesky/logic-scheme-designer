@@ -12,34 +12,36 @@
     <h1>Конструктор логических схем</h1>
 
     <div class="tools-panel">
-      <button class="" title="Отменить (Undo)">
-        <i class="fas fa-reply"></i>
-      </button>
-      <button class="" title="Повторить (Redo)">
-        <i class="fas fa-share"></i>
-      </button>
-      <button title="Удалить (Delete)">
-        <i class="fas fa-trash-alt"></i>
-      </button>
-      <button id="fit-btn" title="В начало координат (Go to origin)">
-        <i class="fas fa-compress"></i>
-      </button>
+      <div class="canvas-actions">
+        <button class="" title="Отменить (Undo)">
+          <i class="fas fa-reply"></i>
+        </button>
+        <button class="" title="Повторить (Redo)">
+          <i class="fas fa-share"></i>
+        </button>
+        <button title="Удалить (Delete)">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+        <button id="fit-btn" title="В начало координат (Go to origin)">
+          <i class="fas fa-compress"></i>
+        </button>
 
-      <div class="scale-control">
-        <button title="Масштаб (Scale)">
-          <i class="fas fa-search"></i>
-          <i class="fas fa-angle-down"></i>
-        </button>
-        <button class="down-scale" title="Уменьшить масштаб (Down scale)">
-          <i class="fas fa-search-minus"></i>
-        </button>
-        <button class="up-scale" title="Увеличить масштаб (Up scale)">
-          <i class="fas fa-search-plus"></i>
-        </button>
+        <div class="scale-control">
+          <button title="Масштаб (Scale)">
+            <i class="fas fa-search"></i>
+            <i class="fas fa-angle-down"></i>
+          </button>
+          <button class="down-scale" title="Уменьшить масштаб (Down scale)">
+            <i class="fas fa-search-minus"></i>
+          </button>
+          <button class="up-scale" title="Увеличить масштаб (Up scale)">
+            <i class="fas fa-search-plus"></i>
+          </button>
+        </div>
       </div>
 
       <div class="scheme-control">
-        <button id="testMode-btn">Режим тестирования</button>
+        <button id="testMode-btn"><i class="fas fa-caret-square-right"></i>Режим тестирования</button>
         <button id="doTact-btn" disabled>Сделать такт</button>
         <button id="discard-inputs-btn" disabled>Сбросить входы</button>
       </div>
@@ -59,6 +61,7 @@
 
   <div class="editor-area">
     <ul id="select-obj" class="obj-list">
+      <div class="select-obj-toggler"><i class="fas fa-caret-left"></i></div>
       <li class="card">
         <div class="card-header">
           <span class="card-title">Базовые элементы</span>
@@ -103,7 +106,7 @@
           </li>
         </ul>
       </li>
-      <li class="card">
+      <!-- <li class="card">
         <div class="card-header">
           <span class="card-title">Скрытый</span>
           <i class="fas fa-caret-down toggle"></i>
@@ -114,11 +117,11 @@
             <span class="name">Элемент</span>
           </li>
         </ul>
-      </li>
+      </li> -->
     </ul>
 
     <!-- context menu -->
-    <div class="context-menu">
+    <div class="context-menu" style="display: none;">
       <ul class="context-menu__list">
         <li>
           <i class="fas fa-trash-alt"></i>

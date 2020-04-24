@@ -35,7 +35,8 @@ h1 {
 }
 
 button:focus {
-  outline: #999 1px solid;
+  outline: none;
+  box-shadow: 0 0 3px #555;
 }
 
 button:hover {
@@ -81,6 +82,12 @@ li {
   color: #555;
 }
 
+.canvas-actions button:focus {
+  box-shadow: 0 0 3px #555;
+  border-radius: 50%;
+}
+
+
 span.show-scale {
   position: absolute;
   top: 0;
@@ -111,18 +118,26 @@ span.show-scale {
 }
 
 #mountNode {
+  /* background-color: grey; */
   display: inline-block;
-  -webkit-box-shadow: 0 0 2px 2px #0003;
   box-shadow: 0 0 2px 2px #0003;
-  position: absolute !important;
+  /* position: absolute !important; */
+  flex-grow: 1;
   z-index: 0;
-  top: 0px;
-  left: 320px;
+  top: 0;
+  left: 0;
+  height: calc(100vh - 70px - 8px);
+  min-width: 640px;
+  min-height: 480px;
+  margin: 0 8px;
+  -webkit-box-shadow: 0 0 2px 2px #0003;
 }
 
 .editor-area {
+  display: flex;
   position: relative;
   margin-top: 70px;
+  margin-bottom: 8px;
 }
 
 #testMode-btn {
@@ -130,6 +145,10 @@ span.show-scale {
   color: inherit;
   border: 2px solid black;
   padding: 10px;
+}
+
+#testMode-btn i {
+  margin-right: 8px;
 }
 
 #testMode-btn.active {
@@ -163,15 +182,42 @@ span.show-scale {
   display: flex;
   flex-direction: column;
   position: absolute;
+  z-index: 3;
   top: 0;
   left: 0;
   margin-left: 8px;
-  width: 300px;
-  height: calc(100vh - 70px - 45px);
-  font-size: 14px;
   margin-right: 20px;
+  width: 300px;
+  height: calc(100vh - 70px - 8px);
+  min-height: 470px;
+  font-size: 14px;
   background-color: #fff;
   box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.1);
+  transition: transform ease 1s;
+}
+
+#select-obj.hide {
+  transform: translateX(-308px);
+}
+
+.select-obj-toggler {
+  position: absolute;
+  z-index: 3;
+  right: -8px;
+  top: 40%;
+  padding: 20px 4px;
+  background-color: #ddd;
+  border: 1px solid #bbb;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+#select-obj.hide .select-obj-toggler {
+  right: -12px;
+}
+
+#select-obj.hide .select-obj-toggler i {
+  transform: rotate(180deg);
 }
 
 .card-header {

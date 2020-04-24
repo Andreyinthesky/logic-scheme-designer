@@ -10,11 +10,11 @@ import OrGate from "./model/gates/OrGate";
 import NotGate from "./model/gates/NotGate";
 import XorGate from "./model/gates/XorGate";
 
-let scale = 1.0;
 const graph = init();
 
-graph.indexer = new EditorObjIndexer();
+graph.moveTo(320, 70);
 
+graph.indexer = new EditorObjIndexer();
 
 const graphData = {
   nodes: [
@@ -59,55 +59,15 @@ function addAnchors(node) {
 
 graph.paint();
 
-graph.on("node:mouseover", event => {
-  console.log("hover node");
-  // USE STATES
-  let item = event.item;
-  let group = item.getContainer();
-  let children = group.get("children");
-  for (let i = 0, len = children.length; i < len; i++) {
-    let child = children[i];
-    if (child._attrs && child.attr("name") === "anchor") {
-      child.show();
-    }
-  }
-  graph.paint();
-});
+// console.log(graph.getPointByClient(0,0));
 
-graph.on("node:mouseout", event => {
-  console.log("hover node");
-  // USE STATES
-  let item = event.item;
-  let group = item.getContainer();
-  let children = group.get("children");
-  for (let i = 0, len = children.length; i < len; i++) {
-    let child = children[i];
-    if (child._attrs && child.attr("name") === "anchor") {
-      child.hide();
-    }
-  }
-  graph.paint();
-});
-
-graph.on("wheel", ev => {
-  const { deltaY } = ev;
-  if ((deltaY > 0 && scale <= graph.get("minZoom")) || (deltaY < 0 && scale >= graph.get("maxZoom")))
+document.querySelector(".select-obj-toggler").addEventListener("click", evt => {
+  if (document.getElementById("select-obj").classList.contains("hide")) {
+    document.getElementById("select-obj").classList.remove("hide");
     return;
-  scale = parseFloat((scale + (deltaY < 0 ? 0.1 : -0.1)).toFixed(2));
-  console.log("scale", scale);
-  graph.zoomTo(scale);
-  const viewText = document.getElementById("show-scale");
-  viewText.innerHTML =
-    viewText.innerHTML.substring(0, viewText.innerHTML.indexOf(":") + 1) +
-    " " +
-    Math.round(scale * 100) +
-    "%";
-});
+  }
 
-document.getElementById("fit-btn").addEventListener("click", event => {
-  console.log("try to move to (0,0)");
-  const leftTopCorner = graph.getPointByCanvas(0, 0);
-  graph.translate(leftTopCorner.x * scale, leftTopCorner.y * scale);
+  document.getElementById("select-obj").classList.add("hide");
 });
 
 document.getElementById("delay").addEventListener("click", evt => {
@@ -232,11 +192,59 @@ function createLogicSchemeModel() {
   return Object.values(elements);
 }
 
-function rankElements(elements) {
-  const inputs = elements.filter(element => element instanceof Input);
-  const delays = elements.filter(element => element instanceof DelayGate);
-  const stack = inputs.concat(delays);
+function findSchemeCycle(elements) {
+  const stack = [];
+  const color = {};
+  const path = {};
 
+  elements.forEach(element => {
+    if (element instanceof Input || element instanceof DelayGate) {
+      stack.push(element);
+    }
+    color[element.id] = 0;
+  });
+
+  while (stack.length > 0) {
+    const current = stack[stack.length - 1];
+
+    if (color[current.id] === 1) {
+      color[current.id] = 2;
+      stack.pop();
+      continue;
+    }
+    color[current.id] = 1;
+
+    const output = current.output;
+    for (let outputObj of output) {
+      const output = outputObj.element;
+
+      if (color[output.id] === 2 || output instanceof DelayGate) {
+        continue;
+      }
+
+      if (color[output.id] === 1) {
+        console.log("cycle is exist!");
+        console.log(`start is ${output.id}, end is ${current.id}`);
+        return {
+          verdict: true,
+          start: output.id,
+          end: current.id,
+          path: path,
+        };
+      }
+
+      path[output.id] = current.id;
+      stack.push(output);
+    }
+  }
+
+  return {verdict: false};
+}
+
+function rankElements(elements) {
+  const delays = elements.filter(element => element instanceof DelayGate);
+  const inputs = elements.filter(element => element instanceof Input);
+  const stack = delays.concat(inputs);
   stack.forEach(element => element.rank = 0);
 
   while (stack.length > 0) {
@@ -246,13 +254,8 @@ function rankElements(elements) {
     for (let outputObj of output) {
       const output = outputObj.element;
 
-      if (delays.includes(output)) {
+      if (output instanceof DelayGate) {
         continue;
-      }
-
-      if (output.rank > 0 && output.rank < current.rank) {
-        console.log("cycle is exist!");
-        return;
       }
 
       if (output.rank < current.rank + 1) {
@@ -310,11 +313,18 @@ document.getElementById("testMode-btn").addEventListener("click", () => {
   }
 
   logicSchemeModel = createLogicSchemeModel();
-  rankedElements = rankElements(logicSchemeModel);
+  const cycle = findSchemeCycle(logicSchemeModel);
 
-  if (!rankedElements) {
+  if (cycle.verdict) {
+    const { path } = cycle;
+    console.log(cycle.start);
+    for (let current = cycle.end; current !== cycle.start; current = path[current]) {
+      console.log(current);
+    }
     return;
   }
+
+  rankedElements = rankElements(logicSchemeModel);
 
   document.getElementById("doTact-btn").disabled = false;
   document.getElementById("discard-inputs-btn").disabled = false;
