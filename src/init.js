@@ -3,9 +3,7 @@ import {debounce} from "./utils";
 
 let scale = 1.0;
 
-export default function init() {
-  const mountNode = document.getElementById("mountNode");
-
+export default function init(mountNode) {
   const graph = new G6.Graph({
     container: "mountNode",
     width: mountNode.getBoundingClientRect().width,

@@ -15,6 +15,11 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        use: ["babel-loader", "eslint-loader"]
+      },
+      {
         test: /\.css$/,
         use: ["style-loader", "css-loader"]
       },
@@ -27,6 +32,10 @@ module.exports = {
         use: ["file-loader"],
       }
     ]
+  },
+  resolve: {
+    modules: ['node_modules'],
+    extensions: ['.js', '.jsx'],
   },
   plugins: [
     new HtmlWebpackPlugin({
