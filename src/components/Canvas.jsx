@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import init from "../init";
+import start from "../g6Start"
 
 export default class Canvas extends Component {
     constructor() {
@@ -9,6 +10,7 @@ export default class Canvas extends Component {
 
     componentDidMount() {
         const graph = init(this.mountNode.current);
+        start(graph);
     }
 
     render() {

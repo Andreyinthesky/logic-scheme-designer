@@ -1,5 +1,6 @@
 import G6 from "./g6";
 import {debounce} from "./utils";
+import EditorObjIndexer from "./indexer";
 
 let scale = 1.0;
 
@@ -16,6 +17,8 @@ export default function init(mountNode) {
       testScheme: ["change-input-state", "drag-canvas", "drag-node"],
     }
   });
+
+  graph.indexer = new EditorObjIndexer();
 
   const canvasResize = debounce(() => {
     console.log("resize");
