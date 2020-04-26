@@ -1,7 +1,6 @@
 import React, { Component } from "react";
-import LoadSchemeForm from "./LoadSchemeForm";
 
-export default class App extends Component {
+export default class Header extends Component {
     constructor() {
         super();
     }
