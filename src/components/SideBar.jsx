@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import SideBarSection from "./SidebarSection";
+import { AddNodeContext } from "../contexts/addNodeContext";
+
 
 const graphicObjectsModel = {
     gate: {
@@ -38,14 +40,24 @@ export default class SideBar extends Component {
         const model = Object.entries(graphicObjectsModel);
 
         return (
-            <ul id="select-obj" className={`obj-list ${toggle ? "hide" : null}`}>
-                <div className="select-obj-toggler" onClick={this.handleClickToggle}><i className="fas fa-caret-left"></i></div>
-                {
-                    model.map(([name, description]) =>
-                        <SideBarSection key={name} model={description} />
-                    )
-                }
-            </ul>
+            <AddNodeContext.Consumer>
+                {({ callback }) => (
+                    <ul id="select-obj" className={`obj-list ${toggle ? "hide" : null}`}>
+                        <div className="select-obj-toggler" onClick={this.handleClickToggle}>
+                            <i className="fas fa-caret-left"></i>
+                        </div>
+                        {
+                            model.map(([name, description]) =>
+                                <SideBarSection key={name}
+                                    title={description.title}
+                                    objs={description.objs}
+                                    onClickObj={callback}
+                                />
+                            )
+                        }
+                    </ul>
+                )}
+            </AddNodeContext.Consumer>
         );
     }
 }

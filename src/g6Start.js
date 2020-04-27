@@ -26,113 +26,13 @@ export default function start(graph) {
 
   graphData.nodes.forEach(nodeData => {
     const newNode = graph.addItem("node", nodeData);
-    addAnchors(newNode);
   });
-
-  function addAnchors(node) {
-    const model = node.getModel();
-
-    if (!model.anchorPoints) return;
-
-    const group = node.getContainer();
-    const id = model.id;
-    for (let i = 0; i < model.anchorPoints.length; i++) {
-      let { x, y } = node.getLinkPointByAnchor(i);
-      let anchor = group.addShape("marker", {
-        id: id + "_anchor_bg_" + i,
-        attrs: {
-          boxName: "anchor",
-          name: "anchor",
-          x: x - model.x,
-          y: y - model.y,
-          r: 5,
-          fill: "#f00"
-        }
-      });
-      anchor.hide();
-    }
-  }
 
   graph.paint();
 
   // console.log(graph.getPointByClient(0,0));
 
-  document.querySelector(".select-obj-toggler").addEventListener("click", evt => {
-    if (document.getElementById("select-obj").classList.contains("hide")) {
-      document.getElementById("select-obj").classList.remove("hide");
-      return;
-    }
-
-    document.getElementById("select-obj").classList.add("hide");
-  });
-
-  document.getElementById("delay").addEventListener("click", evt => {
-    addNode("delay");
-  });
-
-  document.getElementById("and").addEventListener("click", evt => {
-    addNode("and");
-  });
-
-  document.getElementById("or").addEventListener("click", evt => {
-    addNode("or");
-  });
-
-  document.getElementById("xor").addEventListener("click", evt => {
-    addNode("xor");
-  });
-
-  document.getElementById("not").addEventListener("click", evt => {
-    addNode("not");
-  });
-
-  document.getElementById("input").addEventListener("click", evt => {
-    addNode("input");
-  });
-
-  document.getElementById("output").addEventListener("click", evt => {
-    addNode("output");
-  });
-
   let testModeActivated = false;
-
-  function addNode(type) {
-    if (testModeActivated) {
-      return;
-    }
-
-    let nodeData = null;
-    const nodePosition = graph.getPointByCanvas(100, 100);
-
-    switch (type) {
-      case "delay":
-        nodeData = new DelayGate(graph.indexer.getNextIndex("delay"), nodePosition);
-        break;
-      case "and":
-        nodeData = new AndGate(graph.indexer.getNextIndex("and"), nodePosition);
-        break;
-      case "or":
-        nodeData = new OrGate(graph.indexer.getNextIndex("or"), nodePosition);
-        break;
-      case "xor":
-        nodeData = new XorGate(graph.indexer.getNextIndex("xor"), nodePosition);
-        break;
-      case "not":
-        nodeData = new NotGate(graph.indexer.getNextIndex("not"), nodePosition);
-        break;
-      case "input":
-        nodeData = new Input(graph.indexer.getNextIndex("input"), nodePosition);
-        break;
-      case "output":
-        nodeData = new Output(graph.indexer.getNextIndex("output"), nodePosition);
-        break;
-      default:
-        return;
-    }
-
-    const newNode = graph.addItem("node", nodeData);
-    addAnchors(newNode);
-  }
 
   const initElement = (element) => {
     const elementModel = element.getModel();

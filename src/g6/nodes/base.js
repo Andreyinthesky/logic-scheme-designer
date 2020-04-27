@@ -14,9 +14,21 @@ export default {
             child.hide();
           }
         }
+      } 
+    } else if (name === "hover") {
+      let group = item.getContainer();
+      let children = group.get("children");
+      for (let i = 0, len = children.length; i < len; i++) {
+        let child = children[i];
+        if (child._attrs && child.attr("name") === "anchor") {
+          if (value) {
+            child.show();
+          } else {
+            child.hide();
+          }
+        }
       }
     }
-
   },
   afterDraw(cfg, group) {
     const { id } = cfg;
@@ -39,8 +51,6 @@ export default {
           ['L', -width / 2, height / 2],
           ['Z']
         ],
-        // styles
-        // ...config.shapeControl.style.default.edge
         stroke: "#00b",
         lineWidth: 2,
         lineDash: [5, 5],
