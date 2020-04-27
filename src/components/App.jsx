@@ -1,9 +1,12 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 import LoadSchemeForm from "./LoadSchemeForm";
 import ExportSchemeForm from "./ExportSchemeForm";
 import Header from "./Header";
 import EditorArea from "./EditorArea";
-import {AddNodeContext} from "../contexts/addNodeContext";
+import { AddNodeContext } from "../contexts/addNodeContext";
+import { updateScale } from "../redux/actions";
+import { connect } from "react-redux";
 
 import init from "../init";
 import start from "../g6Start"
@@ -17,13 +20,11 @@ import OrGate from "../model/gates/OrGate";
 import NotGate from "../model/gates/NotGate";
 import XorGate from "../model/gates/XorGate";
 
-
-export default class App extends Component {
+class App extends Component {
     constructor() {
         super();
         this.state = {
             mode: "default",
-            scale: 1.0,
         };
     }
 
@@ -83,14 +84,16 @@ export default class App extends Component {
         }
 
         graph.on("wheel", evt => {
-            let {scale} = this.state;
+            let scale = graph.getZoom();
             const { deltaY } = evt;
             if ((deltaY > 0 && scale <= graph.get("minZoom")) || (deltaY < 0 && scale >= graph.get("maxZoom")))
                 return;
-            scale = parseFloat((scale + (deltaY < 0 ? 0.1 : -0.1)).toFixed(2));
-            console.log("scale", scale);
-            graph.zoomTo(scale);
-            // this.setState({scale});
+
+            if (deltaY < 0) {
+                this.upScale();
+            } else {
+                this.downScale();
+            }
         });
 
         const mountNode = document.querySelector("#mountNode")
@@ -116,7 +119,8 @@ export default class App extends Component {
         }
 
         let nodeData = null;
-        const nodePosition = graph.getPointByCanvas(100, 100);
+        const sideBarXOffset = 320;
+        const nodePosition = graph.getPointByCanvas(100 + sideBarXOffset, 100);
 
         switch (type) {
             case "delay":
@@ -147,11 +151,36 @@ export default class App extends Component {
         const newNode = graph.addItem("node", nodeData);
     }
 
+    upScale = () => {
+        const graph = this.graph;
+        let scale = graph.getZoom();
+        scale = parseFloat((scale + 0.1).toFixed(2));
+        graph.zoomTo(scale);
+        console.log("scale", scale);
+
+        this.props.updateScale(scale);
+    }
+
+
+    downScale = () => {
+        const graph = this.graph;
+        let scale = graph.getZoom();
+        scale = parseFloat((scale - 0.1).toFixed(2));
+        graph.zoomTo(scale);
+        console.log("scale", scale);
+
+        this.props.updateScale(scale);
+    }
+
     render() {
         return (
             <>
-                <Header />
-                <AddNodeContext.Provider value={{ callback: this.addNode }}>
+                <AddNodeContext.Provider value={{
+                    callback: this.addNode,
+                    upScaleCallback: this.upScale,
+                    downScaleCallback: this.downScale
+                }}>
+                    <Header />
                     <EditorArea />
                 </AddNodeContext.Provider>
                 {/* <LoadSchemeForm /> */}
@@ -160,3 +189,18 @@ export default class App extends Component {
         );
     }
 }
+
+App.propTypes = {
+    scale: PropTypes.number,
+    updateScale: PropTypes.func,
+}
+
+const mapStateToProps = state => ({
+    scale: state.editor.scale
+});
+
+const mapDispatchToProps = {
+    updateScale
+};
+
+export default connect(null, mapDispatchToProps)(App);

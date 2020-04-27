@@ -1,0 +1,1 @@
+export const UPDATE_SCALE = "EDITOR/UPDATE_SCALE";

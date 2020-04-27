@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-
+import EditorStatusBar from "./EditorStatusBar";
 
 
 export default class Canvas extends Component {
@@ -8,16 +8,10 @@ export default class Canvas extends Component {
         this.mountNode = React.createRef();
     }
 
-    componentDidMount() {
-
-    }
-
     render() {
         return (
             <div id="mountNode" ref={this.mountNode}>
-                <span className="show-scale">
-                    Масштаб: <span id="show-scale"> 100%</span>
-                </span>
+                <EditorStatusBar />
             </div>
         );
     }

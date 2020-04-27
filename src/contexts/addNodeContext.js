@@ -1,3 +1,3 @@
 import React from "react";
 
-export const AddNodeContext = React.createContext({ callback: null });
+export const AddNodeContext = React.createContext({ upScaleCallback: null, downScaleCallback: null, callback: null });
