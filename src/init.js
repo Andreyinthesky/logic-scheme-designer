@@ -10,6 +10,9 @@ export default function init(mountNode) {
     maxZoom: 3,
     minZoom: 0.2,
     groupType: "rect",
+    layout: {
+      type: "schemeLayout"
+    },
     modes: {
       default: ["drag-node", "click-add-edge", "drag-canvas"],
       testScheme: ["change-input-state", "drag-canvas", "drag-node"],
