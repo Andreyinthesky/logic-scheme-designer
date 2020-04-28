@@ -1,14 +1,15 @@
 const SELECT_ANCHOR_RADIUS = 16;
+const NODE_SELECT_BOX_PADDING = 10;
 
 const clickAddEdgeBehaviour = {
   getEvents() {
     return {
       "node:click": "onClick",
-      "node:mousedown" : "onNodeMousedown",
+      "node:mousedown": "onNodeMousedown",
       mousemove: "onMousemove",
       "edge:click": "onEdgeClick",
       "edge:mousedown": "onEdgeMousedown",
-      "canvas:mousedown" : "onCanvasMousedown",
+      "canvas:mousedown": "onCanvasMousedown",
     };
   },
   onClick(ev) {
@@ -67,23 +68,47 @@ const clickAddEdgeBehaviour = {
     }
   },
   onNodeMousedown(ev) {
-    const nativeEvent = ev.event;
     if (this.addingEdge) {
       return;
     }
 
+    const nativeEvent = ev.event;
+
     if (nativeEvent.which == 3) {
-      this.deselectAllObjects();
-      this.graph.setItemState(ev.item, "select", true);
+
+      const node = ev.item;
+      const nodeModel = node.getModel();
+      console.log(nodeModel);
+
+      const { x, y } = ev;
+      const { x: centerX, y: centerY, size } = nodeModel;
+      const minX = centerX - size[0] / 2;
+      const minY = centerY - size[1] / 2;
+      const maxX = minX + size[0];
+      const maxY = minY + size[1];
+
+      const selectBox = {
+        minX: minX + NODE_SELECT_BOX_PADDING,
+        minY: minY + NODE_SELECT_BOX_PADDING,
+        maxX: maxX - NODE_SELECT_BOX_PADDING,
+        maxY: maxY - NODE_SELECT_BOX_PADDING,
+      };
+
+      console.log(selectBox, ev);
+
+      const isPointBelongsToSelectBox = x >= selectBox.minX && x <= selectBox.maxX
+        && y >= selectBox.minY && y <= selectBox.maxY;
+
+      isPointBelongsToSelectBox && this.graph.removeItem(ev.item);
 
       // ROTATION
       // const isRotate = ev.item.hasState("rotate");
       // this.graph.setItemState(ev.item, "rotate", !isRotate);
-      
+
       // const nodeModel = ev.item.getModel();
       // const xPos = nodeModel.x;
       // const yPos = nodeModel.y;
-      
+
       // // UPDATE NODE
       // ev.item.updatePosition({x: xPos, y: yPos});
       // ev.item.getEdges().forEach(edge => edge.refresh());
