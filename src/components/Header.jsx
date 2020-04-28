@@ -13,18 +13,26 @@ export default class Header extends Component {
             <header>
                 <h1>{"Конструктор логических схем"}</h1>
                 <EditorContext.Consumer>
-                    {({ upScaleCallback, downScaleCallback, deleteSelectedCallback, exportSchemeCallback }) => (
-                        <>
-                            <EditorActionsPanel
-                                onUpScale={upScaleCallback}
-                                onDownScale={downScaleCallback}
-                                onDeleteSelected={deleteSelectedCallback}
-                            />
-                            <AppActionsPanel
-                                onExportScheme={exportSchemeCallback}
-                            />
-                        </>
-                    )}
+                    {({
+                        upScaleCallback,
+                        downScaleCallback,
+                        deleteSelectedCallback,
+                        goToOriginCallback,
+                        exportSchemeCallback
+                    }) =>
+                        (
+                            <>
+                                <EditorActionsPanel
+                                    onUpScale={upScaleCallback}
+                                    onDownScale={downScaleCallback}
+                                    onDeleteSelected={deleteSelectedCallback}
+                                    onGoToOrigin={goToOriginCallback}
+                                />
+                                <AppActionsPanel
+                                    onExportScheme={exportSchemeCallback}
+                                />
+                            </>
+                        )}
 
                 </EditorContext.Consumer>
             </header>

@@ -163,6 +163,13 @@ class App extends Component {
         this.graph.emit("custom:removeselected")
     }
 
+    goToOrigin = () => {
+        console.log("try to move to (0,0)");
+        const leftTopCorner = this.graph.getPointByCanvas(0, 0);
+        const scale = this.graph.getZoom();
+        this.graph.translate(leftTopCorner.x * scale, leftTopCorner.y * scale);
+    };
+
     exportSchemeToFile = () => {
         const schemeData = this.graph.save();
         schemeData.nodes = schemeData.nodes.map(({ id, index, x, y, shape, direction }) => {
@@ -220,13 +227,14 @@ class App extends Component {
                     upScaleCallback: this.upScale,
                     downScaleCallback: this.downScale,
                     deleteSelectedCallback: this.deleteSelectedItem,
+                    goToOriginCallback: this.goToOrigin,
                     exportSchemeCallback: this.exportSchemeToFile,
                 }}>
                     <Header />
                     <EditorArea />
                 </EditorContext.Provider>
-                {/* <LoadSchemeForm /> */}
-                {/* <ExportSchemeForm /> */}
+                <LoadSchemeForm />
+                <ExportSchemeForm />
             </>
         );
     }

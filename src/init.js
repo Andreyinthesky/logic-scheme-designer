@@ -21,11 +21,5 @@ export default function init(mountNode) {
 
   graph.indexer = new EditorObjIndexer();
 
-  // document.getElementById("fit-btn").addEventListener("click", evt => {
-  //   console.log("try to move to (0,0)");
-  //   const leftTopCorner = graph.getPointByCanvas(0, 0);
-  //   graph.translate(leftTopCorner.x * scale, leftTopCorner.y * scale);
-  // });
-
   return graph;
 }
