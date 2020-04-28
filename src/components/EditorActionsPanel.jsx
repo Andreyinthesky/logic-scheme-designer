@@ -16,7 +16,7 @@ export default class EditorActionsPanel extends Component {
     };
 
     handleClickDeleteBtn = () => {
-        console.log("undo");
+        this.props.onDeleteSelected();
     };
 
     handleClickGoToOriginBtn = () => {
@@ -28,7 +28,6 @@ export default class EditorActionsPanel extends Component {
     };
 
     handleClickUpScaleBtn = () => {
-        console.log(this.props);
         this.props.onUpScale();
     };
 
@@ -107,4 +106,5 @@ export default class EditorActionsPanel extends Component {
 EditorActionsPanel.propTypes = {
     onUpScale: PropTypes.func,
     onDownScale: PropTypes.func,
+    onDeleteSelected: PropTypes.func,
 }

@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import SideBarSection from "./SidebarSection";
-import { AddNodeContext } from "../contexts/addNodeContext";
+import { EditorContext } from "../contexts/editorContext";
 
 
-const graphicObjectsModel = {
+const itemsModel = {
     gate: {
         title: "Базовые элементы",
-        objs: {
+        items: {
             "and": "и",
             "or": "или",
             "not": "не",
@@ -16,7 +16,7 @@ const graphicObjectsModel = {
     },
     io: {
         title: "Вход/Выход",
-        objs: {
+        items: {
             "input": "вход",
             "output": "выход",
         }
@@ -37,11 +37,11 @@ export default class SideBar extends Component {
 
     render() {
         const { toggle } = this.state;
-        const model = Object.entries(graphicObjectsModel);
+        const model = Object.entries(itemsModel);
 
         return (
-            <AddNodeContext.Consumer>
-                {({ callback }) => (
+            <EditorContext.Consumer>
+                {({ addNodeCallback }) => (
                     <ul id="select-obj" className={`obj-list ${toggle ? "hide" : null}`}>
                         <div className="select-obj-toggler" onClick={this.handleClickToggle}>
                             <i className="fas fa-caret-left"></i>
@@ -50,14 +50,14 @@ export default class SideBar extends Component {
                             model.map(([name, description]) =>
                                 <SideBarSection key={name}
                                     title={description.title}
-                                    objs={description.objs}
-                                    onClickObj={callback}
+                                    items={description.items}
+                                    onClickItem={addNodeCallback}
                                 />
                             )
                         }
                     </ul>
                 )}
-            </AddNodeContext.Consumer>
+            </EditorContext.Consumer>
         );
     }
 }

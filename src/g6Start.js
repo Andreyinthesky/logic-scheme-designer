@@ -10,27 +10,20 @@ import XorGate from "./model/gates/XorGate";
 
 
 export default function start(graph) {
-  graph.moveTo(320, 70);
+  // const graphData = {
+  //   nodes: [
+  //     new AndGate(graph.indexer.getNextIndex("and"), { x: 250, y: 100 }),
+  //     new NotGate(graph.indexer.getNextIndex("not"), { x: 150, y: 50 }),
+  //     new Input(graph.indexer.getNextIndex("input"), { x: 150, y: 150 }),
+  //     new OrGate(graph.indexer.getNextIndex("or"), { x: 250, y: 200 }),
+  //     new XorGate(graph.indexer.getNextIndex("xor"), { x: 150, y: 250 }),
+  //     new Output(graph.indexer.getNextIndex("output"), { x: 250, y: 300 }),
+  //     new DelayGate(graph.indexer.getNextIndex("delay"), { x: 150, y: 350 }),
+  //   ]
+  // };
 
-  const graphData = {
-    nodes: [
-      new AndGate(graph.indexer.getNextIndex("and"), { x: 250, y: 100 }),
-      new NotGate(graph.indexer.getNextIndex("not"), { x: 150, y: 50 }),
-      new Input(graph.indexer.getNextIndex("input"), { x: 150, y: 150 }),
-      new OrGate(graph.indexer.getNextIndex("or"), { x: 250, y: 200 }),
-      new XorGate(graph.indexer.getNextIndex("xor"), { x: 150, y: 250 }),
-      new Output(graph.indexer.getNextIndex("output"), { x: 250, y: 300 }),
-      new DelayGate(graph.indexer.getNextIndex("delay"), { x: 150, y: 350 }),
-    ]
-  };
-
-  graphData.nodes.forEach(nodeData => {
-    const newNode = graph.addItem("node", nodeData);
-  });
-
-  graph.paint();
-
-  // console.log(graph.getPointByClient(0,0));
+  // graph.read(graphData);
+  // graph.moveTo(320, 70);
 
   let testModeActivated = false;
 

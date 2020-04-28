@@ -14,12 +14,12 @@ export default class SideBarSection extends Component {
     }
 
     handleClickObj = (evt) => {
-        this.props.onClickObj(evt.currentTarget.id)
+        this.props.onClickItem(evt.currentTarget.id)
     }
 
     render() {
         const { toggle } = this.state;
-        const { title, objs } = this.props;
+        const { title, items } = this.props;
 
         return (
             <li className="card">
@@ -32,7 +32,7 @@ export default class SideBarSection extends Component {
                 </div>
                 <ul className="card-body" style={{ display: toggle && "none" }}>
                     {
-                        Object.entries(objs).map(([id, name]) => {
+                        Object.entries(items).map(([id, name]) => {
                             return (
                                 <li key={id} id={id} className={`obj ${id}`} onClick={this.handleClickObj}>
                                     <div className="img"></div>
@@ -49,6 +49,6 @@ export default class SideBarSection extends Component {
 
 SideBarSection.propTypes = {
     title: PropTypes.string,
-    objs: PropTypes.object,
-    onClickObj: PropTypes.func,
+    items: PropTypes.object,
+    onClickItem: PropTypes.func,
 }

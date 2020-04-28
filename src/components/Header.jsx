@@ -1,43 +1,32 @@
 import React, { Component } from "react";
 import EditorActionsPanel from "./EditorActionsPanel";
-import { AddNodeContext } from "../contexts/addNodeContext";
+import { EditorContext } from "../contexts/editorContext";
+import AppActionsPanel from "./AppActionsPanel";
 
 export default class Header extends Component {
     constructor() {
         super();
     }
 
-    handleClickLoadBtn = () => {
-        console.log("load");
-    };
-
-    handleClickExportBtn = () => {
-        console.log("export");
-    };
-
     render() {
         return (
             <header>
                 <h1>{"Конструктор логических схем"}</h1>
-                <AddNodeContext.Consumer>
-                    {({ upScaleCallback, downScaleCallback }) => (
-                        <EditorActionsPanel
-                            onUpScale={upScaleCallback}
-                            onDownScale={downScaleCallback}
-                        />
+                <EditorContext.Consumer>
+                    {({ upScaleCallback, downScaleCallback, deleteSelectedCallback, exportSchemeCallback }) => (
+                        <>
+                            <EditorActionsPanel
+                                onUpScale={upScaleCallback}
+                                onDownScale={downScaleCallback}
+                                onDeleteSelected={deleteSelectedCallback}
+                            />
+                            <AppActionsPanel
+                                onExportScheme={exportSchemeCallback}
+                            />
+                        </>
                     )}
-                </AddNodeContext.Consumer>
 
-                <div className="app-control">
-                    <button onClick={this.handleClickLoadBtn}>
-                        <i className="fas fa-cloud-upload-alt"></i>
-                        {"Загрузить" + "..."}
-                    </button>
-                    <button onClick={this.handleClickExportBtn}>
-                        <i className="fas fa-download"></i>
-                        {"Экспорт в файл" + "..."}
-                    </button>
-                </div>
+                </EditorContext.Consumer>
             </header>
         );
     }
