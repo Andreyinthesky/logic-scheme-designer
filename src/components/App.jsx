@@ -28,6 +28,14 @@ class App extends Component {
         };
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        return false;
+    }
+
+    UNSAFE_componentWillUpdate() {
+        console.log("I will update!");
+    }
+
     componentDidMount() {
         const graph = init(document.querySelector("#mountNode"));
         this.graph = graph;
@@ -170,24 +178,30 @@ class App extends Component {
         this.graph.translate(leftTopCorner.x * scale, leftTopCorner.y * scale);
     };
 
-    exportSchemeToFile = () => {
+    exportSchemeToFile = (filename) => {
         const schemeData = this.graph.save();
         schemeData.nodes = schemeData.nodes.map(({ id, index, x, y, shape, direction }) => {
             return { id, index, x, y, shape, direction };
         });
         schemeData.version = "0.1.0";
-        schemeData.name = "Untitled";
+        schemeData.name = filename;
         schemeData.index = this.graph.indexer.index;
 
         console.log(schemeData)
 
-        // const str = JSON.stringify(schemeData);
-        // const file = new File([str], schemeData.name, {type: "application/json"});
-        // const link = document.createElement("a");
-        // link.href = URL.createObjectURL(file);
-        // link.download = schemeData.name;
-        // link.click();
-        // URL.revokeObjectURL(link.href)
+        const file = new Blob([JSON.stringify(schemeData)], { type: "application/json" });
+
+        // MS browsers
+        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+            window.navigator.msSaveOrOpenBlob(file, `${schemeData.name}.json`);
+        }
+        else {
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(file);
+            link.download = schemeData.name;
+            link.click();
+            setTimeout(() => URL.revokeObjectURL(link.href), 100);
+        }
     };
 
     createNode = (type, index, position) => {
@@ -207,16 +221,13 @@ class App extends Component {
         return new constructors[type](index, position);
     }
 
-    importScheme = () => {
-        const scheme = { "nodes": [{ "id": "and1", "x": 250, "y": 100, "input": [false, false], "output": [], "size": [100, 50], "index": 1, "shape": "and", "label": "И-1", "anchorPoints": [[0, 0.685], [0, 0.315], [1, 0.5]] }, { "id": "not1", "x": 150, "y": 50, "input": [false], "output": [], "size": [100, 50], "index": 1, "shape": "not", "label": "НЕ-1", "anchorPoints": [[0, 0.5], [1, 0.5]] }, { "id": "input1", "x": 150, "y": 150, "input": [false], "output": [], "size": [75, 50], "index": 1, "shape": "input", "label": "ВХОД-1", "anchorPoints": [[1, 0.5]] }, { "id": "or1", "x": 250, "y": 200, "input": [false, false], "output": [], "size": [100, 50], "index": 1, "shape": "or", "label": "ИЛИ-1", "anchorPoints": [[0, 0.685], [0, 0.315], [1, 0.5]] }, { "id": "xor1", "x": 150, "y": 250, "input": [false, false], "output": [], "size": [100, 50], "index": 1, "shape": "xor", "label": "ИСКЛ.ИЛИ-1", "anchorPoints": [[0, 0.685], [0, 0.315], [1, 0.5]] }, { "id": "output1", "x": 250, "y": 300, "input": [false], "output": [], "size": [65, 50], "index": 1, "shape": "output", "label": "ВЫХОД-1", "anchorPoints": [[0, 0.5]] }, { "id": "delay1", "x": 150, "y": 350, "input": [false], "output": [], "size": [100, 50], "index": 1, "shape": "delay", "label": "ЗАДЕРЖ-1", "anchorPoints": [[0, 0.5], [1, 0.5]] }], "edges": [], "groups": [], "version": "0.1.0", "name": "Untitled" };
+    importScheme = (scheme) => {
         scheme.nodes = scheme.nodes.map(node => {
-            const position = {x: node.x, y: node.y};
+            const position = { x: node.x, y: node.y };
             return this.createNode(node.shape, node.index, position);
         })
 
-        // update
         this.graph.read(scheme);
-        this.graph.moveTo(320, 70);
     };
 
     render() {
@@ -228,25 +239,23 @@ class App extends Component {
                     downScaleCallback: this.downScale,
                     deleteSelectedCallback: this.deleteSelectedItem,
                     goToOriginCallback: this.goToOrigin,
-                    exportSchemeCallback: this.exportSchemeToFile,
                 }}>
                     <Header />
                     <EditorArea />
+                    <LoadSchemeForm onImportScheme={this.importScheme}/>
+                    <ExportSchemeForm onExportScheme={this.exportSchemeToFile} />
                 </EditorContext.Provider>
-                <LoadSchemeForm />
-                <ExportSchemeForm />
             </>
         );
     }
 }
 
 App.propTypes = {
-    scale: PropTypes.number,
     updateScale: PropTypes.func,
 }
 
 const mapStateToProps = state => ({
-    scale: state.editor.scale
+    filename: state.editor.filename
 });
 
 const mapDispatchToProps = {

@@ -3,27 +3,12 @@ import "./index.css";
 import Input from "./model/Input";
 import Output from "./model/Output";
 import DelayGate from "./model/gates/DelayGate";
-import AndGate from "./model/gates/AndGate";
-import OrGate from "./model/gates/OrGate";
-import NotGate from "./model/gates/NotGate";
-import XorGate from "./model/gates/XorGate";
+
+import { EDITOR_EDITING_MODE, EDITOR_SIMULATION_MODE } from "./model/constants";
 
 
 export default function start(graph) {
-  // const graphData = {
-  //   nodes: [
-  //     new AndGate(graph.indexer.getNextIndex("and"), { x: 250, y: 100 }),
-  //     new NotGate(graph.indexer.getNextIndex("not"), { x: 150, y: 50 }),
-  //     new Input(graph.indexer.getNextIndex("input"), { x: 150, y: 150 }),
-  //     new OrGate(graph.indexer.getNextIndex("or"), { x: 250, y: 200 }),
-  //     new XorGate(graph.indexer.getNextIndex("xor"), { x: 150, y: 250 }),
-  //     new Output(graph.indexer.getNextIndex("output"), { x: 250, y: 300 }),
-  //     new DelayGate(graph.indexer.getNextIndex("delay"), { x: 150, y: 350 }),
-  //   ]
-  // };
-
-  // graph.read(graphData);
-  // graph.moveTo(320, 70);
+  graph.moveTo(320, 70);
 
   let testModeActivated = false;
 
@@ -197,7 +182,7 @@ export default function start(graph) {
       document.getElementById("discard-inputs-btn").disabled = true;
       document.getElementById("testMode-btn").classList.remove("active");
       testModeActivated = false;
-      graph.setMode("default");
+      graph.setMode(EDITOR_EDITING_MODE);
       return;
     }
 
@@ -219,7 +204,7 @@ export default function start(graph) {
     document.getElementById("discard-inputs-btn").disabled = false;
     document.getElementById("testMode-btn").classList.add("active");
     testModeActivated = true;
-    graph.setMode("testScheme");
+    graph.setMode(EDITOR_SIMULATION_MODE);
   });
 
   document.getElementById("doTact-btn").addEventListener("click", () => {

@@ -73,17 +73,16 @@ li {
   overflow: hidden;
   margin: auto;
   min-width: 500px;
-  min-height: 350px;
+  min-height: 250px;
   width: 65%;
-  height: 60%;
+  height: 50%;
   background-color: #eee;
   border-radius: 20px;
   font-size: 26px;
   text-align: center;
 }
 
-.load-form > .load,
-.load-form > .continue {
+.load-form > .choise {
   display: flex;
   box-shadow: -1px 1px #000a;
   align-items: center;
@@ -93,14 +92,13 @@ li {
   max-width: 50%;
 }
 
-.load-form > .load i {
+.load-form > .choise i {
   display: block;
   margin-bottom: 8px;
   font-size: 52px;
 }
 
-.load-form > .continue:hover,
-.load-form > .load:hover {
+.load-form > .choise:hover {
   cursor: pointer;
   background-color: #ddd;
 }
@@ -125,6 +123,13 @@ li {
   font-size: 26px;
   width: 100%;
   display: block;
+}
+
+.export-form span.validation-error {
+  display: inline-block;
+  color: #f00;
+  margin-top: 8px;
+  max-width: 500px;
 }
 
 .export-form button {
