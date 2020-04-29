@@ -1,5 +1,5 @@
-import {UPDATE_SCALE, SET_FILENAME} from "./actionTypes";
-import {DEFAULT_FILENAME, EDITOR_EDITING_MODE} from "../model/constants";
+import { UPDATE_SCALE, SET_FILENAME, SET_MODE } from "./actionTypes";
+import { DEFAULT_FILENAME, EDITOR_EDITING_MODE } from "../model/constants";
 
 
 const initialState = {
@@ -14,6 +14,8 @@ export const editorReducer = (state = initialState, action) => {
       return { ...state, scale: action.payload };
     case SET_FILENAME:
       return { ...state, filename: action.payload };
+    case SET_MODE:
+      return { ...state, mode: action.payload };
     default: return state;
   }
 };

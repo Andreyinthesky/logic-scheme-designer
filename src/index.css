@@ -218,6 +218,11 @@ span.show-scale {
   background-color: rgb(210, 210, 210);
 }
 
+.app-control button > i,
+.scheme-control button > i {
+  margin-right: 8px;
+}
+
 #mountNode {
   display: inline-block;
   box-shadow: 0 0 2px 2px #0003;
@@ -246,17 +251,17 @@ span.show-scale {
   padding: 10px;
 }
 
-.app-control button > i,
-.scheme-control button > i {
-  margin-right: 8px;
+#testMode-btn:hover {
+  background-color: #41905b;
 }
 
 #testMode-btn.active {
-  background-color: #41705b;
+  background-color: rgb(240, 240, 240);
 }
 
-#testMode-btn:hover {
-  background-color: #41905b;
+#testMode-btn.active:hover {
+  background-color: rgb(210, 210, 210);
+
 }
 
 #doTact-btn,
