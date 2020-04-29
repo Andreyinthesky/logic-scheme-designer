@@ -1,8 +1,11 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import { connect } from "react-redux";
+
+import { EDITOR_SIMULATION_MODE, EDITOR_EDITING_MODE } from "../model/constants";
 
 
-export default class EditorActionsPanel extends Component {
+class EditorActionsPanel extends Component {
     constructor() {
         super();
     }
@@ -36,7 +39,12 @@ export default class EditorActionsPanel extends Component {
     };
 
     handleClickChangeModeBtn = () => {
-        console.log("undo");
+        if (this.props.editorMode === EDITOR_SIMULATION_MODE) {
+            this.props.onSetMode(EDITOR_EDITING_MODE);
+            return;
+        }
+
+        this.props.onSetMode(EDITOR_SIMULATION_MODE);
     };
 
     handleClickDoTactBtn = () => {
@@ -48,6 +56,8 @@ export default class EditorActionsPanel extends Component {
     };
 
     render() {
+        const isSimulationMode = this.props.editorMode === EDITOR_SIMULATION_MODE;
+
         return (
             <div className="tools-panel">
                 <div className="canvas-actions">
@@ -85,16 +95,20 @@ export default class EditorActionsPanel extends Component {
                 </div>
 
                 <div className="scheme-control">
-                    <button id="testMode-btn"
-                        onClick={this.handleClickChangeModeBtn}
-                    >
-                        <i className="fas fa-caret-square-right"></i>
-                        {"В режим симуляции"}
-                    </button>
-                    <button id="doTact-btn" onClick={this.handleClickDoTactBtn} disabled >
+                    {isSimulationMode ?
+                        <button id="testMode-btn" className={"active"} onClick={this.handleClickChangeModeBtn}>
+                            <i className="fas fa-pencil-alt"></i>
+                            {"В режим редактирования"}
+                        </button> :
+                        <button id="testMode-btn" onClick={this.handleClickChangeModeBtn}>
+                            <i className="fas fa-caret-square-right"></i>
+                            {"В режим симуляции"}
+                        </button>
+                    }
+                    <button id="doTact-btn" onClick={this.handleClickDoTactBtn} disabled={!isSimulationMode} >
                         {"Сделать такт"}
                     </button>
-                    <button id="discard-inputs-btn" onClick={this.handleClickDiscardInputsBtn} disabled >
+                    <button id="discard-inputs-btn" onClick={this.handleClickDiscardInputsBtn} disabled={!isSimulationMode} >
                         {"Сбросить входы"}
                     </button>
                 </div>
@@ -103,9 +117,17 @@ export default class EditorActionsPanel extends Component {
     }
 }
 
+const mapStateToProps = state => ({
+    editorMode: state.editor.mode,
+});
+
 EditorActionsPanel.propTypes = {
+    editorMode: PropTypes.string.isRequired,
+    onSetMode: PropTypes.func.isRequired,
     onUpScale: PropTypes.func,
     onDownScale: PropTypes.func,
     onGoToOrigin: PropTypes.func,
     onDeleteSelected: PropTypes.func,
-}
+};
+
+export default connect(mapStateToProps, null)(EditorActionsPanel);

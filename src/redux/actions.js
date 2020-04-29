@@ -4,8 +4,10 @@ import {
   SHOW_EXPORT_FORM,
   SHOW_LOAD_FORM,
   HIDE_EXPORT_FORM,
-  HIDE_LOAD_FORM
+  HIDE_LOAD_FORM,
+  SET_MODE
 } from "./actionTypes";
+import {EDITOR_EDITING_MODE, EDITOR_SIMULATION_MODE} from "../model/constants";
 
 export function updateScale(scale) {
   return {
@@ -21,6 +23,16 @@ export function setFilename(filename) {
   };
 }
 
+export function setMode(mode) {
+  if (![EDITOR_SIMULATION_MODE, EDITOR_EDITING_MODE].includes(mode)) {
+    throw new Error(`Unknown editor mode - ${mode}`);
+  }
+
+  return {
+    type: SET_MODE,
+    payload: mode
+  };
+}
 
 export function showLoadForm() {
   return {

@@ -178,9 +178,6 @@ export default function start(graph) {
   let rankedElements;
   document.getElementById("testMode-btn").addEventListener("click", () => {
     if (testModeActivated) {
-      document.getElementById("doTact-btn").disabled = true;
-      document.getElementById("discard-inputs-btn").disabled = true;
-      document.getElementById("testMode-btn").classList.remove("active");
       testModeActivated = false;
       graph.setMode(EDITOR_EDITING_MODE);
       return;
@@ -199,10 +196,6 @@ export default function start(graph) {
     }
 
     rankedElements = rankElements(logicSchemeModel);
-
-    document.getElementById("doTact-btn").disabled = false;
-    document.getElementById("discard-inputs-btn").disabled = false;
-    document.getElementById("testMode-btn").classList.add("active");
     testModeActivated = true;
     graph.setMode(EDITOR_SIMULATION_MODE);
   });

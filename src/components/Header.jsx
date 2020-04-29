@@ -18,6 +18,7 @@ export default class Header extends Component {
                         downScaleCallback,
                         deleteSelectedCallback,
                         goToOriginCallback,
+                        setModeCallback
                     }) =>
                         (
                             <EditorActionsPanel
@@ -25,6 +26,7 @@ export default class Header extends Component {
                                 onDownScale={downScaleCallback}
                                 onDeleteSelected={deleteSelectedCallback}
                                 onGoToOrigin={goToOriginCallback}
+                                onSetMode={setModeCallback}
                             />
                         )}
                 </EditorContext.Consumer>
