@@ -18,23 +18,17 @@ export default class Header extends Component {
                         downScaleCallback,
                         deleteSelectedCallback,
                         goToOriginCallback,
-                        exportSchemeCallback
                     }) =>
                         (
-                            <>
-                                <EditorActionsPanel
-                                    onUpScale={upScaleCallback}
-                                    onDownScale={downScaleCallback}
-                                    onDeleteSelected={deleteSelectedCallback}
-                                    onGoToOrigin={goToOriginCallback}
-                                />
-                                <AppActionsPanel
-                                    onExportScheme={exportSchemeCallback}
-                                />
-                            </>
+                            <EditorActionsPanel
+                                onUpScale={upScaleCallback}
+                                onDownScale={downScaleCallback}
+                                onDeleteSelected={deleteSelectedCallback}
+                                onGoToOrigin={goToOriginCallback}
+                            />
                         )}
-
                 </EditorContext.Consumer>
+                <AppActionsPanel />
             </header>
         );
     }

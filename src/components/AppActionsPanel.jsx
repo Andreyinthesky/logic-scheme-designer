@@ -1,36 +1,46 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import {connect} from "react-redux";
+import {showExportForm, showLoadForm } from "../redux/actions";
 
 
-export default class AppActionsPanel extends Component {
+class AppActionsPanel extends Component {
     constructor() {
         super();
     }
 
     handleClickLoadBtn = () => {
-        console.log("load");
+        this.props.showLoadForm();
     };
 
     handleClickExportBtn = () => {
-        this.props.onExportScheme();
+        this.props.showExportForm();
     };
 
     render() {
         return (
             <div className="app-control">
                 <button onClick={this.handleClickLoadBtn}>
-                    <i className="fas fa-cloud-upload-alt"></i>
-                    {"Загрузить" + "..."}
+                    <i className="fas fa-plus"></i>
+                    {"Новая схема" + "..."}
                 </button>
                 <button onClick={this.handleClickExportBtn}>
                     <i className="fas fa-download"></i>
-                    {"Экспорт в файл" + "..."}
+                    {"Экспорт" + "..."}
                 </button>
             </div>
         );
     }
 }
 
+const mapDispatchToProps = {
+    showExportForm,
+    showLoadForm,
+};
+
 AppActionsPanel.propTypes = {
-    onExportScheme: PropTypes.func,
+    showExportForm: PropTypes.func,
+    showLoadForm: PropTypes.func,
 }
+
+export default connect(null, mapDispatchToProps)(AppActionsPanel);

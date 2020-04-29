@@ -1,6 +1,8 @@
 import G6 from "./g6";
 
 import EditorObjIndexer from "./indexer";
+import { EDITOR_EDITING_MODE, EDITOR_SIMULATION_MODE } from "./model/constants";
+
 
 export default function init(mountNode) {
   const graph = new G6.Graph({
@@ -14,8 +16,8 @@ export default function init(mountNode) {
       type: "schemeLayout"
     },
     modes: {
-      default: ["drag-node", "click-add-edge", "drag-canvas"],
-      testScheme: ["change-input-state", "drag-canvas", "drag-node"],
+      [EDITOR_EDITING_MODE]: ["drag-node", "click-add-edge", "drag-canvas"],
+      [EDITOR_SIMULATION_MODE]: ["change-input-state", "drag-canvas", "drag-node"],
     }
   });
 
