@@ -48,11 +48,11 @@ class EditorActionsPanel extends Component {
     };
 
     handleClickDoTactBtn = () => {
-        console.log("undo");
+        this.props.onDoTact();
     };
 
     handleClickDiscardInputsBtn = () => {
-        console.log("undo");
+        this.props.onDiscardInputs();
     };
 
     render() {
@@ -128,6 +128,8 @@ EditorActionsPanel.propTypes = {
     onDownScale: PropTypes.func,
     onGoToOrigin: PropTypes.func,
     onDeleteSelected: PropTypes.func,
+    onDoTact: PropTypes.func,
+    onDiscardInputs: PropTypes.func,
 };
 
 export default connect(mapStateToProps, null)(EditorActionsPanel);

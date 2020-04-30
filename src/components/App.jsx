@@ -32,7 +32,7 @@ class App extends Component {
 
     bindEditorEvents = (editor) => {
         editor.onWheel = (evt) => {
-            const {deltaY} = evt;
+            const { deltaY } = evt;
 
             if (deltaY < 0) {
                 this.upScale();
@@ -78,6 +78,14 @@ class App extends Component {
         this.editor.setScale(scale);
     }
 
+    evaluateScheme = () => {
+        this.editor.evaluateScheme();
+    };
+
+    discardInputs = () => {
+        this.editor.discardSchemeInputsState();
+    };
+
     importScheme = (schemeData) => {
         this.editor.importScheme(schemeData);
     }
@@ -109,6 +117,8 @@ class App extends Component {
                     deleteSelectedCallback: this.deleteSelected,
                     goToOriginCallback: this.goToOrigin,
                     setModeCallback: this.setMode,
+                    doTactCallback: this.evaluateScheme,
+                    discardInputsCallback: this.discardInputs,
                 }}>
                     <Header />
                     <EditorArea />
