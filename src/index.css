@@ -60,7 +60,7 @@ li {
   left: 0;
   background-color: #000a;
   background-color: rgba(0, 0, 0, 0.66);
-  z-index: 2000;
+  z-index: 1010;
   width: 100vw;
   height: 100vh;
 }
@@ -440,17 +440,28 @@ ul.card-body li:hover {
 .msg-list {
   display: block;
   position: fixed;
-  z-index: 1000;
+  z-index: 1010;
   right: 8px;
   bottom: 8px;
 }
 
 .msg {
   position: relative;
+  left: 450px;
   margin: 8px 0;
   padding: 8px;
+  min-height: 50px;
   width: 350px;
+  border-radius: 8px;
   background-color: rgb(165, 133, 121, 0.75);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.66);
+  transition-property: left, opacity;
+  transition-timing-function: ease;
+  transition-duration: 1s, 0.5s;
+}
+
+.msg.show {
+  left: 0;
 }
 
 .msg .msg-close {
@@ -462,6 +473,7 @@ ul.card-body li:hover {
 
 .msg .msg-close:hover {
   cursor: pointer;
+  color: #555;
 }
 
 .msg.error {
@@ -477,8 +489,16 @@ ul.card-body li:hover {
 }
 
 .msg .msg-text {
-  font-weight: bold;
   margin-right: 16px;
+}
+
+.msg .msg-title {
+  font-weight: bold;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  margin-right: 24px;
+  margin-bottom: 8px;
 }
 
 .msg .focus {
@@ -490,6 +510,11 @@ ul.card-body li:hover {
   padding: 4px 8px;
 }
 
-.focus i {
+.msg .focus:hover {
+  border-color: #333;
+  color: #333;
+}
+
+.msg .focus > i {
   margin-right: 4px;
 }

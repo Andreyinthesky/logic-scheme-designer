@@ -5,7 +5,9 @@ import {
   SHOW_LOAD_FORM,
   HIDE_EXPORT_FORM,
   HIDE_LOAD_FORM,
-  SET_MODE
+  SHOW_NOTIFICATION,
+  SET_MODE,
+  HIDE_NOTIFICATION
 } from "./actionTypes";
 import {EDITOR_EDITING_MODE, EDITOR_SIMULATION_MODE} from "../model/constants";
 
@@ -32,6 +34,21 @@ export function setMode(mode) {
     type: SET_MODE,
     payload: mode
   };
+}
+
+export function showNotification(notification) {
+  return {
+    type: SHOW_NOTIFICATION,
+    payload: notification,
+  }
+}
+
+
+export function hideNotification(id) {
+  return {
+    type: HIDE_NOTIFICATION,
+    payload: id,
+  }
 }
 
 export function showLoadForm() {

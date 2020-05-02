@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { hideLoadForm } from "../redux/actions";
+import { hideLoadForm, showNotification } from "../redux/actions";
 
 class LoadSchemeForm extends Component {
     constructor() {
@@ -25,6 +25,14 @@ class LoadSchemeForm extends Component {
             && schemeData.index;
     }
 
+    showFileLoadError = () => {
+        this.props.showNotification({
+            title: "Ошибка",
+            type: "error",
+            message: "Схему загрузить не удалось. Произошла ошибка при загрузке файла"
+        });
+    }
+
     loadInputFile = (fileInput) => {
         if (!fileInput || fileInput.files.length <= 0)
             return;
@@ -37,14 +45,14 @@ class LoadSchemeForm extends Component {
                 this.validateSchemeData(schemeData) && this.props.onImportScheme(schemeData);
                 this.closeForm();
             } catch (error) {
-                console.error(error);
+                console.error(error.message);
+                this.showFileLoadError();
             }
-
-            console.log("success");
         }
 
         fileReader.onerror = () => {
             console.error(fileReader.error);
+            this.showFileLoadError();
         }
 
         fileReader.readAsText(fileInput.files[0]);
@@ -97,11 +105,13 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
     hideLoadForm,
+    showNotification,
 };
 
 LoadSchemeForm.propTypes = {
     hideLoadForm: PropTypes.func.isRequired,
     onImportScheme: PropTypes.func.isRequired,
+    showNotification: PropTypes.func,
     show: PropTypes.bool,
 };
 

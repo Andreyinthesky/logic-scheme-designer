@@ -3,13 +3,13 @@ import { debounce } from "../utils";
 import { FILE_VERSION, EDITOR_SIMULATION_MODE, EDITOR_EDITING_MODE } from "./constants";
 import EditorObjIndexer from "../indexer";
 
-import Input from "../model/Input";
-import Output from "../model/Output";
-import DelayGate from "../model/gates/DelayGate";
-import AndGate from "../model/gates/AndGate";
-import OrGate from "../model/gates/OrGate";
-import NotGate from "../model/gates/NotGate";
-import XorGate from "../model/gates/XorGate";
+import Input from "./Input";
+import Output from "./Output";
+import DelayGate from "./gates/DelayGate";
+import AndGate from "./gates/AndGate";
+import OrGate from "./gates/OrGate";
+import NotGate from "./gates/NotGate";
+import XorGate from "./gates/XorGate";
 
 const bindG6Events = (editor) => {
   const graph = editor._graph;
@@ -152,7 +152,7 @@ function createLogicSchemeModel(graph) {
     }
   });
 
-  return Object.values(elements);
+  return elements;
 }
 
 function findSchemeCycle(elements) {
@@ -245,7 +245,6 @@ function rankElements(elements) {
 }
 
 function evalScheme(rankedElements) {
-  console.log("start eval");
   const maxRank = rankedElements.length - 1;
 
   for (let rank = 0; rank <= maxRank; rank++) {
@@ -258,8 +257,6 @@ function evalScheme(rankedElements) {
       });
     });
   }
-
-  console.log("end eval");
 }
 
 export default class SchemeEditor {
@@ -292,15 +289,23 @@ export default class SchemeEditor {
 
   setMode = (mode) => {
     if (mode === EDITOR_SIMULATION_MODE) {
-      const schemeElements = createLogicSchemeModel(this._graph);
+      const scheme = createLogicSchemeModel(this._graph);
+      const schemeElements = Object.values(scheme);
       const cycle = findSchemeCycle(schemeElements);
 
       if (cycle.verdict) {
         const { path } = cycle;
-        console.log(cycle.start);
+        const cycleNodes = [];
+        cycleNodes.push(cycle.start);
         for (let current = cycle.end; current !== cycle.start; current = path[current]) {
-          console.log(current);
+          cycleNodes.push(current);
         }
+
+        this.onError({
+          error: `В цепи обратной связи ${cycleNodes.map(nodeId => scheme[nodeId].label).join(" —> ")} 
+                  отсутствует элемент задержки`,
+          focus: () => alert("Фокус")
+        });
         return;
       }
 
@@ -380,10 +385,13 @@ export default class SchemeEditor {
 
     this._graph.read(scheme);
     this._graph.indexer = new EditorObjIndexer(scheme.index);
+    this.afterImportScheme({ schemeName: scheme.name });
   };
 
   // EVENTS
 
+  afterImportScheme = (evt) => { };
+  onError = (evt) => { };
   onWheel = (evt) => { };
   onUpdateScale = (evt) => { };
   onChangeMode = (evt) => { };

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { updateScale, setMode } from "../redux/actions";
+import { updateScale, setMode, setFilename, showNotification } from "../redux/actions";
 import { connect } from "react-redux";
 
 import LoadSchemeForm from "./LoadSchemeForm";
@@ -8,7 +8,8 @@ import ExportSchemeForm from "./ExportSchemeForm";
 import Header from "./Header";
 import EditorArea from "./EditorArea";
 import { EditorContext } from "../contexts/editorContext";
-import SchemeEditor from "../model/Editor";
+import SchemeEditor from "../model/SchemeEditor";
+import NotificationsArea from "./NotificationsArea";
 
 
 class App extends Component {
@@ -47,6 +48,25 @@ class App extends Component {
 
         editor.onChangeMode = (evt) => {
             this.props.setMode(evt.mode);
+        }
+
+        editor.afterImportScheme = (evt) => {
+            const { schemeName } = evt;
+            this.props.setFilename(schemeName);
+            this.props.showNotification({
+                message: `Схема "${schemeName}" успешно загружена`,
+                type: "success"
+            });
+        }
+
+        editor.onError = ({ error, focus }) => {
+            this.props.showNotification({
+                title: "Ошибка в построении схемы",
+                type: "error",
+                duration: 10000,
+                message: error,
+                focus
+            });
         }
     }
 
@@ -105,6 +125,8 @@ class App extends Component {
             link.click();
             setTimeout(() => URL.revokeObjectURL(link.href), 100);
         }
+
+        this.props.showNotification({message: "Схема успешно экспортирована", type: "success"});
     };
 
     render() {
@@ -124,6 +146,7 @@ class App extends Component {
                     <EditorArea />
                     <LoadSchemeForm onImportScheme={this.importScheme} />
                     <ExportSchemeForm onExportScheme={this.exportSchemeToFile} />
+                    <NotificationsArea />
                 </EditorContext.Provider>
             </>
         );
@@ -132,7 +155,9 @@ class App extends Component {
 
 App.propTypes = {
     updateScale: PropTypes.func,
-    setMode: PropTypes.func
+    setMode: PropTypes.func,
+    setFilename: PropTypes.func,
+    showNotification: PropTypes.func
 }
 
 const mapStateToProps = state => ({
@@ -142,6 +167,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
     updateScale,
     setMode,
+    setFilename,
+    showNotification,
 };
 
 export default connect(null, mapDispatchToProps)(App);
