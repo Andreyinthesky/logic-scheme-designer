@@ -7,9 +7,17 @@ import {
   HIDE_LOAD_FORM,
   SHOW_NOTIFICATION,
   SET_MODE,
-  HIDE_NOTIFICATION
+  HIDE_NOTIFICATION,
+  REINIT
 } from "./actionTypes";
 import {EDITOR_EDITING_MODE, EDITOR_SIMULATION_MODE} from "../model/constants";
+
+
+export function reInitEditor() {
+  return {
+    type: REINIT,
+  };
+}
 
 export function updateScale(scale) {
   return {

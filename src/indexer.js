@@ -1,4 +1,4 @@
-const editorObjectsIndex = {
+const createObjectsIndex = () => ({
   "wire": 0,
   "and" : 0,
   "or" : 0,
@@ -7,11 +7,11 @@ const editorObjectsIndex = {
   "delay" : 0,
   "input" : 0,
   "output" : 0,
-};
+});
 
 export default class EditorObjIndexer {
   constructor(index) {
-    this.index = index || editorObjectsIndex;
+    this.index = index || createObjectsIndex();
   }
 
   getNextIndex(objName) {

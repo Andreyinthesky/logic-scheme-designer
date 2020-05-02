@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { updateScale, setMode, setFilename, showNotification } from "../redux/actions";
+import { updateScale, setMode, setFilename, showNotification, reInitEditor } from "../redux/actions";
 import { connect } from "react-redux";
 
 import LoadSchemeForm from "./LoadSchemeForm";
@@ -28,7 +28,7 @@ class App extends Component {
     componentDidMount() {
         const editor = new SchemeEditor(document.getElementById("mountNode"));
         this.editor = editor;
-        this.bindEditorEvents(editor);
+        this.bindEditorEvents(this.editor);
     }
 
     bindEditorEvents = (editor) => {
@@ -52,6 +52,7 @@ class App extends Component {
 
         editor.afterImportScheme = (evt) => {
             const { schemeName } = evt;
+            this.props.reInitEditor();
             this.props.setFilename(schemeName);
             this.props.showNotification({
                 message: `Схема "${schemeName}" успешно загружена`,
@@ -68,6 +69,11 @@ class App extends Component {
                 focus
             });
         }
+    }
+
+    initNewScheme = () => {
+        this.editor.restart();
+        this.props.reInitEditor();
     }
 
     addNode = (type) => {
@@ -100,11 +106,11 @@ class App extends Component {
 
     evaluateScheme = () => {
         this.editor.evaluateScheme();
-    };
+    }
 
     discardInputs = () => {
         this.editor.discardSchemeInputsState();
-    };
+    }
 
     importScheme = (schemeData) => {
         this.editor.importScheme(schemeData);
@@ -127,7 +133,7 @@ class App extends Component {
         }
 
         this.props.showNotification({message: "Схема успешно экспортирована", type: "success"});
-    };
+    }
 
     render() {
         return (
@@ -144,7 +150,7 @@ class App extends Component {
                 }}>
                     <Header />
                     <EditorArea />
-                    <LoadSchemeForm onImportScheme={this.importScheme} />
+                    <LoadSchemeForm onNewScheme={this.initNewScheme} onImportScheme={this.importScheme} />
                     <ExportSchemeForm onExportScheme={this.exportSchemeToFile} />
                     <NotificationsArea />
                 </EditorContext.Provider>
@@ -157,7 +163,8 @@ App.propTypes = {
     updateScale: PropTypes.func,
     setMode: PropTypes.func,
     setFilename: PropTypes.func,
-    showNotification: PropTypes.func
+    showNotification: PropTypes.func,
+    reInitEditor: PropTypes.func
 }
 
 const mapStateToProps = state => ({
@@ -169,6 +176,7 @@ const mapDispatchToProps = {
     setMode,
     setFilename,
     showNotification,
+    reInitEditor
 };
 
 export default connect(null, mapDispatchToProps)(App);

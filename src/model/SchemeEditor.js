@@ -388,6 +388,13 @@ export default class SchemeEditor {
     this.afterImportScheme({ schemeName: scheme.name });
   };
 
+  restart = () => {
+    const container = this._graph.get("container");
+    this._graph.destroy();
+    this._graph = init(container);
+    bindG6Events(this);
+  }
+
   // EVENTS
 
   afterImportScheme = (evt) => { };

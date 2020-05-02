@@ -14,7 +14,12 @@ class LoadSchemeForm extends Component {
         this.closeForm();
     };
 
-    handleClickLoadArea = () => {
+    handleClickNewSchemeArea = () => {
+        this.props.onNewScheme();
+        this.closeForm();
+    }
+
+    handleClickLoadSchemeArea = () => {
         this.createNativeFileInputElement().click();
     };
 
@@ -81,13 +86,13 @@ class LoadSchemeForm extends Component {
         return (
             <div className={"form-wrapper"} onClick={this.handleClickForeground}>
                 <div className={"load-form"}>
-                    <div className="choise" onClick={this.closeForm}>
+                    <div className="choise" onClick={this.handleClickNewSchemeArea}>
                         <div>
                             <i className="fas fa-file"></i>
                             <span>Новая схема</span>
                         </div>
                     </div>
-                    <div className="choise" onClick={this.handleClickLoadArea}>
+                    <div className="choise" onClick={this.handleClickLoadSchemeArea}>
                         <div>
                             <i className="fas fa-cloud-upload-alt"></i>
                             <span>Загрузить cхему</span>
@@ -111,6 +116,7 @@ const mapDispatchToProps = {
 LoadSchemeForm.propTypes = {
     hideLoadForm: PropTypes.func.isRequired,
     onImportScheme: PropTypes.func.isRequired,
+    onNewScheme: PropTypes.func.isRequired,
     showNotification: PropTypes.func,
     show: PropTypes.bool,
 };

@@ -1,6 +1,7 @@
 export const UPDATE_SCALE = "EDITOR/UPDATE_SCALE";
 export const SET_FILENAME = "EDITOR/SET_FILENAME";
 export const SET_MODE = "EDITOR/SET_MODE";
+export const REINIT = "EDITOR/REINIT";
 
 export const SHOW_LOAD_FORM = "APP/SHOW_LOAD_FORM";
 export const HIDE_LOAD_FORM = "APP/HIDE_LOAD_FORM";
