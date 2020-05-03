@@ -408,31 +408,31 @@ ul.card-body li:hover {
 
 /* CARDS */
 .obj.and .img {
-  background-image: url(assets/svg_elements/AND_ANSI.svg);
+  background-image: url(~@assets/svg_elements/AND_ANSI.svg);
 }
 
 .obj.or .img {
-  background-image: url(assets/svg_elements/OR_ANSI.svg);
+  background-image: url(~@assets/svg_elements/OR_ANSI.svg);
 }
 
 .obj.not .img {
-  background-image: url(assets/svg_elements/NOT_ANSI.svg);
+  background-image: url(~@assets/svg_elements/NOT_ANSI.svg);
 }
 
 .obj.xor .img {
-  background-image: url(assets/svg_elements/XOR_ANSI.svg);
+  background-image: url(~@assets/svg_elements/XOR_ANSI.svg);
 }
 
 .obj.delay .img {
-  background-image: url(assets/svg_elements/Delay.svg);
+  background-image: url(~@assets/svg_elements/Delay.svg);
 }
 
 .obj.input .img {
-  background-image: url(assets/svg_elements/Input.svg);
+  background-image: url(~@assets/svg_elements/Input.svg);
 }
 
 .obj.output .img {
-  background-image: url(assets/svg_elements/Output.svg);
+  background-image: url(~@assets/svg_elements/Output.svg);
 }
 
 /* MESSAGES */

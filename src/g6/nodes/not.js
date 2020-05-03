@@ -1,4 +1,4 @@
-import NOT_GATE from "../../assets/svg_elements/NOT_ANSI.svg";
+import NOT_GATE from "@assets/svg_elements/NOT_ANSI.svg";
 import base from "./base";
 
 const not = {

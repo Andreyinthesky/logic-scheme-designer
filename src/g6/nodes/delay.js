@@ -1,4 +1,4 @@
-import DELAY_GATE from "../../assets/svg_elements/Buffer_ANSI.svg";
+import DELAY_GATE from "@assets/svg_elements/Buffer_ANSI.svg";
 import base from "./base";
 
 const delay = {

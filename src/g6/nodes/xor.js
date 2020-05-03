@@ -1,4 +1,4 @@
-import XOR_GATE from "../../assets/svg_elements/XOR_ANSI.svg";
+import XOR_GATE from "@assets/svg_elements/XOR_ANSI.svg";
 import base from "./base";
 
 const xor = {

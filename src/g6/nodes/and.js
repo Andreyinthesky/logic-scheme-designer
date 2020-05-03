@@ -1,4 +1,4 @@
-import AND_GATE from "../../assets/svg_elements/AND_ANSI.svg";
+import AND_GATE from "@assets/svg_elements/AND_ANSI.svg";
 import base from "./base";
 
 const and = {

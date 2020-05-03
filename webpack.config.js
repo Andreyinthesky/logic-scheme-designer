@@ -25,15 +25,26 @@ module.exports = {
       },
       {
         test: /\.svg$/,
-        use: ["file-loader"]
+        loader: "file-loader",
+        options: {
+          name: "[name].[contenthash].[ext]",
+          outputPath: "assets/images/svg"
+        },
       },
       {
         test: /[\.eot|\.ttf|\.woff|\.woff2]$/,
-        use: ["file-loader"],
+        loader: "file-loader",
+        options: {
+          name: "[name].[contenthash].[ext]",
+          outputPath: "assets/fonts"
+        },
       }
     ]
   },
   resolve: {
+    alias: {
+      '@assets': path.join(__dirname, './assets'),
+    },
     modules: ['node_modules'],
     extensions: ['.js', '.jsx'],
   },
