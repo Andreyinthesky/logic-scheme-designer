@@ -42,7 +42,7 @@ export default class SideBar extends Component {
         return (
             <EditorContext.Consumer>
                 {({ addNodeCallback }) => (
-                    <ul id="select-obj" className={`obj-list ${toggle ? "hide" : null}`}>
+                    <ul id="select-obj" className={`obj-list ${toggle ? "hide" : ""}`}>
                         <div className="select-obj-toggler" onClick={this.handleClickToggle}>
                             <i className="fas fa-caret-left"></i>
                         </div>

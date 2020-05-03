@@ -31,9 +31,8 @@ const output = {
     const text = group.addShape("text", {
       attrs: {
         x: connectorOffset / 2,
-        y: 3,
+        y: height / 2 - 1,
         textAlign: "center",
-        textBaseline: "middle",
         text: "0",
         fontWeight: "bold",
         fontSize: 40,

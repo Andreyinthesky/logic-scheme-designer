@@ -31,9 +31,8 @@ const input = {
     group.addShape("text", {
       attrs: {
         x: -width / 2 + height / 2,
-        y: 3,
+        y: height / 2 - 1,
         textAlign: "center",
-        textBaseline: "middle",
         text: "0",
         fontWeight: "bold",
         fontSize: 40,

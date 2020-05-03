@@ -259,6 +259,8 @@ function evalScheme(rankedElements) {
   }
 }
 
+const SIDEBAR_X_OFFSET = 320;
+
 export default class SchemeEditor {
   constructor(mountHTMLElement) {
     this._graph = init(mountHTMLElement);
@@ -267,8 +269,8 @@ export default class SchemeEditor {
 
   addNode = (type) => {
     const graph = this._graph;
-    const sideBarXOffset = 320;
-    const position = graph.getPointByCanvas(100 + sideBarXOffset, 100);
+
+    const position = graph.getPointByCanvas(100 + SIDEBAR_X_OFFSET, 100);
 
     graph.addItem("node", createNodeModel(type, graph.indexer.getNextIndex(type), position));
   }
