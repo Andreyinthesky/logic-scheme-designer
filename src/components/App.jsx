@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { updateScale, setMode, setFilename, showNotification, reInitEditor } from "../redux/actions";
+import { updateScale, setMode, setFilename, showNotification, reInitEditor, showLoadForm } from "../redux/actions";
 import { connect } from "react-redux";
 
 import LoadSchemeForm from "./LoadSchemeForm";
@@ -29,6 +29,7 @@ class App extends Component {
         const editor = new SchemeEditor(document.getElementById("mountNode"));
         this.editor = editor;
         this.bindEditorEvents(this.editor);
+        this.props.showLoadForm();
     }
 
     bindEditorEvents = (editor) => {
@@ -95,12 +96,16 @@ class App extends Component {
     upScale = () => {
         let scale = this.editor.getScale();
         scale = parseFloat((scale + 0.1).toFixed(1));
-        this.editor.setScale(scale);
+        this.setScale(scale);
     }
 
     downScale = () => {
         let scale = this.editor.getScale();
         scale = parseFloat((scale - 0.1).toFixed(1));
+        this.setScale(scale);
+    }
+
+    setScale = (scale) => {
         this.editor.setScale(scale);
     }
 
@@ -147,6 +152,7 @@ class App extends Component {
                     setModeCallback: this.setMode,
                     doTactCallback: this.evaluateScheme,
                     discardInputsCallback: this.discardInputs,
+                    setScaleCallback: this.setScale,
                 }}>
                     <Header />
                     <EditorArea />
@@ -164,7 +170,8 @@ App.propTypes = {
     setMode: PropTypes.func,
     setFilename: PropTypes.func,
     showNotification: PropTypes.func,
-    reInitEditor: PropTypes.func
+    reInitEditor: PropTypes.func,
+    showLoadForm: PropTypes.func,
 }
 
 const mapStateToProps = state => ({
@@ -176,7 +183,8 @@ const mapDispatchToProps = {
     setMode,
     setFilename,
     showNotification,
-    reInitEditor
+    reInitEditor,
+    showLoadForm
 };
 
 export default connect(null, mapDispatchToProps)(App);

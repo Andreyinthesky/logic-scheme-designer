@@ -518,3 +518,45 @@ ul.card-body li:hover {
 .msg .focus > i {
   margin-right: 4px;
 }
+
+/* SCALE SELECTOR */
+
+ul.scale-selector {
+  position: absolute;
+  z-index: 1000;
+  top: 100%;
+  left: 0;
+  padding-top: 4px;
+  margin-left: 4px;
+  margin-top: 16px;
+  background-color: #ddd;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.66);
+  border-radius: 8px;
+  text-align: center;
+}
+
+ul.scale-selector::before,
+ul.scale-selector::after {
+  position: absolute;
+  top: -21px;
+  left: 8px;
+  content: " ";
+  width: 0;
+  height: 0;
+  border: 10px solid transparent;
+  border-bottom: 10px solid rgba(0, 0, 0, 0.15);
+}
+
+ul.scale-selector::after {
+  top: -19px;
+  border-bottom: 10px solid #ddd;
+}
+
+.scale-selector__item {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.scale-selector__item:hover {
+  background-color: #ccc;
+}

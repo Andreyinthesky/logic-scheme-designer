@@ -3,6 +3,8 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 
 import { EDITOR_SIMULATION_MODE, EDITOR_EDITING_MODE } from "../model/constants";
+import EditorScaleSelector from "./EditorScaleSelector";
+import { EditorContext } from "../contexts/editorContext";
 
 
 class EditorActionsPanel extends Component {
@@ -76,10 +78,11 @@ class EditorActionsPanel extends Component {
                     >
                         <i className="fas fa-compress"></i>
                     </button>
-                    <button title="Масштаб (Scale)" onClick={this.handleClickChooseScaleBtn}>
-                        <i className="fas fa-search"></i>
-                        <i className="fas fa-angle-down"></i>
-                    </button>
+                    <EditorContext.Consumer>
+                        {({ setScaleCallback }) => (
+                            <EditorScaleSelector onChooseScale={setScaleCallback} />
+                        )}
+                    </EditorContext.Consumer>
                     <button className="down-scale"
                         title="Уменьшить масштаб (Down scale)"
                         onClick={this.handleClickDownScaleBtn}

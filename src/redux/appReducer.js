@@ -5,7 +5,7 @@ const initialState = {
   nextNotificationId: 1,
   notifications: [],
   showExportForm: false,
-  showLoadForm: true,
+  showLoadForm: false,
 };
 
 export const appReducer = (state = initialState, action) => {
