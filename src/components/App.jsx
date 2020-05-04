@@ -29,7 +29,13 @@ class App extends Component {
         const editor = new SchemeEditor(document.getElementById("mountNode"));
         this.editor = editor;
         this.bindEditorEvents(this.editor);
-        this.props.showLoadForm();
+
+        window.onbeforeunload = (evt) => {
+            this.saveEditorState();
+        }
+
+        this.restoreEditorState();
+        // this.props.showLoadForm();
     }
 
     bindEditorEvents = (editor) => {
@@ -137,7 +143,27 @@ class App extends Component {
             setTimeout(() => URL.revokeObjectURL(link.href), 100);
         }
 
-        this.props.showNotification({message: "Схема успешно экспортирована", type: "success"});
+        this.props.showNotification({ message: "Схема успешно экспортирована", type: "success" });
+    }
+
+    restoreEditorState = () => {
+        const editorState = JSON.parse(localStorage.getItem("editorState"));
+        const timeout = 15 * 60 * 1000;
+        const passed = new Date(editorState.timeStamp) - Date.now();
+
+        if (passed >= timeout) {
+            alert("TA-DA!");
+        } else {
+            this.editor.restoreState(editorState);
+        }
+    }
+
+    saveEditorState = () => {
+        const editorState = this.props.editorState;
+        editorState.scheme = this.editor.exportScheme(editorState.filename);
+        editorState.timeStamp = Date.now();
+
+        localStorage.setItem("editorState", JSON.stringify(editorState));
     }
 
     render() {
@@ -172,10 +198,11 @@ App.propTypes = {
     showNotification: PropTypes.func,
     reInitEditor: PropTypes.func,
     showLoadForm: PropTypes.func,
+    editorState: PropTypes.object,
 }
 
 const mapStateToProps = state => ({
-    filename: state.editor.filename
+    editorState: state.editor
 });
 
 const mapDispatchToProps = {
@@ -187,4 +214,4 @@ const mapDispatchToProps = {
     showLoadForm
 };
 
-export default connect(null, mapDispatchToProps)(App);
+export default connect(mapStateToProps, mapDispatchToProps)(App);

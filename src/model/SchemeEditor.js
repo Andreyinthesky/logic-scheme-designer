@@ -265,13 +265,15 @@ export default class SchemeEditor {
   constructor(mountHTMLElement) {
     this._graph = init(mountHTMLElement);
     bindG6Events(this);
+    this.setMode(EDITOR_EDITING_MODE);
   }
 
   addNode = (type) => {
+    if (this.getMode() !== EDITOR_EDITING_MODE)
+      return;
+
     const graph = this._graph;
-
     const position = graph.getPointByCanvas(100 + SIDEBAR_X_OFFSET, 100);
-
     graph.addItem("node", createNodeModel(type, graph.indexer.getNextIndex(type), position));
   }
 
@@ -287,7 +289,7 @@ export default class SchemeEditor {
     this.onUpdateScale({ scale });
   };
 
-  getMode = () => this._graph.get("mode");
+  getMode = () => { return this._graph.getCurrentMode() };
 
   setMode = (mode) => {
     if (mode === EDITOR_SIMULATION_MODE) {
@@ -351,6 +353,9 @@ export default class SchemeEditor {
   };
 
   deleteSelectedItems = () => {
+    if (this.getMode() !== EDITOR_EDITING_MODE)
+      return;
+
     this._graph.getEdges().forEach(edge => {
       edge.hasState("select") && this._graph.removeItem(edge);
     });
@@ -387,6 +392,7 @@ export default class SchemeEditor {
 
     this._graph.read(scheme);
     this._graph.indexer = new EditorObjIndexer(scheme.index);
+    this.setMode(EDITOR_EDITING_MODE);
     this.afterImportScheme({ schemeName: scheme.name });
   };
 
@@ -395,6 +401,20 @@ export default class SchemeEditor {
     this._graph.destroy();
     this._graph = init(container);
     bindG6Events(this);
+  }
+
+  restoreState = (editorState) => {
+    const {scale, mode, scheme} = editorState;
+    
+    scheme.nodes = scheme.nodes.map(node => {
+      const position = { x: node.x, y: node.y };
+      return createNodeModel(node.shape, node.index, position);
+    })
+    this._graph.read(scheme);
+    this._graph.indexer = new EditorObjIndexer(scheme.index);
+
+    this.setScale(scale);
+    this.setMode(mode);
   }
 
   // EVENTS
