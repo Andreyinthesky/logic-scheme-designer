@@ -29,13 +29,16 @@ class App extends Component {
         const editor = new SchemeEditor(document.getElementById("mountNode"));
         this.editor = editor;
         this.bindEditorEvents(this.editor);
+        // document.addEventListener("keydown", (evt) => {
+        //     if (evt.code === "KeyZ" && !evt.repeat && evt.target === document.body)
+        //         console.log(evt.code, evt.ctrlKey, evt.currentTarget, evt.target);
+        // })
 
         window.onbeforeunload = (evt) => {
             this.saveEditorState();
         }
 
-        this.restoreEditorState();
-        // this.props.showLoadForm();
+        this.tryRestoreEditorState() || this.props.showLoadForm();
     }
 
     bindEditorEvents = (editor) => {
@@ -80,6 +83,7 @@ class App extends Component {
 
     initNewScheme = () => {
         this.editor.restart();
+        localStorage.removeItem("editorState");
         this.props.reInitEditor();
     }
 
@@ -146,24 +150,39 @@ class App extends Component {
         this.props.showNotification({ message: "Схема успешно экспортирована", type: "success" });
     }
 
-    restoreEditorState = () => {
+    tryRestoreEditorState = () => {
         const editorState = JSON.parse(localStorage.getItem("editorState"));
         const timeout = 15 * 60 * 1000;
-        const passed = new Date(editorState.timeStamp) - Date.now();
+        const passed = Math.abs(new Date(editorState.timeStamp) - Date.now());
 
         if (passed >= timeout) {
-            alert("TA-DA!");
+            localStorage.removeItem("editorState");
+            return false;
         } else {
             this.editor.restoreState(editorState);
+            this.props.setFilename(editorState.scheme.name);
+            return true;
         }
     }
 
     saveEditorState = () => {
-        const editorState = this.props.editorState;
+        const editorState = {
+            mode: this.editor.getMode(),
+            scale: this.editor.getScale(),
+            filename: this.props.filename
+        };
         editorState.scheme = this.editor.exportScheme(editorState.filename);
         editorState.timeStamp = Date.now();
 
         localStorage.setItem("editorState", JSON.stringify(editorState));
+    }
+
+    undo = () => {
+        this.editor.undo();
+    }
+
+    redo = () => {
+        this.editor.redo();
     }
 
     render() {
@@ -179,6 +198,8 @@ class App extends Component {
                     doTactCallback: this.evaluateScheme,
                     discardInputsCallback: this.discardInputs,
                     setScaleCallback: this.setScale,
+                    undoEditorActionCallback: this.undo,
+                    redoEditorActionCallback: this.redo
                 }}>
                     <Header />
                     <EditorArea />
@@ -198,11 +219,11 @@ App.propTypes = {
     showNotification: PropTypes.func,
     reInitEditor: PropTypes.func,
     showLoadForm: PropTypes.func,
-    editorState: PropTypes.object,
+    filename: PropTypes.string,
 }
 
 const mapStateToProps = state => ({
-    editorState: state.editor
+    filename: state.editor.filename,
 });
 
 const mapDispatchToProps = {

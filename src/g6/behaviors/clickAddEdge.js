@@ -49,6 +49,7 @@ const clickAddEdgeBehaviour = {
         targetAnchor: targetNodeAnchorIndex
       });
 
+      graph.emit("afteradditem", { item: this.drivenEdge });
       this.drivenEdge = null;
       this.addingEdge = false;
     } else {
@@ -75,10 +76,8 @@ const clickAddEdgeBehaviour = {
     const nativeEvent = ev.event;
 
     if (nativeEvent.which == 3) {
-
       const node = ev.item;
       const nodeModel = node.getModel();
-      console.log(nodeModel);
 
       const { x, y } = ev;
       const { x: centerX, y: centerY, size } = nodeModel;
@@ -94,13 +93,13 @@ const clickAddEdgeBehaviour = {
         maxY: maxY - NODE_SELECT_BOX_PADDING,
       };
 
-      console.log(selectBox, ev);
-
       const isPointBelongsToSelectBox = x >= selectBox.minX && x <= selectBox.maxX
         && y >= selectBox.minY && y <= selectBox.maxY;
 
-      isPointBelongsToSelectBox && this.graph.removeItem(ev.item);
-
+      if (isPointBelongsToSelectBox) {
+        this.graph.removeItem(ev.item);
+      }
+     
       // ROTATION
       // const isRotate = ev.item.hasState("rotate");
       // this.graph.setItemState(ev.item, "rotate", !isRotate);

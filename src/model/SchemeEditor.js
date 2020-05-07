@@ -67,6 +67,30 @@ const bindG6Events = (editor) => {
 
   graph.on("canvas:mousemove", evt => {
     // console.log(evt.x, evt.y);
+  });
+
+  graph.on("afteradditem", evt => {
+    const {item} = evt;
+    if (item.get("type") === "edge") {
+      if (!item.getSource().get || !item.getTarget().get) {
+        return;
+      }
+    }
+    editor.restoration || logEditorAction(editor);
+  })
+
+  graph.on("beforeremoveitem", evt => {
+    const { item } = evt;
+    if (item.get("type") === "node") {
+      const edges = item.getEdges();
+      for (let i = edges.length; i >= 0; i--) {
+        graph.removeItem(edges[i]);
+      }
+    }
+  })
+
+  graph.on("afterremoveitem", evt => {
+    logEditorAction(editor);
   })
 
   const mountNode = graph.get("container");
@@ -82,6 +106,11 @@ const bindG6Events = (editor) => {
   window.onresize = () => {
     canvasResize();
   }
+}
+
+function logEditorAction(editor) {
+  editor._store.log(editor.getScheme());
+  console.log("log", editor._store);
 }
 
 const createNodeModel = (type, index, position) => {
@@ -261,11 +290,26 @@ function evalScheme(rankedElements) {
 
 const SIDEBAR_X_OFFSET = 320;
 
+class SchemeStatesStore {
+  constructor() {
+    this.doStack = [];
+    this.undoStack = [];
+  }
+
+  log(state) {
+    while (this.undoStack.length > 0) {
+      this.undoStack.pop();
+    }
+    this.doStack.push(state);
+  }
+}
+
 export default class SchemeEditor {
   constructor(mountHTMLElement) {
     this._graph = init(mountHTMLElement);
     bindG6Events(this);
-    this.setMode(EDITOR_EDITING_MODE);
+    this._store = new SchemeStatesStore();
+    logEditorAction(this);
   }
 
   addNode = (type) => {
@@ -372,11 +416,17 @@ export default class SchemeEditor {
     this._graph.translate(leftTopCorner.x * scale, leftTopCorner.y * scale);
   };
 
-  exportScheme = (name) => {
+  getScheme = () => {
     const schemeData = this._graph.save();
     schemeData.nodes = schemeData.nodes.map(({ id, index, x, y, shape, direction }) => {
       return { id, index, x, y, shape, direction };
     });
+
+    return schemeData;
+  }
+
+  exportScheme = (name) => {
+    const schemeData = this.getScheme();
     schemeData.version = FILE_VERSION;
     schemeData.name = name;
     schemeData.index = this._graph.indexer.index;
@@ -390,9 +440,15 @@ export default class SchemeEditor {
       return createNodeModel(node.shape, node.index, position);
     })
 
+    this.restoration = true;
     this._graph.read(scheme);
+    this.restoration = false;
     this._graph.indexer = new EditorObjIndexer(scheme.index);
     this.setMode(EDITOR_EDITING_MODE);
+
+    this._store = new SchemeStatesStore();
+    logEditorAction(this);
+
     this.afterImportScheme({ schemeName: scheme.name });
   };
 
@@ -401,20 +457,68 @@ export default class SchemeEditor {
     this._graph.destroy();
     this._graph = init(container);
     bindG6Events(this);
+
+    this._store = new SchemeStatesStore();
+    logEditorAction(this);
   }
 
   restoreState = (editorState) => {
-    const {scale, mode, scheme} = editorState;
-    
+    const { scale, mode, scheme } = editorState;
+
     scheme.nodes = scheme.nodes.map(node => {
       const position = { x: node.x, y: node.y };
       return createNodeModel(node.shape, node.index, position);
     })
+    this.restoration = true;
     this._graph.read(scheme);
+    this.restoration = false;
     this._graph.indexer = new EditorObjIndexer(scheme.index);
 
     this.setScale(scale);
     this.setMode(mode);
+
+    this._store = new SchemeStatesStore();
+    logEditorAction(this);
+  }
+
+  undo() {
+    if (this.getMode() !== EDITOR_EDITING_MODE)
+      return;
+
+    if (this._store.doStack.length <= 1)
+      return;
+
+    this._store.undoStack.push(this._store.doStack.pop());
+    const current = this._store.doStack[this._store.doStack.length - 1];
+
+    current.nodes = current.nodes.map(node => {
+      const position = { x: node.x, y: node.y };
+      return createNodeModel(node.shape, node.index, position);
+    });
+    this.restoration = true;
+    this._graph.read(current);
+    this.restoration = false;
+    console.log("undo", this._store);
+  }
+
+  redo() {
+    if (this.getMode() !== EDITOR_EDITING_MODE)
+      return;
+
+    if (this._store.undoStack.length <= 0)
+      return;
+
+    this._store.doStack.push(this._store.undoStack.pop());
+    const current = this._store.doStack[this._store.doStack.length - 1];
+
+    current.nodes = current.nodes.map(node => {
+      const position = { x: node.x, y: node.y };
+      return createNodeModel(node.shape, node.index, position);
+    });
+    this.restoration = true;
+    this._graph.read(current);
+    this.restoration = false;
+    console.log("redo", this._store);
   }
 
   // EVENTS

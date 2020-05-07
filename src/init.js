@@ -22,6 +22,8 @@ export default function init(mountNode) {
   });
 
   graph.indexer = new EditorObjIndexer();
+  graph.setMode(EDITOR_EDITING_MODE);
+
 
   return graph;
 }

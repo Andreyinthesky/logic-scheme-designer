@@ -13,11 +13,11 @@ class EditorActionsPanel extends Component {
     }
 
     handleClickUndoBtn = () => {
-        console.log("undo");
+        this.props.onUndo();
     };
 
     handleClickRedoBtn = () => {
-        console.log("redo");
+        this.props.onRedo();
     };
 
     handleClickDeleteBtn = () => {
@@ -26,10 +26,6 @@ class EditorActionsPanel extends Component {
 
     handleClickGoToOriginBtn = () => {
         this.props.onGoToOrigin();
-    };
-
-    handleClickChooseScaleBtn = () => {
-        console.log("undo");
     };
 
     handleClickUpScaleBtn = () => {
@@ -133,6 +129,8 @@ EditorActionsPanel.propTypes = {
     onDeleteSelected: PropTypes.func,
     onDoTact: PropTypes.func,
     onDiscardInputs: PropTypes.func,
+    onUndo: PropTypes.func,
+    onRedo: PropTypes.func,
 };
 
 export default connect(mapStateToProps, null)(EditorActionsPanel);

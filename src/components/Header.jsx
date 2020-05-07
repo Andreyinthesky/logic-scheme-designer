@@ -21,9 +21,13 @@ export default class Header extends Component {
                         setModeCallback,
                         doTactCallback,
                         discardInputsCallback,
+                        undoEditorActionCallback,
+                        redoEditorActionCallback,
                     }) =>
                         (
                             <EditorActionsPanel
+                                onUndo={undoEditorActionCallback}
+                                onRedo={redoEditorActionCallback}
                                 onUpScale={upScaleCallback}
                                 onDownScale={downScaleCallback}
                                 onDeleteSelected={deleteSelectedCallback}
