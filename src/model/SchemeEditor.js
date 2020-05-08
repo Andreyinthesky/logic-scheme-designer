@@ -66,7 +66,7 @@ const bindG6Events = (editor) => {
   });
 
   graph.on("canvas:mousemove", evt => {
-    // console.log(evt.x, evt.y);
+    editor.onMouseMove(evt);
   });
 
   graph.on("afteradditem", evt => {
@@ -536,4 +536,5 @@ export default class SchemeEditor {
   onWheel = (evt) => { };
   onUpdateScale = (evt) => { };
   onChangeMode = (evt) => { };
+  onMouseMove = (evt) => { };
 } 

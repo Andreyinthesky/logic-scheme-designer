@@ -191,14 +191,19 @@ li {
   margin-right: 4px;
 }
 
-span.show-scale {
+div.editor-statusbar {
   position: absolute;
   top: 0;
   right: 0;
 
   background-color: transparent;
   font-weight: bold;
+  text-align: end;
   padding: 8px;
+}
+
+div.editor-statusbar > :not(:last-child) {
+  margin-bottom: 8px;
 }
 
 .scheme-control {

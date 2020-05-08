@@ -1,6 +1,14 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { updateScale, setMode, setFilename, showNotification, reInitEditor, showLoadForm } from "../redux/actions";
+import {
+    updateScale,
+    updateMouseCoords,
+    setMode,
+    setFilename,
+    showNotification,
+    reInitEditor,
+    showLoadForm
+} from "../redux/actions";
 import { connect } from "react-redux";
 
 import LoadSchemeForm from "./LoadSchemeForm";
@@ -56,9 +64,13 @@ class App extends Component {
             this.props.updateScale(evt.scale);
         };
 
+        editor.onMouseMove = (evt) => {
+            this.props.updateMouseCoords({ x: evt.x, y: evt.y });
+        }
+
         editor.onChangeMode = (evt) => {
             this.props.setMode(evt.mode);
-        }
+        };
 
         editor.afterImportScheme = (evt) => {
             const { schemeName } = evt;
@@ -214,6 +226,7 @@ class App extends Component {
 
 App.propTypes = {
     updateScale: PropTypes.func,
+    updateMouseCoords: PropTypes.func,
     setMode: PropTypes.func,
     setFilename: PropTypes.func,
     showNotification: PropTypes.func,
@@ -228,6 +241,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
     updateScale,
+    updateMouseCoords,
     setMode,
     setFilename,
     showNotification,

@@ -8,7 +8,8 @@ import {
   SHOW_NOTIFICATION,
   SET_MODE,
   HIDE_NOTIFICATION,
-  REINIT
+  REINIT,
+  UPDATE_MOUSE_COORDS
 } from "./actionTypes";
 import {EDITOR_EDITING_MODE, EDITOR_SIMULATION_MODE} from "../model/constants";
 
@@ -23,6 +24,15 @@ export function updateScale(scale) {
   return {
     type: UPDATE_SCALE,
     payload: scale
+  };
+}
+
+export function updateMouseCoords(coords) {
+  const roundedCoords = { x: Math.round(coords.x), y: Math.round(coords.y) };
+
+  return {
+    type: UPDATE_MOUSE_COORDS,
+    payload: roundedCoords
   };
 }
 

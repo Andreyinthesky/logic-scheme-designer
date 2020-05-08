@@ -9,23 +9,27 @@ class EditorStatusBar extends Component {
     }
 
     render() {
-        const { scale } = this.props;
+        const { scale, mouseCoords } = this.props;
         const scaleInPercents = Math.round(scale * 100);
+        const { x, y } = mouseCoords;
 
         return (
-            <span className="show-scale">
-                {`Масштаб:`} <span id="show-scale"> {`${scaleInPercents}%`}</span>
-            </span>
+            <div className="editor-statusbar">
+                <div>{`Масштаб:`}  {`${scaleInPercents}%`}</div>
+                <div>{`X: ${x} Y: ${y}`}</div>
+            </div>
         );
     }
 }
 
 EditorStatusBar.propTypes = {
     scale: PropTypes.number,
+    mouseCoords: PropTypes.object,
 }
 
 const mapStateToProps = state => ({
-    scale: state.editor.scale
+    scale: state.editor.scale,
+    mouseCoords: state.editor.mouseCoords,
 })
 
 export default connect(mapStateToProps, null)(EditorStatusBar);
