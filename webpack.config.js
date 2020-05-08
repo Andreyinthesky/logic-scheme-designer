@@ -1,6 +1,19 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpack = require('copy-webpack-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const TerserJSPlugin = require('terser-webpack-plugin');
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const path = require("path");
+
+const isDev = process.env.NODE_ENV === "development";
+
+const optimization = () => {
+  return isDev
+    ? false
+    : {
+      minimizer: [new TerserJSPlugin({}), new OptimizeCSSAssetsPlugin({})],
+    };
+}
 
 module.exports = {
   mode: "development",
@@ -9,7 +22,7 @@ module.exports = {
     path: path.resolve(__dirname, "dist"),
     filename: "bundle.js"
   },
-  devtool: `source-map`,
+  devtool: isDev ? `source-map` : false,
   devServer: {
     port: 8020
   },
@@ -22,13 +35,13 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: ["style-loader", "css-loader"]
+        use: [isDev ? "style-loader" : MiniCssExtractPlugin.loader, "css-loader"]
       },
       {
         test: /\.svg$/,
         loader: "file-loader",
         options: {
-          name: "[name].[contenthash].[ext]",
+          name: "[name].[ext]",
           outputPath: "assets/images/svg"
         },
       },
@@ -36,7 +49,7 @@ module.exports = {
         test: /[\.eot|\.ttf|\.woff|\.woff2]$/,
         loader: "file-loader",
         options: {
-          name: "[name].[contenthash].[ext]",
+          name: "[name].[ext]",
           outputPath: "assets/fonts"
         },
       }
@@ -49,12 +62,17 @@ module.exports = {
     modules: ['node_modules'],
     extensions: ['.js', '.jsx'],
   },
+  optimization: optimization(),
   plugins: [
     new HtmlWebpackPlugin({
       template: "./src/index.html"
     }),
     new CopyWebpack([
       { from: 'assets/favicon', to: 'favicon' },
-    ])
+      { from: 'src/serviceWorker.js' },
+    ]),
+    new MiniCssExtractPlugin({
+      filename: "index.css",
+    })
   ]
 }

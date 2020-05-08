@@ -5,7 +5,7 @@
   ],
   "parser": "babel-eslint",
   "rules": {
-    "no-console": "off",
+    "no-console": "warn",
     "no-useless-escape": "off",
     "arrow-body-style": "off",
     "no-useless-computed-key": "off",
