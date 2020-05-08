@@ -349,10 +349,18 @@ export default class SchemeEditor {
           cycleNodes.push(current);
         }
 
+        let timeout = null;
+        const highlightCycleNodes = () => cycleNodes.forEach(nodeId => this._graph.setItemState(nodeId, "highlight", true));
         this.onError({
           error: `В цепи обратной связи ${cycleNodes.map(nodeId => scheme[nodeId].label).join(" —> ")} 
                   отсутствует элемент задержки`,
-          focus: () => alert("Фокус")
+          focus: () => {
+            if (timeout)
+              clearTimeout(timeout);
+            this._graph.focusItem(cycleNodes[0]);
+            highlightCycleNodes();
+            timeout = setTimeout(() => cycleNodes.forEach(nodeId => this._graph.setItemState(nodeId, "highlight", false)), 5000);
+          }
         });
         return;
       }

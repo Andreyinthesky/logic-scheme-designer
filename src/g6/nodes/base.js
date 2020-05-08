@@ -14,7 +14,7 @@ export default {
             child.hide();
           }
         }
-      } 
+      }
     } else if (name === "hover") {
       let group = item.getContainer();
       let children = group.get("children");
@@ -27,6 +27,22 @@ export default {
             child.hide();
           }
         }
+      }
+    } else if (name === "highlight") {
+      let shape = item.getKeyShape();
+      if (value) {
+        shape.animate({
+          repeat: true,
+          onFrame(ratio) {
+            const opacity = ratio < 0.5 ? 1 - 2 * ratio : (ratio - 0.5) * 2;
+            return {
+              opacity: opacity
+            };
+          },
+        }, 250, "easeLinear");
+      } else {
+        shape.stopAnimate();
+        shape.attr("opacity", 1);
       }
     }
   },
