@@ -206,6 +206,14 @@ div.editor-statusbar > :not(:last-child) {
   margin-bottom: 8px;
 }
 
+div.tact-counter {
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  font-weight: bold;
+  font-size: 18px;
+}
+
 .scheme-control {
   margin-left: 32px;
 }
@@ -243,7 +251,6 @@ div.editor-statusbar > :not(:last-child) {
   min-width: 640px;
   min-height: 480px;
   margin: 0 8px;
-
 }
 
 .editor-area {

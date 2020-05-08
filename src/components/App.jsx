@@ -7,7 +7,10 @@ import {
     setFilename,
     showNotification,
     reInitEditor,
-    showLoadForm
+    showLoadForm,
+    increaseTactCount,
+    showTactCounter,
+    hideTactCounter
 } from "../redux/actions";
 import { connect } from "react-redux";
 
@@ -18,6 +21,7 @@ import EditorArea from "./EditorArea";
 import { EditorContext } from "../contexts/editorContext";
 import SchemeEditor from "../model/SchemeEditor";
 import NotificationsArea from "./NotificationsArea";
+import { EDITOR_EDITING_MODE } from "../model/constants";
 
 
 class App extends Component {
@@ -70,7 +74,16 @@ class App extends Component {
 
         editor.onChangeMode = (evt) => {
             this.props.setMode(evt.mode);
+            if (evt.mode === EDITOR_EDITING_MODE) {
+                this.props.hideTactCounter();
+            } else {
+                this.props.showTactCounter();
+            }
         };
+
+        editor.afterEvaluateScheme = (evt) => {
+            this.props.increaseTactCount();
+        }
 
         editor.afterImportScheme = (evt) => {
             const { schemeName } = evt;
@@ -232,6 +245,9 @@ App.propTypes = {
     showNotification: PropTypes.func,
     reInitEditor: PropTypes.func,
     showLoadForm: PropTypes.func,
+    increaseTactCount: PropTypes.func,
+    showTactCounter: PropTypes.func,
+    hideTactCounter: PropTypes.func,
     filename: PropTypes.string,
 }
 
@@ -246,7 +262,10 @@ const mapDispatchToProps = {
     setFilename,
     showNotification,
     reInitEditor,
-    showLoadForm
+    showLoadForm,
+    increaseTactCount,
+    showTactCounter,
+    hideTactCounter,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

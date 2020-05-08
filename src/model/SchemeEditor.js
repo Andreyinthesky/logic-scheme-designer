@@ -389,6 +389,8 @@ export default class SchemeEditor {
 
         this._graph.setItemState(outElementNode, "enable", outElementValue);
       });
+    
+    this.afterEvaluateScheme();
   };
 
   discardSchemeInputsState = () => {
@@ -532,6 +534,7 @@ export default class SchemeEditor {
   // EVENTS
 
   afterImportScheme = (evt) => { };
+  afterEvaluateScheme = (evt) => { };
   onError = (evt) => { };
   onWheel = (evt) => { };
   onUpdateScale = (evt) => { };

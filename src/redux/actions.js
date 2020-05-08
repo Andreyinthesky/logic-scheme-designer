@@ -9,9 +9,12 @@ import {
   SET_MODE,
   HIDE_NOTIFICATION,
   REINIT,
-  UPDATE_MOUSE_COORDS
+  UPDATE_MOUSE_COORDS,
+  INCREASE_TACT_COUNT,
+  SHOW_TACT_COUNTER,
+  HIDE_TACT_COUNTER
 } from "./actionTypes";
-import {EDITOR_EDITING_MODE, EDITOR_SIMULATION_MODE} from "../model/constants";
+import { EDITOR_EDITING_MODE, EDITOR_SIMULATION_MODE } from "../model/constants";
 
 
 export function reInitEditor() {
@@ -33,6 +36,24 @@ export function updateMouseCoords(coords) {
   return {
     type: UPDATE_MOUSE_COORDS,
     payload: roundedCoords
+  };
+}
+
+export function increaseTactCount() {
+  return {
+    type: INCREASE_TACT_COUNT,
+  };
+}
+
+export function showTactCounter() {
+  return {
+    type: SHOW_TACT_COUNTER,
+  };
+}
+
+export function hideTactCounter() {
+  return {
+    type: HIDE_TACT_COUNTER,
   };
 }
 
