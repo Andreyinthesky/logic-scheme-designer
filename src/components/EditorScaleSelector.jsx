@@ -36,7 +36,6 @@ export default class EditorScaleSelector extends Component {
     }
 
     onChooseScale = (scale) => {
-        console.log(scale);
         this.props.onChooseScale(scale);
     }
 

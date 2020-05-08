@@ -96,7 +96,6 @@ const bindG6Events = (editor) => {
   const mountNode = graph.get("container");
 
   const canvasResize = debounce(() => {
-    console.log("resize");
     const width = mountNode.getBoundingClientRect().width;
     const height = mountNode.getBoundingClientRect().height;
 
@@ -110,7 +109,6 @@ const bindG6Events = (editor) => {
 
 function logEditorAction(editor) {
   editor._store.log(editor.getScheme());
-  console.log("log", editor._store);
 }
 
 const createNodeModel = (type, index, position) => {
@@ -420,7 +418,6 @@ export default class SchemeEditor {
   };
 
   goToOrigin = () => {
-    console.log("try to move to (0,0)");
     const leftTopCorner = this._graph.getPointByCanvas(0, 0);
     const scale = this._graph.getZoom();
     this._graph.translate(leftTopCorner.x * scale, leftTopCorner.y * scale);
@@ -508,7 +505,6 @@ export default class SchemeEditor {
     this.restoration = true;
     this._graph.read(current);
     this.restoration = false;
-    console.log("undo", this._store);
   }
 
   redo() {
@@ -528,7 +524,6 @@ export default class SchemeEditor {
     this.restoration = true;
     this._graph.read(current);
     this.restoration = false;
-    console.log("redo", this._store);
   }
 
   // EVENTS

@@ -17,14 +17,12 @@ class ExportSchemeForm extends Component {
     handleClickForeground = (evt) => {
         if (evt.target !== evt.currentTarget)
             return;
-        console.log("foreg", "close");
         this.closeForm();
     };
 
     handleClickOkBtn = () => {
         const filename = this.filenameInputElement.current.value.trim();
         if (this.validateFilename(filename)) {
-            console.log("Ok");
             this.closeForm();
             this.props.setFilename(filename);
             this.props.onExportScheme(filename);
@@ -35,7 +33,6 @@ class ExportSchemeForm extends Component {
     };
 
     handleClickCancelBtn = () => {
-        console.log("cancel", "close");
         this.closeForm();
     };
 

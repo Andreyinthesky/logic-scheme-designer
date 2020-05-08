@@ -33,10 +33,6 @@ class App extends Component {
         return false;
     }
 
-    UNSAFE_componentWillUpdate() {
-        console.log("I will update!");
-    }
-
     componentDidMount() {
         const editor = new SchemeEditor(document.getElementById("mountNode"));
         this.editor = editor;
