@@ -68,8 +68,7 @@ class EditorActionsPanel extends Component {
                     <button title="Удалить (Delete)" onClick={this.handleClickDeleteBtn}>
                         <i className="fas fa-trash-alt"></i>
                     </button>
-                    <button id="fit-btn"
-                        title="В начало координат (Go to origin)"
+                    <button title="В начало координат (Go to origin)"
                         onClick={this.handleClickGoToOriginBtn}
                     >
                         <i className="fas fa-compress"></i>
@@ -95,19 +94,19 @@ class EditorActionsPanel extends Component {
 
                 <div className="scheme-control">
                     {isSimulationMode ?
-                        <button id="testMode-btn" className={"active"} onClick={this.handleClickChangeModeBtn}>
+                        <button className={"testMode-btn active"} onClick={this.handleClickChangeModeBtn}>
                             <i className="fas fa-pencil-alt"></i>
                             {"В режим редактирования"}
                         </button> :
-                        <button id="testMode-btn" onClick={this.handleClickChangeModeBtn}>
+                        <button className="testMode-btn" onClick={this.handleClickChangeModeBtn}>
                             <i className="fas fa-caret-square-right"></i>
                             {"В режим симуляции"}
                         </button>
                     }
-                    <button id="doTact-btn" onClick={this.handleClickDoTactBtn} disabled={!isSimulationMode} >
+                    <button className="doTact-btn" onClick={this.handleClickDoTactBtn} disabled={!isSimulationMode} >
                         {"Сделать такт"}
                     </button>
-                    <button id="discard-inputs-btn" onClick={this.handleClickDiscardInputsBtn} disabled={!isSimulationMode} >
+                    <button className="discard-inputs-btn" onClick={this.handleClickDiscardInputsBtn} disabled={!isSimulationMode} >
                         {"Сбросить входы"}
                     </button>
                 </div>

@@ -170,13 +170,13 @@ li {
   padding: 8px;
 }
 
-.tools-panel button {
+.canvas-actions button {
   background-color: inherit;
   padding: 8px 8px;
   border: none;
 }
 
-.tools-panel button:hover {
+.canvas-actions button:hover {
   color: #555;
 }
 
@@ -260,47 +260,47 @@ div.tact-counter {
   margin-bottom: 8px;
 }
 
-#testMode-btn {
+.testMode-btn {
   background-color: #41ac5b;
   color: inherit;
   border: 2px solid black;
   padding: 10px;
 }
 
-#testMode-btn:hover {
+.testMode-btn:hover {
   background-color: #41905b;
 }
 
-#testMode-btn.active {
+.testMode-btn.active {
   background-color: rgb(240, 240, 240);
 }
 
-#testMode-btn.active:hover {
+.testMode-btn.active:hover {
   background-color: rgb(210, 210, 210);
 
 }
 
-#doTact-btn,
-#discard-inputs-btn {
+.doTact-btn,
+.discard-inputs-btn {
   background-color: #fff;
   color: #000;
   border: 2px solid black;
   padding: 10px;
 }
 
-#doTact-btn:hover,
-#discard-inputs-btn:hover {
+.doTact-btn:hover,
+.discard-inputs-btn:hover {
   background-color: #eee;
 }
 
-#doTact-btn[disabled],
-#discard-inputs-btn[disabled] {
+.doTact-btn[disabled],
+.discard-inputs-btn[disabled] {
   background-color: rgb(165, 133, 121);
   color: rgb(66, 57, 50);
   cursor: default;
 }
 
-#select-obj {
+.select-obj-list {
   display: flex;
   flex-direction: column;
   position: absolute;
@@ -318,11 +318,11 @@ div.tact-counter {
   transition: transform ease 1s;
 }
 
-#select-obj.hide {
+.select-obj-list.hide {
   transform: translateX(-308px);
 }
 
-.select-obj-toggler {
+.select-obj-list__toggler {
   position: absolute;
   z-index: 3;
   right: -8px;
@@ -334,11 +334,11 @@ div.tact-counter {
   cursor: pointer;
 }
 
-#select-obj.hide .select-obj-toggler {
+.select-obj-list.hide .select-obj-list__toggler {
   right: -12px;
 }
 
-#select-obj.hide .select-obj-toggler i {
+.select-obj-list.hide .select-obj-list__toggler i {
   transform: rotate(180deg);
 }
 
