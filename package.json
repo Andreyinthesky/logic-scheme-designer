@@ -1,0 +1,14 @@
+{
+  "name": "logic-scheme-designer",
+  "version": "0.1.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Andreyinthesky",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
