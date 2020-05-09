@@ -8,4 +8,6 @@ registerBehaviors(G6);
 registerEdges(G6);
 registerNodes(G6);
 
+G6.registerLayout("schemeLayout", {});
+
 export default G6;

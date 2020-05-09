@@ -1,4 +1,4 @@
-import OR_GATE from "../../assets/svg_elements/OR_ANSI.svg";
+import OR_GATE from "@assets/svg_elements/OR_ANSI.svg";
 import base from "./base";
 
 const or = {

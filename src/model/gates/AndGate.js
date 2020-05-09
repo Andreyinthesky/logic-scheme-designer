@@ -19,5 +19,5 @@ export default class AndGate extends BaseElement {
     return this.anchorPoints.map((_, i) => i).slice(2, 3);
   }
 
-  evaluate() { return this.input[0] && this.input[1] };
+  evaluate() { return this.input[0] && this.input[1] }
 }

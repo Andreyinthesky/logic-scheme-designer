@@ -19,4 +19,4 @@ export default class Input extends BaseElement {
   evaluate() {
     return this.input[0];
   }
-};
+}
