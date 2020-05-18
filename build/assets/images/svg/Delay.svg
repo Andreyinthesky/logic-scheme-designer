@@ -4,6 +4,6 @@
   </style>
 
   <path fill="none" stroke="#000" stroke-width="2" d="M72 25 H 100 M 29 25 h -29"/>
-  <path d="M28.96875 2.59375v44.8125l2.15625-1.0625 41.03125-20v-2.6875l-41.03125-20-2.15625-1.0625zm3 4.8125L68.09375 25l-36.125 17.59375V7.40625z" style="marker:none"/>
-  <text x="67" y="18" class="text">z</text>
+  <rect fill="none" stroke="#000" stroke-width="3" x="29" y="10.5" width="42" height="29"/>
+  <text x="75" y="18" class="text">z</text>
 </svg>
