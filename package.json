@@ -4,8 +4,7 @@
   "description": "",
   "private": true,
   "scripts": {
-    "start": "node server.js",
-    "build": "cd react-ui && npm run build"
+    "start": "node server.js"
   },
   "author": "Andreyinthesky",
   "license": "ISC",
