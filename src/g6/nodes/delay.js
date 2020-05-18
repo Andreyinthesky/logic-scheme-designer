@@ -34,8 +34,8 @@ const delay = {
     });
 
     // z mark
-    const zMarkOffsetX = 15;
-    const zMarkOffsetY = -15;
+    const zMarkOffsetX = 35;
+    const zMarkOffsetY = -12;
     group.addShape("text", {
       attrs: {
         x: zMarkOffsetX,
@@ -51,7 +51,7 @@ const delay = {
     });
 
     //state
-    const stateTextOffsetX = -6;
+    const stateTextOffsetX = 0;
     const stateTextOffsetY = 1;
     group.addShape("text", {
       attrs: {
