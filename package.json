@@ -1,11 +1,7 @@
 {
   "name": "logic-scheme-designer",
   "version": "1.0.0",
-  "description": "",
   "private": true,
-  "directories": {
-    "lib": "lib"
-  },
   "scripts": {
     "test": "node ./src/testScheme.js",
     "dev": "webpack --mode=development",
