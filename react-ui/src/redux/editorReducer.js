@@ -6,7 +6,9 @@ import {
   UPDATE_MOUSE_COORDS,
   INCREASE_TACT_COUNT,
   SHOW_TACT_COUNTER,
-  HIDE_TACT_COUNTER
+  HIDE_TACT_COUNTER,
+  SHOW_CONTEXT_MENU,
+  HIDE_CONTEXT_MENU
 } from "./actionTypes";
 import { DEFAULT_FILENAME, EDITOR_EDITING_MODE } from "../model/constants";
 
@@ -17,7 +19,7 @@ const initialState = {
   filename: DEFAULT_FILENAME,
   mouseCoords: { x: 0, y: 0 },
   tactCount: 0,
-  showTactCounter: false,
+  contextMenuData: null,
 };
 
 export const editorReducer = (state = initialState, action) => {
@@ -32,6 +34,10 @@ export const editorReducer = (state = initialState, action) => {
       return { ...state, showTactCounter: true, tactCount: 0 };
     case HIDE_TACT_COUNTER:
       return { ...state, showTactCounter: false };
+    case SHOW_CONTEXT_MENU:
+      return { ...state, contextMenuData: action.payload };
+    case HIDE_CONTEXT_MENU:
+      return { ...state, contextMenuData: null };
     case SET_FILENAME:
       return { ...state, filename: action.payload };
     case SET_MODE:

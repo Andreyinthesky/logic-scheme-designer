@@ -12,7 +12,9 @@ import {
   UPDATE_MOUSE_COORDS,
   INCREASE_TACT_COUNT,
   SHOW_TACT_COUNTER,
-  HIDE_TACT_COUNTER
+  HIDE_TACT_COUNTER,
+  SHOW_CONTEXT_MENU,
+  HIDE_CONTEXT_MENU
 } from "./actionTypes";
 import { EDITOR_EDITING_MODE, EDITOR_SIMULATION_MODE } from "../model/constants";
 
@@ -54,6 +56,19 @@ export function showTactCounter() {
 export function hideTactCounter() {
   return {
     type: HIDE_TACT_COUNTER,
+  };
+}
+
+export function showContextMenu(model) {
+  return {
+    type: SHOW_CONTEXT_MENU,
+    payload: model
+  };
+}
+
+export function hideContextMenu() {
+  return {
+    type: HIDE_CONTEXT_MENU,
   };
 }
 

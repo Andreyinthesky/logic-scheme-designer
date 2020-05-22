@@ -14,6 +14,7 @@ html {
 body {
   -webkit-user-select: none;
   user-select: none;
+  overflow: hidden;
 }
 
 header {
@@ -401,18 +402,18 @@ ul.card-body li:hover {
 /* Context menu */
 
 .context-menu {
-  position: fixed;
+  position: absolute;
   z-index: 1000;
-  top: 50vh;
-  right: 100px;
-
-  border: 1px solid #000;
+  left: -150px;
+  box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.2);
   border-radius: 2px;
+  white-space: nowrap;
 }
 
 .context-menu__list > li {
   background-color: white;
   padding: 10px;
+  cursor: pointer;
 }
 
 .context-menu__list > li:hover {

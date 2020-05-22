@@ -10,7 +10,9 @@ import {
     showLoadForm,
     increaseTactCount,
     showTactCounter,
-    hideTactCounter
+    hideTactCounter,
+    showContextMenu,
+    hideContextMenu
 } from "../redux/actions";
 import { connect } from "react-redux";
 
@@ -100,6 +102,14 @@ class App extends Component {
                 focus
             });
         }
+
+        editor.onOpenContextMenu = (data) => {
+           this.props.showContextMenu(data);
+        };
+
+        editor.onCloseContextMenu = () => {
+            this.props.hideContextMenu();
+        };
     }
 
     initNewScheme = () => {
@@ -244,6 +254,8 @@ App.propTypes = {
     increaseTactCount: PropTypes.func,
     showTactCounter: PropTypes.func,
     hideTactCounter: PropTypes.func,
+    showContextMenu: PropTypes.func,
+    hideContextMenu: PropTypes.func,
     filename: PropTypes.string,
 }
 
@@ -262,6 +274,8 @@ const mapDispatchToProps = {
     increaseTactCount,
     showTactCounter,
     hideTactCounter,
+    showContextMenu,
+    hideContextMenu
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

@@ -63,6 +63,18 @@ const bindG6Events = (editor) => {
     editor.onWheel(evt);
   });
 
+  graph.on("node:contextmenu", evt => {
+    console.log(evt);
+    const { item } = evt;
+    evt.preventDefault();
+    evt.stopPropagation();
+    editor.onOpenContextMenu({ x: evt.canvasX, y: evt.canvasY });
+  });
+
+  graph.on("mousedown", evt => {
+    editor.onCloseContextMenu();
+  })
+
   graph.on("canvas:mousemove", evt => {
     editor.onMouseMove(evt);
   });

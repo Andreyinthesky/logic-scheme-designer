@@ -99,7 +99,7 @@ const itemsControlBehaviour = {
         && y >= selectBox.minY && y <= selectBox.maxY;
 
       if (isPointBelongsToSelectBox) {
-        this.graph.removeItem(evt.item);
+        // this.graph.removeItem(evt.item);
       }
      
       // ROTATION
