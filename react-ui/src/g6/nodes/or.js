@@ -33,6 +33,19 @@ const or = {
       },
     });
 
+    //background for better interaction
+    const marginX = 10;
+    group.addShape("rect", {
+      attrs: {
+        x: -width / 2 - marginX,
+        y: -height / 2,
+        width: width + marginX * 2,
+        height: height,
+        fill: "white",
+        opacity: 0,
+      }
+    });
+
     return shape;
   },
 };

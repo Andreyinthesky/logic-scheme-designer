@@ -18,6 +18,19 @@ const not = {
       }
     });
 
+    //background for better interaction
+    const marginX = 10;
+    group.addShape("rect", {
+      attrs: {
+        x: -width / 2 - marginX,
+        y: -height / 2,
+        width: width + marginX * 2,
+        height: height,
+        fill: "white",
+        opacity: 0,
+      }
+    });
+
     //label text
     group.addShape("text", {
       attrs: {
