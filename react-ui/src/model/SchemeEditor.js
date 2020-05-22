@@ -2,6 +2,7 @@ import init from "./g6Init";
 import { debounce } from "../utils";
 import { FILE_VERSION, EDITOR_SIMULATION_MODE, EDITOR_EDITING_MODE } from "./constants";
 import EditorObjIndexer from "./indexer";
+import SchemeStatesStore from "./SchemeStatesStore";
 
 import Input from "./Input";
 import Output from "./Output";
@@ -10,6 +11,12 @@ import AndGate from "./gates/AndGate";
 import OrGate from "./gates/OrGate";
 import NotGate from "./gates/NotGate";
 import XorGate from "./gates/XorGate";
+
+const restoreSchemeState = (editor, state) => {
+  editor.restoration = true;
+  editor._graph.read(state);
+  editor.restoration = false;
+}
 
 const bindG6Events = (editor) => {
   const graph = editor._graph;
@@ -61,26 +68,41 @@ const bindG6Events = (editor) => {
   });
 
   graph.on("afteradditem", evt => {
-    const {item} = evt;
+    if (editor.restoration)
+      return;
+
+    const { item } = evt;
     if (item.get("type") === "edge") {
       if (!item.getSource().get || !item.getTarget().get) {
         return;
       }
     }
-    editor.restoration || logEditorAction(editor);
+
+    logEditorAction(editor);
   })
 
+
+  let logDelete = true;
   graph.on("beforeremoveitem", evt => {
+    logDelete = true;
     const { item } = evt;
     if (item.get("type") === "node") {
       const edges = item.getEdges();
       for (let i = edges.length; i >= 0; i--) {
         graph.removeItem(edges[i]);
       }
+    } else if (item.get("type") === "edge") {
+      if (!item.getSource().get || !item.getTarget().get) {
+        logDelete = false;
+      }
     }
   })
 
   graph.on("afterremoveitem", evt => {
+    if (!logDelete) {
+      return;
+    }
+
     logEditorAction(editor);
   })
 
@@ -99,7 +121,12 @@ const bindG6Events = (editor) => {
 }
 
 function logEditorAction(editor) {
-  editor._store.log(editor.getScheme());
+  const scheme = editor.getScheme();
+  scheme.nodes = scheme.nodes.map(node => {
+    const position = { x: node.x, y: node.y };
+    return createNodeModel(node.shape, node.index, position);
+  });
+  editor._store.log(scheme);
 }
 
 const createNodeModel = (type, index, position) => {
@@ -117,6 +144,39 @@ const createNodeModel = (type, index, position) => {
     throw new Error(`Unknown node type - ${type}`);
 
   return new constructors[type](index, position);
+}
+
+function validateScheme(editor, scheme) {
+  const schemeElements = Object.values(scheme);
+  const cycle = findSchemeCycle(schemeElements);
+
+  if (cycle.verdict) {
+    const { path } = cycle;
+    const cycleNodes = [];
+    cycleNodes.push(cycle.start);
+    for (let current = cycle.end; current !== cycle.start; current = path[current]) {
+      cycleNodes.push(current);
+    }
+
+    let timeout = null;
+    const highlightCycleNodes = () => cycleNodes.forEach(nodeId => editor._graph.setItemState(nodeId, "highlight", true));
+    return {
+      valid: false,
+      error: {
+        error: `В цепи обратной связи ${cycleNodes.map(nodeId => scheme[nodeId].label).join(" —> ")} 
+                  отсутствует элемент задержки`,
+        focus: () => {
+          if (timeout)
+            clearTimeout(timeout);
+          editor._graph.focusItem(cycleNodes[0]);
+          highlightCycleNodes();
+          timeout = setTimeout(() => cycleNodes.forEach(nodeId => editor._graph.setItemState(nodeId, "highlight", false)), 5000);
+        }
+      }
+    };
+  }
+
+  return { valid: true };
 }
 
 function createLogicSchemeModel(graph) {
@@ -279,20 +339,6 @@ function evalScheme(rankedElements) {
 
 const SIDEBAR_X_OFFSET = 320;
 
-class SchemeStatesStore {
-  constructor() {
-    this.doStack = [];
-    this.undoStack = [];
-  }
-
-  log(state) {
-    while (this.undoStack.length > 0) {
-      this.undoStack.pop();
-    }
-    this.doStack.push(state);
-  }
-}
-
 export default class SchemeEditor {
   constructor(mountHTMLElement) {
     this._graph = init(mountHTMLElement);
@@ -327,35 +373,14 @@ export default class SchemeEditor {
   setMode = (mode) => {
     if (mode === EDITOR_SIMULATION_MODE) {
       const scheme = createLogicSchemeModel(this._graph);
-      const schemeElements = Object.values(scheme);
-      const cycle = findSchemeCycle(schemeElements);
-
-      if (cycle.verdict) {
-        const { path } = cycle;
-        const cycleNodes = [];
-        cycleNodes.push(cycle.start);
-        for (let current = cycle.end; current !== cycle.start; current = path[current]) {
-          cycleNodes.push(current);
-        }
-
-        let timeout = null;
-        const highlightCycleNodes = () => cycleNodes.forEach(nodeId => this._graph.setItemState(nodeId, "highlight", true));
-        this.onError({
-          error: `В цепи обратной связи ${cycleNodes.map(nodeId => scheme[nodeId].label).join(" —> ")} 
-                  отсутствует элемент задержки`,
-          focus: () => {
-            if (timeout)
-              clearTimeout(timeout);
-            this._graph.focusItem(cycleNodes[0]);
-            highlightCycleNodes();
-            timeout = setTimeout(() => cycleNodes.forEach(nodeId => this._graph.setItemState(nodeId, "highlight", false)), 5000);
-          }
-        });
+      const validationResult = validateScheme(this, scheme)
+      if (!validationResult.valid) {
+        this.onError(validationResult.error);
         return;
       }
 
-      this._schemeElements = schemeElements;
-      this._rankedElements = rankElements(schemeElements);
+      this._schemeElements = Object.values(scheme);
+      this._rankedElements = rankElements(this._schemeElements);
     } else {
       this._rankedElements = null;
     }
@@ -378,7 +403,7 @@ export default class SchemeEditor {
 
         this._graph.setItemState(outElementNode, "enable", outElementValue);
       });
-    
+
     this.afterEvaluateScheme();
   };
 
@@ -433,20 +458,11 @@ export default class SchemeEditor {
   };
 
   importScheme = (scheme) => {
-    scheme.nodes = scheme.nodes.map(node => {
-      const position = { x: node.x, y: node.y };
-      return createNodeModel(node.shape, node.index, position);
-    })
+    const editorState = { scheme };
+    editorState.mode = EDITOR_EDITING_MODE;
+    editorState.scale = 1;
 
-    this.restoration = true;
-    this._graph.read(scheme);
-    this.restoration = false;
-    this._graph.indexer = new EditorObjIndexer(scheme.index);
-    this.setMode(EDITOR_EDITING_MODE);
-
-    this._store = new SchemeStatesStore();
-    logEditorAction(this);
-
+    this.restoreState(editorState);
     this.afterImportScheme({ schemeName: scheme.name });
   };
 
@@ -467,9 +483,7 @@ export default class SchemeEditor {
       const position = { x: node.x, y: node.y };
       return createNodeModel(node.shape, node.index, position);
     })
-    this.restoration = true;
-    this._graph.read(scheme);
-    this.restoration = false;
+    restoreSchemeState(this, scheme);
     this._graph.indexer = new EditorObjIndexer(scheme.index);
 
     this.setScale(scale);
@@ -488,14 +502,7 @@ export default class SchemeEditor {
 
     this._store.undoStack.push(this._store.doStack.pop());
     const current = this._store.doStack[this._store.doStack.length - 1];
-
-    current.nodes = current.nodes.map(node => {
-      const position = { x: node.x, y: node.y };
-      return createNodeModel(node.shape, node.index, position);
-    });
-    this.restoration = true;
-    this._graph.read(current);
-    this.restoration = false;
+    restoreSchemeState(this, current);
   }
 
   redo() {
@@ -507,14 +514,7 @@ export default class SchemeEditor {
 
     this._store.doStack.push(this._store.undoStack.pop());
     const current = this._store.doStack[this._store.doStack.length - 1];
-
-    current.nodes = current.nodes.map(node => {
-      const position = { x: node.x, y: node.y };
-      return createNodeModel(node.shape, node.index, position);
-    });
-    this.restoration = true;
-    this._graph.read(current);
-    this.restoration = false;
+    restoreSchemeState(this, current);
   }
 
   // EVENTS
