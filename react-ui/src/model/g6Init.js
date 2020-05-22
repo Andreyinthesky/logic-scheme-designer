@@ -1,7 +1,7 @@
-import G6 from "./g6";
+import G6 from "../g6";
 
 import EditorObjIndexer from "./indexer";
-import { EDITOR_EDITING_MODE, EDITOR_SIMULATION_MODE } from "./model/constants";
+import { EDITOR_EDITING_MODE, EDITOR_SIMULATION_MODE } from "./constants";
 
 
 export default function init(mountNode) {
@@ -16,7 +16,7 @@ export default function init(mountNode) {
       type: "schemeLayout"
     },
     modes: {
-      [EDITOR_EDITING_MODE]: ["drag-node", "click-add-edge", "drag-canvas"],
+      [EDITOR_EDITING_MODE]: ["drag-node", "items-control", "drag-canvas"],
       [EDITOR_SIMULATION_MODE]: ["change-input-state", "drag-canvas", "drag-node"],
     }
   });

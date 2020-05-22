@@ -1,30 +1,32 @@
 const SELECT_ANCHOR_RADIUS = 16;
 const NODE_SELECT_BOX_PADDING = 10;
 
-const clickAddEdgeBehaviour = {
+const itemsControlBehaviour = {
   getEvents() {
     return {
       "node:click": "onClick",
       "node:mousedown": "onNodeMousedown",
       mousemove: "onMousemove",
+      "node:mouseover": "onNodeMouseover",
+      "node:mouseout": "onNodeMouseout",
       "edge:click": "onEdgeClick",
       "edge:mousedown": "onEdgeMousedown",
       "canvas:mousedown": "onCanvasMousedown",
     };
   },
-  onClick(ev) {
-    const targetNode = ev.item;
+  onClick(evt) {
+    const targetNode = evt.item;
     const graph = this.graph;
     const point = {
-      x: ev.x,
-      y: ev.y
+      x: evt.x,
+      y: evt.y
     };
     const anchorPoint = targetNode.getLinkPoint(point);
     const distanceToAnchorPoint = Math.sqrt(Math.pow(point.x - anchorPoint.x, 2) + Math.pow(point.y - anchorPoint.y, 2));
 
     if (distanceToAnchorPoint > SELECT_ANCHOR_RADIUS) {
       if (!this.addingEdge) {
-        this.deselectAllObjects();
+        this.deselectAllItems();
         const isSelect = targetNode.hasState("select");
         this.graph.setItemState(targetNode, "select", !isSelect);
       }
@@ -53,7 +55,7 @@ const clickAddEdgeBehaviour = {
       this.drivenEdge = null;
       this.addingEdge = false;
     } else {
-      this.deselectAllObjects();
+      this.deselectAllItems();
       this.drivenEdge = graph.addItem("edge", {
         id: ("wire" + this.graph.indexer.getNextIndex("wire")),
         source: targetNodeModel.id,
@@ -68,18 +70,18 @@ const clickAddEdgeBehaviour = {
       this.sourceNode = targetNode;
     }
   },
-  onNodeMousedown(ev) {
+  onNodeMousedown(evt) {
     if (this.addingEdge) {
       return;
     }
 
-    const nativeEvent = ev.event;
+    const nativeEvent = evt.event;
 
     if (nativeEvent.which == 3) {
-      const node = ev.item;
+      const node = evt.item;
       const nodeModel = node.getModel();
 
-      const { x, y } = ev;
+      const { x, y } = evt;
       const { x: centerX, y: centerY, size } = nodeModel;
       const minX = centerX - size[0] / 2;
       const minY = centerY - size[1] / 2;
@@ -97,7 +99,7 @@ const clickAddEdgeBehaviour = {
         && y >= selectBox.minY && y <= selectBox.maxY;
 
       if (isPointBelongsToSelectBox) {
-        this.graph.removeItem(ev.item);
+        this.graph.removeItem(evt.item);
       }
      
       // ROTATION
@@ -114,10 +116,10 @@ const clickAddEdgeBehaviour = {
       // this.graph.paint();
     }
   },
-  onMousemove(ev) {
+  onMousemove(evt) {
     const point = {
-      x: ev.x,
-      y: ev.y
+      x: evt.x,
+      y: evt.y
     };
     if (this.addingEdge && this.drivenEdge) {
       this.graph.updateItem(this.drivenEdge, {
@@ -125,8 +127,21 @@ const clickAddEdgeBehaviour = {
       });
     }
   },
-  onEdgeClick(ev) {
-    const clickedEdge = ev.item;
+  onNodeMouseover(evt) {
+    let item = evt.item;
+    if (item.hasState("hover")) {
+      return;
+    }
+
+    this.graph.setItemState(item, "hover", true);
+  },
+  onNodeMouseout(evt) {
+    let item = evt.item;
+
+    this.graph.setItemState(item, "hover", false);
+  },
+  onEdgeClick(evt) {
+    const clickedEdge = evt.item;
     if (this.addingEdge && this.drivenEdge == clickedEdge) {
       this.graph.removeItem(this.drivenEdge);
       this.drivenEdge = null;
@@ -135,19 +150,19 @@ const clickAddEdgeBehaviour = {
     }
 
     if (!this.addingEdge) {
-      this.deselectAllObjects();
+      this.deselectAllItems();
       this.graph.setItemState(clickedEdge, "select", true);
     }
   },
-  onEdgeMousedown(ev) {
-    const nativeEvent = ev.event;
+  onEdgeMousedown(evt) {
+    const nativeEvent = evt.event;
     if (this.addingEdge) {
       return;
     }
-    if (nativeEvent.which == 3) this.graph.removeItem(ev.item);
+    if (nativeEvent.which == 3) this.graph.removeItem(evt.item);
   },
   onCanvasMousedown() {
-    this.deselectAllObjects();
+    this.deselectAllItems();
   },
   findExistingEdge(targetNode, targetNodeAnchorIndex, drivenEdgeModel) {
     const targetNodeModel = targetNode.getModel();
@@ -174,7 +189,7 @@ const clickAddEdgeBehaviour = {
       );
     })
   },
-  deselectAllObjects() {
+  deselectAllItems() {
     this.graph.getEdges().forEach(edge => {
       this.graph.setItemState(edge, "select", false);
     });
@@ -185,4 +200,4 @@ const clickAddEdgeBehaviour = {
   },
 };
 
-export default clickAddEdgeBehaviour;
+export default itemsControlBehaviour;

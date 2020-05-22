@@ -1,9 +1,9 @@
 import changeInputState from "./changeInputState";
-import clickAddEdge from "./clickAddEdge";
+import itemsControl from "./itemsControl";
 
 const behaviours = {
   "change-input-state": changeInputState,
-  "click-add-edge": clickAddEdge,
+  "items-control": itemsControl,
 }
 
 export default function registerBehaviors(G6) {

@@ -1,7 +1,7 @@
-import init from "../init";
+import init from "./g6Init";
 import { debounce } from "../utils";
 import { FILE_VERSION, EDITOR_SIMULATION_MODE, EDITOR_EDITING_MODE } from "./constants";
-import EditorObjIndexer from "../indexer";
+import EditorObjIndexer from "./indexer";
 
 import Input from "./Input";
 import Output from "./Output";
@@ -13,15 +13,6 @@ import XorGate from "./gates/XorGate";
 
 const bindG6Events = (editor) => {
   const graph = editor._graph;
-
-  graph.on("node:mouseover", evt => {
-    let item = evt.item;
-    if (item.hasState("hover")) {
-      return;
-    }
-
-    graph.setItemState(item, "hover", true);
-  });
 
   graph.on("node:mouseout", evt => {
     let item = evt.item;
