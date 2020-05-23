@@ -1,7 +1,4 @@
-const DIRECTION_LEFT = "L";
-const DIRECTION_RIGHT = "R";
-const DIRECTION_TOP = "T";
-const DIRECTION_BOTTOM = "B";
+import { DIRECTION_RIGHT } from "./directions";
 
 export default class BaseElement {
   constructor(id, position) {
@@ -11,7 +8,7 @@ export default class BaseElement {
     this.input = [];
     this.output = [];
     this.size = [100, 50];
-    this.direction = DIRECTION_LEFT;
+    this.direction = DIRECTION_RIGHT;
   }
 
   getInputAnchors() {

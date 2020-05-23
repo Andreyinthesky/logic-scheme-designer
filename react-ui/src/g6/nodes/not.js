@@ -1,5 +1,6 @@
 import NOT_GATE from "@assets/svg_elements/NOT_ANSI.svg";
 import base from "./base";
+import { DIRECTION_LEFT } from "../../model/directions";
 
 const not = {
   ...base,
@@ -46,25 +47,20 @@ const not = {
       },
     });
 
+    this.doRotate(cfg, group);
+
     return shape;
   },
-
   setState(name, value, item) {
     base.setState(name, value, item);
-
-    if (name === "rotate") {
-      const shape = item.getKeyShape();
-      const model = item.getModel();
-
-      if (value) {
-        shape.rotate(Math.PI);
-        model.anchorPoints = [[1, 0.5], [0, 0.5]];
-      } else {
-        shape.rotate(-Math.PI);
-        model.anchorPoints = [[0, 0.5], [1, 0.5]];
-      }
-    }
   },
+  doRotate(cfg, group) {
+    const elementImage = group.get("children")[0];
+    const { direction } = cfg;
+    if (direction === DIRECTION_LEFT) {
+      elementImage.rotate(Math.PI);
+    }
+  }
 };
 
 export default not;

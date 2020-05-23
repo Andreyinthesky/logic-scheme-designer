@@ -1,5 +1,6 @@
 import XOR_GATE from "@assets/svg_elements/XOR_ANSI.svg";
 import base from "./base";
+import { DIRECTION_LEFT } from "../../model/directions";
 
 const xor = {
   ...base,
@@ -46,8 +47,17 @@ const xor = {
       }
     });
 
+    this.doRotate(cfg, group);
+
     return shape;
   },
+  doRotate(cfg, group) {
+    const elementImage = group.get("children")[0];
+    const { direction } = cfg;
+    if (direction === DIRECTION_LEFT) {
+      elementImage.rotate(Math.PI);
+    }
+  }
 };
 
 export default xor;

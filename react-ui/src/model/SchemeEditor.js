@@ -11,6 +11,7 @@ import AndGate from "./gates/AndGate";
 import OrGate from "./gates/OrGate";
 import NotGate from "./gates/NotGate";
 import XorGate from "./gates/XorGate";
+import { DIRECTION_RIGHT, DIRECTION_LEFT } from "./directions";
 
 const restoreSchemeState = (editor, state) => {
   editor.restoration = true;
@@ -27,53 +28,50 @@ const bindG6Events = (editor) => {
     graph.setItemState(item, "hover", false);
   });
 
-  graph.on("afteradditem", evt => {
-    const itemType = evt.item.get("type");
-
-    if (itemType == "node") {
-      addAnchors(evt.item);
-    }
-  });
-
-  function addAnchors(node) {
-    const model = node.getModel();
-
-    if (!model.anchorPoints) return;
-
-    const group = node.getContainer();
-    const id = model.id;
-    for (let i = 0; i < model.anchorPoints.length; i++) {
-      let { x, y } = node.getLinkPointByAnchor(i);
-      let anchor = group.addShape("marker", {
-        id: id + "_anchor_bg_" + i,
-        attrs: {
-          boxName: "anchor",
-          name: "anchor",
-          x: x - model.x,
-          y: y - model.y,
-          r: 5,
-          fill: "#f00"
-        }
-      });
-      anchor.hide();
-    }
-  }
-
   graph.on("wheel", evt => {
     editor.onWheel(evt);
   });
 
+  const isElementSelected = (element, clickCoords) => {
+    const node = element;
+    const nodeModel = node.getModel();
+
+    const { x, y } = clickCoords;
+    const { x: centerX, y: centerY, size } = nodeModel;
+    const selectBox = {
+      minX: centerX - size[0] / 2,
+      minY: centerY - size[1] / 2,
+      maxX: centerX + size[0] / 2,
+      maxY: centerY + size[1] / 2,
+    };
+
+    const isPointBelongsToSelectBox = x >= selectBox.minX && x <= selectBox.maxX
+      && y >= selectBox.minY && y <= selectBox.maxY;
+
+    return isPointBelongsToSelectBox;
+  };
+
+  const closeContextMenu = () => {
+    editor.onCloseContextMenu();
+    document.removeEventListener("click", closeContextMenu);
+  };
+
   graph.on("node:contextmenu", evt => {
-    console.log(evt);
-    const { item } = evt;
     evt.preventDefault();
     evt.stopPropagation();
-    editor.onOpenContextMenu({ x: evt.canvasX, y: evt.canvasY });
-  });
 
-  graph.on("mousedown", evt => {
-    editor.onCloseContextMenu();
-  })
+    if (editor.getMode() !== EDITOR_EDITING_MODE) {
+      return;
+    }
+
+    const { item } = evt;
+    if (!isElementSelected(item, { x: evt.x, y: evt.y })) {
+      return;
+    }
+    graph.emit("node:select", { item });
+    editor.onOpenContextMenu({ x: evt.canvasX, y: evt.canvasY });
+    document.addEventListener("click", closeContextMenu);
+  });
 
   graph.on("canvas:mousemove", evt => {
     editor.onMouseMove(evt);
@@ -431,6 +429,35 @@ export default class SchemeEditor {
         this._graph.setItemState(this._graph.findById(input.id), "enable", false);
       });
   };
+
+  rotateSelectedItems = () => {
+    if (this.getMode() !== EDITOR_EDITING_MODE)
+      return;
+
+    this._graph.getNodes().forEach(node => {
+      if (node.hasState("select")) {
+        const nodeModel = node.getModel();
+        if (!nodeModel.direction || !nodeModel.changeDirection) {
+          return;
+        }
+
+        const currentDirection = nodeModel.direction;
+        if (currentDirection === DIRECTION_RIGHT) {
+          nodeModel.changeDirection(DIRECTION_LEFT);
+        } else {
+          nodeModel.changeDirection(DIRECTION_RIGHT);
+        }
+
+        // UPDATE NODE
+        node.update();
+        const xPos = nodeModel.x;
+        const yPos = nodeModel.y;
+        node.updatePosition({ x: xPos, y: yPos });
+        node.getEdges().forEach(edge => edge.update());
+        this._graph.paint();
+      }
+    });
+  }
 
   deleteSelectedItems = () => {
     if (this.getMode() !== EDITOR_EDITING_MODE)

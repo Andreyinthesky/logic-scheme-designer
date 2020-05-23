@@ -47,24 +47,24 @@ export default {
     }
   },
   afterDraw(cfg, group) {
-    const { id } = cfg;
-    let [width, height] = cfg.size;
-    width += PADDING;
-    height += PADDING;
+    const { id, size } = cfg;
+    const [width, height] = size;
+    const frameWidth = width + PADDING;
+    const frameHeight = height + PADDING;
 
     const frame = group.addShape('path', {
       id: id + '_frame',
       attrs: {
         name: 'frame',
-        x: -width / 2,
-        y: -height / 2,
-        width,
-        height,
+        x: -frameWidth / 2,
+        y: -frameHeight / 2,
+        frameWidth,
+        frameHeight,
         path: [
-          ['M', -width / 2, -height / 2],
-          ['L', width / 2, -height / 2],
-          ['L', width / 2, height / 2],
-          ['L', -width / 2, height / 2],
+          ['M', -frameWidth / 2, -frameHeight / 2],
+          ['L', frameWidth / 2, -frameHeight / 2],
+          ['L', frameWidth / 2, frameHeight / 2],
+          ['L', -frameWidth / 2, frameHeight / 2],
           ['Z']
         ],
         stroke: "#00b",
@@ -72,7 +72,22 @@ export default {
         lineDash: [5, 5],
       }
     });
-
     frame.hide();
+
+    for (let i = 0; i < cfg.anchorPoints.length; i++) {
+      const [x, y] = cfg.anchorPoints[i];
+      let anchor = group.addShape("marker", {
+        id: id + "_anchor_bg_" + i,
+        attrs: {
+          boxName: "anchor",
+          name: "anchor",
+          x: x * width - width / 2,
+          y: y * height - height / 2,
+          r: 5,
+          fill: "#f00"
+        }
+      });
+      anchor.hide();
+    }
   }
 };

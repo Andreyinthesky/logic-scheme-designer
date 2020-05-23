@@ -1,17 +1,17 @@
 const SELECT_ANCHOR_RADIUS = 16;
-const NODE_SELECT_BOX_PADDING = 10;
 
 const itemsControlBehaviour = {
   getEvents() {
     return {
       "node:click": "onClick",
-      "node:mousedown": "onNodeMousedown",
       mousemove: "onMousemove",
       "node:mouseover": "onNodeMouseover",
       "node:mouseout": "onNodeMouseout",
+      "node:select": "onNodeSelect",
       "edge:click": "onEdgeClick",
       "edge:mousedown": "onEdgeMousedown",
       "canvas:mousedown": "onCanvasMousedown",
+      "beforemodechange": "onBeforeModeChange"
     };
   },
   onClick(evt) {
@@ -26,9 +26,7 @@ const itemsControlBehaviour = {
 
     if (distanceToAnchorPoint > SELECT_ANCHOR_RADIUS) {
       if (!this.addingEdge) {
-        this.deselectAllItems();
-        const isSelect = targetNode.hasState("select");
-        this.graph.setItemState(targetNode, "select", !isSelect);
+        this.graph.emit("node:select", {item: targetNode});
       }
 
       return;
@@ -70,51 +68,10 @@ const itemsControlBehaviour = {
       this.sourceNode = targetNode;
     }
   },
-  onNodeMousedown(evt) {
-    if (this.addingEdge) {
-      return;
-    }
-
-    const nativeEvent = evt.event;
-
-    if (nativeEvent.which == 3) {
-      const node = evt.item;
-      const nodeModel = node.getModel();
-
-      const { x, y } = evt;
-      const { x: centerX, y: centerY, size } = nodeModel;
-      const minX = centerX - size[0] / 2;
-      const minY = centerY - size[1] / 2;
-      const maxX = minX + size[0];
-      const maxY = minY + size[1];
-
-      const selectBox = {
-        minX: minX + NODE_SELECT_BOX_PADDING,
-        minY: minY + NODE_SELECT_BOX_PADDING,
-        maxX: maxX - NODE_SELECT_BOX_PADDING,
-        maxY: maxY - NODE_SELECT_BOX_PADDING,
-      };
-
-      const isPointBelongsToSelectBox = x >= selectBox.minX && x <= selectBox.maxX
-        && y >= selectBox.minY && y <= selectBox.maxY;
-
-      if (isPointBelongsToSelectBox) {
-        // this.graph.removeItem(evt.item);
-      }
-     
-      // ROTATION
-      // const isRotate = ev.item.hasState("rotate");
-      // this.graph.setItemState(ev.item, "rotate", !isRotate);
-
-      // const nodeModel = ev.item.getModel();
-      // const xPos = nodeModel.x;
-      // const yPos = nodeModel.y;
-
-      // // UPDATE NODE
-      // ev.item.updatePosition({x: xPos, y: yPos});
-      // ev.item.getEdges().forEach(edge => edge.refresh());
-      // this.graph.paint();
-    }
+  onNodeSelect(evt) {
+    this.deselectAllItems();
+    const isSelect = evt.item.hasState("select");
+    this.graph.setItemState(evt.item, "select", !isSelect);
   },
   onMousemove(evt) {
     const point = {
@@ -161,7 +118,10 @@ const itemsControlBehaviour = {
     }
     if (nativeEvent.which == 3) this.graph.removeItem(evt.item);
   },
-  onCanvasMousedown() {
+  onCanvasMousedown(evt) {
+    this.deselectAllItems();
+  },
+  onBeforeModeChange(evt) {
     this.deselectAllItems();
   },
   findExistingEdge(targetNode, targetNodeAnchorIndex, drivenEdgeModel) {

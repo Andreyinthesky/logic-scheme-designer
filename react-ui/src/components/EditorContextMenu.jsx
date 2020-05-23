@@ -1,10 +1,25 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
+import { hideContextMenu } from "../redux/actions";
 
 class EditorContextMenu extends Component {
     constructor() {
         super();
+    }
+
+    handleClickDeleteAction = () => {
+        this.props.onDeleteAction();
+        this.closeMenu();
+    }
+
+    handleClickRotateAction = () => {
+        this.props.onRotateAction();
+        this.closeMenu();
+    }
+
+    closeMenu() {
+        this.props.hideContextMenu();
     }
 
     render() {
@@ -16,11 +31,11 @@ class EditorContextMenu extends Component {
         return (
             <div className="context-menu" style={{ left: x, top: y }}>
                 <ul className="context-menu__list">
-                    <li>
+                    <li onClick={this.handleClickDeleteAction}>
                         <i className="fas fa-trash-alt"></i>
                         {"Удалить"}
                     </li>
-                    <li>
+                    <li onClick={this.handleClickRotateAction}>
                         <span>
                             <i className="fas fa-exchange-alt"></i>
                             {"Повернуть на 180"}&#176;
@@ -34,10 +49,17 @@ class EditorContextMenu extends Component {
 
 EditorContextMenu.propTypes = {
     menuData: PropTypes.object,
+    hideContextMenu: PropTypes.func.isRequired,
+    onDeleteAction: PropTypes.func.isRequired,
+    onRotateAction: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
     menuData: state.editor.contextMenuData,
 });
 
-export default connect(mapStateToProps, null)(EditorContextMenu);
+const mapDispatchToProps = {
+    hideContextMenu
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(EditorContextMenu);

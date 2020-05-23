@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import SideBar from "./SideBar";
 import Canvas from "./Canvas";
 import EditorContextMenu from "./EditorContextMenu";
+import { EditorContext } from "../contexts/editorContext";
 
 export default class EditorArea extends Component {
     constructor() {
@@ -11,7 +12,14 @@ export default class EditorArea extends Component {
     render() {
         return (
             <div className="editor-area">
-                <EditorContextMenu />
+                <EditorContext.Consumer>
+                    {({ deleteSelectedCallback, rotateSelectedCallback }) => (
+                        <EditorContextMenu
+                            onDeleteAction={deleteSelectedCallback}
+                            onRotateAction={rotateSelectedCallback}
+                        />
+                    )}
+                </EditorContext.Consumer>
                 <SideBar />
                 <Canvas />
             </div>

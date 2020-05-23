@@ -39,10 +39,6 @@ class App extends Component {
         const editor = new SchemeEditor(document.getElementById("mountNode"));
         this.editor = editor;
         this.bindEditorEvents(this.editor);
-        // document.addEventListener("keydown", (evt) => {
-        //     if (evt.code === "KeyZ" && !evt.repeat && evt.target === document.body)
-        //         console.log(evt.code, evt.ctrlKey, evt.currentTarget, evt.target);
-        // })
 
         window.onbeforeunload = (evt) => {
             this.saveEditorState();
@@ -110,6 +106,11 @@ class App extends Component {
         editor.onCloseContextMenu = () => {
             this.props.hideContextMenu();
         };
+
+        // document.addEventListener("keydown", (evt) => {
+        //     if (evt.code === "KeyZ" && !evt.repeat && evt.target === document.body)
+        //         console.log(evt.code, evt.ctrlKey, evt.currentTarget, evt.target);
+        // })
     }
 
     initNewScheme = () => {
@@ -124,6 +125,10 @@ class App extends Component {
 
     deleteSelected = () => {
         this.editor.deleteSelectedItems();
+    }
+
+    rotateSelected = () => {
+        this.editor.rotateSelectedItems();
     }
 
     setMode = (mode) => {
@@ -224,6 +229,7 @@ class App extends Component {
                     upScaleCallback: this.upScale,
                     downScaleCallback: this.downScale,
                     deleteSelectedCallback: this.deleteSelected,
+                    rotateSelectedCallback: this.rotateSelected,
                     goToOriginCallback: this.goToOrigin,
                     setModeCallback: this.setMode,
                     doTactCallback: this.evaluateScheme,

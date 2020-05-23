@@ -1,5 +1,8 @@
 import DELAY_GATE from "@assets/svg_elements/Buffer_ANSI.svg";
 import base from "./base";
+import { DIRECTION_LEFT } from "../../model/directions";
+const zMarkOffsetX = 35;
+const zMarkOffsetY = -12;
 
 const delay = {
   ...base,
@@ -34,8 +37,6 @@ const delay = {
     });
 
     // z mark
-    const zMarkOffsetX = 35;
-    const zMarkOffsetY = -12;
     group.addShape("text", {
       attrs: {
         x: zMarkOffsetX,
@@ -80,6 +81,8 @@ const delay = {
       }
     });
 
+    this.doRotate(cfg, group);
+
     return shape;
   },
 
@@ -96,6 +99,15 @@ const delay = {
       }
     }
   },
+  doRotate(cfg, group) {
+    const elementImage = group.get("children")[0];
+    const zMark = group.get("children")[2];
+    const { direction } = cfg;
+    if (direction === DIRECTION_LEFT) {
+      elementImage.rotate(Math.PI);
+      zMark.attr({ x: -zMarkOffsetX, y: zMarkOffsetY });
+    }
+  }
 };
 
 export default delay;
