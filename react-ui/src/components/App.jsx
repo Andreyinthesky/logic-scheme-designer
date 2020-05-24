@@ -107,10 +107,29 @@ class App extends Component {
             this.props.hideContextMenu();
         };
 
-        // document.addEventListener("keydown", (evt) => {
-        //     if (evt.code === "KeyZ" && !evt.repeat && evt.target === document.body)
-        //         console.log(evt.code, evt.ctrlKey, evt.currentTarget, evt.target);
-        // })
+        document.addEventListener("keydown", (evt) => {
+            if (evt.repeat || document.activeElement.tagName === "INPUT") {
+                return;
+            }
+
+            switch (evt.code) {
+                case "Delete":
+                    this.deleteSelected();
+                    break;
+                case "KeyZ":
+                    if (evt.ctrlKey) {
+                        this.undo();
+                    }
+                    break;
+                case "KeyY":
+                    if (evt.ctrlKey) {
+                        this.redo();
+                    }
+                    break;
+                default:
+                    break;
+            }
+        })
     }
 
     initNewScheme = () => {
