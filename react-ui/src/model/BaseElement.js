@@ -11,6 +11,10 @@ export default class BaseElement {
     this.direction = DIRECTION_RIGHT;
   }
 
+  changeDirection() {
+    return null;
+  }
+
   getInputAnchors() {
     return [];
   }

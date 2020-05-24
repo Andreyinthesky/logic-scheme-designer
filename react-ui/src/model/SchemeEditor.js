@@ -134,7 +134,9 @@ function logEditorAction(editor) {
   const scheme = editor.getScheme();
   scheme.nodes = scheme.nodes.map(node => {
     const position = { x: node.x, y: node.y };
-    return createNodeModel(node.shape, node.index, position);
+    const model = createNodeModel(node.shape, node.index, position);
+    model.changeDirection(node.direction);
+    return model;
   });
   editor._store.log(scheme);
 }
@@ -492,6 +494,7 @@ export default class SchemeEditor {
     schemeData.version = FILE_VERSION;
     schemeData.name = name;
     schemeData.index = this._graph.indexer.index;
+    schemeData.editorLeftTopCorner = this._graph.getCanvasByPoint(0, 0);
 
     return schemeData;
   };
@@ -520,13 +523,17 @@ export default class SchemeEditor {
 
     scheme.nodes = scheme.nodes.map(node => {
       const position = { x: node.x, y: node.y };
-      return createNodeModel(node.shape, node.index, position);
+      const model = createNodeModel(node.shape, node.index, position);
+      model.changeDirection(node.direction);
+      return model;
     })
     restoreSchemeState(this, scheme);
     this._graph.indexer = new EditorObjIndexer(scheme.index);
 
     this.setScale(scale);
     this.setMode(mode);
+    scheme.editorLeftTopCorner
+      && this._graph.translate(scheme.editorLeftTopCorner.x, scheme.editorLeftTopCorner.y);
 
     this._store = new SchemeStatesStore();
     logEditorAction(this);
