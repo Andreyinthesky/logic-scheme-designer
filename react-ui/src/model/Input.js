@@ -1,4 +1,14 @@
 import BaseElement from "./BaseElement";
+import { DIRECTION_LEFT } from "./directions";
+import { isDirection } from "./utils";
+
+const directionToAnchorPoints = (direction) => {
+  if (direction == DIRECTION_LEFT) {
+    return [[0, 0.5]];
+  } else {
+    return [[1, 0.5]];
+  }
+};
 
 export default class Input extends BaseElement {
   constructor(index, position) {
@@ -8,8 +18,17 @@ export default class Input extends BaseElement {
     this.input = [false];
     this.shape = "input";
     this.label = `ВХОД-${index}`;
-    this.anchorPoints = [[1, 0.5]];
+    this.anchorPoints = directionToAnchorPoints(this.direction);
     this.size = [75, 50];
+  }
+
+  changeDirection(direction) {
+    if (!isDirection(direction)) {
+      throw new Error("Unknown direction - " + direction);
+    }
+
+    this.anchorPoints = directionToAnchorPoints(direction);
+    this.direction = direction;
   }
 
   getOutputAnchors() {

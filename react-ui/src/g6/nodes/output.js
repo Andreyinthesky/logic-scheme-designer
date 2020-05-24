@@ -1,4 +1,5 @@
 import base from "./base";
+import { DIRECTION_LEFT } from "../../model/directions";
 
 const connectorOffset = 25;
 
@@ -24,7 +25,6 @@ const output = {
         path: this.getPath(cfg),
         stroke: cfg.color || "#000",
         lineWidth: cfg.lineWidth || 6,
-        // fill: cfg.fill || "#fff",
       },
     });
 
@@ -47,7 +47,7 @@ const output = {
       attrs: {
         x: -width / 2 - marginX,
         y: -height / 2,
-        width: width + marginX,
+        width: width + marginX * 2,
         height: height,
         fill: "white",
         opacity: 0,
@@ -68,6 +68,8 @@ const output = {
         fill: cfg.color || "#000",
       },
     });
+
+    this.doRotate(cfg, group);
 
     return shape;
   },
@@ -100,6 +102,21 @@ const output = {
       }
     }
   },
+
+  doRotate(cfg, group) {
+    const pin = group.get("children")[0];
+    const elementShape = group.get("children")[1];
+    const valueText = group.get("children")[2];
+    const label = group.get("children")[4];
+
+    const { direction } = cfg;
+    if (direction === DIRECTION_LEFT) {
+      pin.attr("path", [["M", cfg.size[0] / 2, 0], ["l", -connectorOffset, 0]])
+      elementShape.translate(-connectorOffset, 0);
+      valueText.translate(-connectorOffset, 0);
+      label.translate(-connectorOffset, 0);
+    }
+  }
 };
 
 export default output;
