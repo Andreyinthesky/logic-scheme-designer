@@ -100,7 +100,7 @@ class App extends Component {
         }
 
         editor.onOpenContextMenu = (data) => {
-           this.props.showContextMenu(data);
+            this.props.showContextMenu(data);
         };
 
         editor.onCloseContextMenu = () => {
@@ -207,6 +207,8 @@ class App extends Component {
 
     tryRestoreEditorState = () => {
         const editorState = JSON.parse(localStorage.getItem("editorState"));
+        if (!editorState)
+            return;
         const timeout = 15 * 60 * 1000;
         const passed = Math.abs(new Date(editorState.timeStamp) - Date.now());
 
