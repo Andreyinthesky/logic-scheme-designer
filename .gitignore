@@ -1,5 +1,6 @@
 #dirs
 /node_modules
+/build
 
 #files
 package-lock.json

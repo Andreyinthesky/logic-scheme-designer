@@ -1,4 +1,4 @@
-import G6 from "@antv/g6";
+import G6 from "../../lib/g6/g6";
 
 import registerBehaviors from "./behaviors";
 import registerEdges from "./edges";

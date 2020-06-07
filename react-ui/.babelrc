@@ -1,5 +1,10 @@
 {
-  "presets": ["@babel/env", "@babel/react"],
+  "presets": [
+    ["@babel/preset-env", {
+      "useBuiltIns": "usage"
+    }],
+    "@babel/react"
+  ],
   "plugins": [
     "@babel/plugin-proposal-class-properties"
   ]
