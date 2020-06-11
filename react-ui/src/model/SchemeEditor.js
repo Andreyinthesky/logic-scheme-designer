@@ -543,10 +543,11 @@ export default class SchemeEditor {
       model.changeDirection(node.direction);
       return model;
     })
+
+    restoreSchemeState(this, fileData.schemeData);
     this.setScale(scale);
     this.setMode(mode);
 
-    restoreSchemeState(this, fileData.schemeData);
     fileData.editorLeftTopCorner
       && this._graph.translate(fileData.editorLeftTopCorner.x, fileData.editorLeftTopCorner.y);
 
