@@ -17,9 +17,9 @@ class SchemeActionsPanel extends Component {
         this.props.onDiscardInputs();
     };
 
-    // handleClickDiscardDelaysBtn = () => {
-    //     this.props.onDiscardInputs();
-    // };
+    handleClickDiscardDelaysBtn = () => {
+        this.props.onDiscardDelays();
+    };
 
     render() {
         const { show } = this.props;
@@ -37,9 +37,9 @@ class SchemeActionsPanel extends Component {
                     <button className="discard-inputs-btn" onClick={this.handleClickDiscardInputsBtn} >
                         {"Сбросить входы"}
                     </button>
-                    {/* <button className="discard-delays-btn" >
+                    <button className="discard-delays-btn" onClick={this.handleClickDiscardDelaysBtn}>
                         {"Сбросить задержки"}
-                    </button> */}
+                    </button>
                 </div>
             </div>
         );
@@ -54,7 +54,7 @@ SchemeActionsPanel.propTypes = {
     show: PropTypes.bool.isRequired,
     onDoTact: PropTypes.func.isRequired,
     onDiscardInputs: PropTypes.func.isRequired,
-    // onDiscardDelays: PropTypes.func.isRequired,
+    onDiscardDelays: PropTypes.func.isRequired,
 };
 
 export default connect(mapStateToProps, null)(SchemeActionsPanel);

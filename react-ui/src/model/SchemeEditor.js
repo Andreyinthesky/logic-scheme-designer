@@ -453,6 +453,19 @@ export default class SchemeEditor {
       });
   };
 
+  discardSchemeDelaysState = () => {
+    const elements = this._schemeElements;
+    if (this.getMode() !== EDITOR_SIMULATION_MODE || !elements)
+      return;
+
+    elements
+      .filter(element => element instanceof DelayGate)
+      .forEach(delay => {
+        delay.input = delay.input.map(v => false);
+        this._graph.setItemState(this._graph.findById(delay.id), "enable", false);
+      });
+  };
+
   rotateSelectedItems = () => {
     if (this.getMode() !== EDITOR_EDITING_MODE)
       return;

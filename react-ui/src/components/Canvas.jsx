@@ -17,11 +17,13 @@ export default class Canvas extends Component {
                     {({
                         doTactCallback,
                         discardInputsCallback,
+                        discardDelaysCallback,
                     }) =>
                         (
                             <SchemeActionsPanel
                                 onDoTact={doTactCallback}
                                 onDiscardInputs={discardInputsCallback}
+                                onDiscardDelays={discardDelaysCallback}
                             />
                         )}
                 </EditorContext.Consumer>

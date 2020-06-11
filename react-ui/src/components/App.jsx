@@ -186,6 +186,10 @@ class App extends Component {
         this.editor.discardSchemeInputsState();
     }
 
+    discardDelays = () => {
+        this.editor.discardSchemeDelaysState();
+    }
+
     importScheme = (fileData) => {
         this.editor.importScheme(fileData);
     }
@@ -265,6 +269,7 @@ class App extends Component {
                     setModeCallback: this.setMode,
                     doTactCallback: this.evaluateScheme,
                     discardInputsCallback: this.discardInputs,
+                    discardDelaysCallback: this.discardDelays,
                     setScaleCallback: this.setScale,
                     undoEditorActionCallback: this.undo,
                     redoEditorActionCallback: this.redo

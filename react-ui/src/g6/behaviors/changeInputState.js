@@ -11,7 +11,7 @@ const changeInputStateBehavior = {
     if (nativeEvent.which == 3) {
       const nodeModel = ev.item.getModel();
 
-      if (nodeModel.shape == "input") {
+      if (nodeModel.shape === "input" || nodeModel.shape === "delay") {
         const isEnable = ev.item.hasState("enable");
 
         nodeModel.input = nodeModel.input.map(v => !isEnable);
