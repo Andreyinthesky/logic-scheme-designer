@@ -8,7 +8,9 @@ import {
   SHOW_TACT_COUNTER,
   HIDE_TACT_COUNTER,
   SHOW_CONTEXT_MENU,
-  HIDE_CONTEXT_MENU
+  HIDE_CONTEXT_MENU,
+  SHOW_SCHEME_CONTROLS,
+  HIDE_SCHEME_CONTROLS
 } from "./actionTypes";
 import { DEFAULT_FILENAME, EDITOR_EDITING_MODE } from "../model/constants";
 
@@ -20,6 +22,8 @@ const initialState = {
   mouseCoords: { x: 0, y: 0 },
   tactCount: 0,
   contextMenuData: null,
+  showTactCounter: false,
+  showSchemeControls: false
 };
 
 export const editorReducer = (state = initialState, action) => {
@@ -34,6 +38,10 @@ export const editorReducer = (state = initialState, action) => {
       return { ...state, showTactCounter: true, tactCount: 0 };
     case HIDE_TACT_COUNTER:
       return { ...state, showTactCounter: false };
+    case SHOW_SCHEME_CONTROLS:
+      return { ...state, showSchemeControls: true };
+    case HIDE_SCHEME_CONTROLS:
+      return { ...state, showSchemeControls: false };
     case SHOW_CONTEXT_MENU:
       return { ...state, contextMenuData: action.payload };
     case HIDE_CONTEXT_MENU:

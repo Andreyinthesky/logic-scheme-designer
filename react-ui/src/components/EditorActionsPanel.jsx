@@ -45,14 +45,6 @@ class EditorActionsPanel extends Component {
         this.props.onSetMode(EDITOR_SIMULATION_MODE);
     };
 
-    handleClickDoTactBtn = () => {
-        this.props.onDoTact();
-    };
-
-    handleClickDiscardInputsBtn = () => {
-        this.props.onDiscardInputs();
-    };
-
     render() {
         const isSimulationMode = this.props.editorMode === EDITOR_SIMULATION_MODE;
 
@@ -92,24 +84,16 @@ class EditorActionsPanel extends Component {
                     </button>
                 </div>
 
-                <div className="scheme-control">
-                    {isSimulationMode ?
-                        <button className={"testMode-btn active"} onClick={this.handleClickChangeModeBtn}>
-                            <i className="fas fa-pencil-alt"></i>
-                            {"В режим редактирования"}
-                        </button> :
-                        <button className="testMode-btn" onClick={this.handleClickChangeModeBtn}>
-                            <i className="fas fa-caret-square-right"></i>
-                            {"В режим симуляции"}
-                        </button>
-                    }
-                    <button className="doTact-btn" onClick={this.handleClickDoTactBtn} disabled={!isSimulationMode} >
-                        {"Сделать такт"}
+                {isSimulationMode ?
+                    <button className={"testMode-btn active"} onClick={this.handleClickChangeModeBtn}>
+                        <i className="fas fa-pencil-alt"></i>
+                        {"В режим редактирования"}
+                    </button> :
+                    <button className="testMode-btn" onClick={this.handleClickChangeModeBtn}>
+                        <i className="fas fa-caret-square-right"></i>
+                        {"В режим симуляции"}
                     </button>
-                    <button className="discard-inputs-btn" onClick={this.handleClickDiscardInputsBtn} disabled={!isSimulationMode} >
-                        {"Сбросить входы"}
-                    </button>
-                </div>
+                }
             </div>
         );
     }
@@ -126,8 +110,6 @@ EditorActionsPanel.propTypes = {
     onDownScale: PropTypes.func,
     onGoToOrigin: PropTypes.func,
     onDeleteSelected: PropTypes.func,
-    onDoTact: PropTypes.func,
-    onDiscardInputs: PropTypes.func,
     onUndo: PropTypes.func,
     onRedo: PropTypes.func,
 };

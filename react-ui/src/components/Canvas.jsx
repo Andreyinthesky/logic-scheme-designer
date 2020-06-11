@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import EditorStatusBar from "./EditorStatusBar";
-import TactCounter from "./TactCounter";
+import SchemeActionsPanel from "./SchemeActionsPanel";
+import { EditorContext } from "../contexts/editorContext";
 
 
 export default class Canvas extends Component {
@@ -12,7 +13,19 @@ export default class Canvas extends Component {
     render() {
         return (
             <div id="mountNode" ref={this.mountNode}>
-                <TactCounter />
+                <EditorContext.Consumer>
+                    {({
+                        doTactCallback,
+                        discardInputsCallback,
+                    }) =>
+                        (
+                            <SchemeActionsPanel
+                                onDoTact={doTactCallback}
+                                onDiscardInputs={discardInputsCallback}
+                            />
+                        )}
+                </EditorContext.Consumer>
+
                 <EditorStatusBar />
             </div>
         );

@@ -11,6 +11,8 @@ import {
     increaseTactCount,
     showTactCounter,
     hideTactCounter,
+    showSchemeControls,
+    hideSchemeControls,
     showContextMenu,
     hideContextMenu
 } from "../redux/actions";
@@ -70,8 +72,10 @@ class App extends Component {
             this.props.setMode(evt.mode);
             if (evt.mode === EDITOR_EDITING_MODE) {
                 this.props.hideTactCounter();
+                this.props.hideSchemeControls();
             } else {
                 this.props.showTactCounter();
+                this.props.showSchemeControls();
             }
         };
 
@@ -287,6 +291,8 @@ App.propTypes = {
     increaseTactCount: PropTypes.func,
     showTactCounter: PropTypes.func,
     hideTactCounter: PropTypes.func,
+    showSchemeControls: PropTypes.func,
+    hideSchemeControls: PropTypes.func,
     showContextMenu: PropTypes.func,
     hideContextMenu: PropTypes.func,
     filename: PropTypes.string,
@@ -307,6 +313,8 @@ const mapDispatchToProps = {
     increaseTactCount,
     showTactCounter,
     hideTactCounter,
+    showSchemeControls,
+    hideSchemeControls,
     showContextMenu,
     hideContextMenu
 };

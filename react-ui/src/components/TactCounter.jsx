@@ -9,7 +9,9 @@ function TactCounter(props) {
         return null;
 
     return (
-        <div className="tact-counter">{`Сделано тактов: ${count}`}</div>
+        <div className="tact-counter">
+            {`Сделано тактов: ${count}`}
+        </div>
     );
 }
 

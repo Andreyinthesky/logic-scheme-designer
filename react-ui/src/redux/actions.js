@@ -14,7 +14,9 @@ import {
   SHOW_TACT_COUNTER,
   HIDE_TACT_COUNTER,
   SHOW_CONTEXT_MENU,
-  HIDE_CONTEXT_MENU
+  HIDE_CONTEXT_MENU,
+  SHOW_SCHEME_CONTROLS,
+  HIDE_SCHEME_CONTROLS
 } from "./actionTypes";
 import { EDITOR_EDITING_MODE, EDITOR_SIMULATION_MODE } from "../model/constants";
 
@@ -56,6 +58,18 @@ export function showTactCounter() {
 export function hideTactCounter() {
   return {
     type: HIDE_TACT_COUNTER,
+  };
+}
+
+export function showSchemeControls() {
+  return {
+    type: SHOW_SCHEME_CONTROLS,
+  };
+}
+
+export function hideSchemeControls() {
+  return {
+    type: HIDE_SCHEME_CONTROLS,
   };
 }
 

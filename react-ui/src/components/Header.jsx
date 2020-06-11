@@ -19,8 +19,6 @@ export default class Header extends Component {
                         deleteSelectedCallback,
                         goToOriginCallback,
                         setModeCallback,
-                        doTactCallback,
-                        discardInputsCallback,
                         undoEditorActionCallback,
                         redoEditorActionCallback,
                     }) =>
@@ -33,8 +31,6 @@ export default class Header extends Component {
                                 onDeleteSelected={deleteSelectedCallback}
                                 onGoToOrigin={goToOriginCallback}
                                 onSetMode={setModeCallback}
-                                onDoTact={doTactCallback}
-                                onDiscardInputs={discardInputsCallback}
                             />
                         )}
                 </EditorContext.Consumer>
