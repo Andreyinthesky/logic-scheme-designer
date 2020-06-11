@@ -182,8 +182,8 @@ class App extends Component {
         this.editor.discardSchemeInputsState();
     }
 
-    importScheme = (schemeData) => {
-        this.editor.importScheme(schemeData);
+    importScheme = (fileData) => {
+        this.editor.importScheme(fileData);
     }
 
     exportSchemeToFile = (filename) => {
@@ -216,9 +216,15 @@ class App extends Component {
             localStorage.removeItem("editorState");
             return false;
         } else {
-            this.editor.restoreState(editorState);
-            this.props.setFilename(editorState.scheme.name);
-            return true;
+            let verdict = true;
+            try {
+                this.editor.restoreState(editorState);
+                editorState.filename && this.props.setFilename(editorState.filename);
+            } catch(err) {
+                localStorage.removeItem("editorState");
+                verdict = false;
+            }
+            return verdict;
         }
     }
 
@@ -228,7 +234,7 @@ class App extends Component {
             scale: this.editor.getScale(),
             filename: this.props.filename
         };
-        editorState.scheme = this.editor.exportScheme(editorState.filename);
+        editorState.fileData = this.editor.exportScheme(editorState.filename);
         editorState.timeStamp = Date.now();
 
         localStorage.setItem("editorState", JSON.stringify(editorState));

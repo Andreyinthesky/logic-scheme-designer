@@ -31,6 +31,8 @@ const customDragCanvasBehavior = {
     graph.translate((evt.x - dragCanvasCoord.x) * scale, (evt.y - dragCanvasCoord.y) * scale);
   },
   endDrag() {
+    if (this.startDrag && !this.isFirstMove)
+      this.graph.emit("editor:log");
     this.isFirstMove = true;
     this.startDrag = false;
     this.setCursorStyle("default");

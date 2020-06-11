@@ -10,6 +10,10 @@ class SchemeStatesStore {
     }
     this.doStack.push(state);
   }
+
+  getCurrent() {
+    return this.doStack[this.doStack.length - 1];
+  }
 }
 
 export default SchemeStatesStore;

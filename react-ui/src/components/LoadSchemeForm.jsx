@@ -23,11 +23,12 @@ class LoadSchemeForm extends Component {
         this.createNativeFileInputElement().click();
     };
 
-    validateSchemeData = (schemeData) => {
-        return schemeData.nodes
-            && schemeData.edges
-            && schemeData.name
-            && schemeData.index;
+    validateFileData = (fileData) => {
+        return fileData.name
+            && fileData.schemeData
+            && fileData.schemeData.nodes
+            && fileData.schemeData.edges
+            && fileData.index;
     }
 
     showFileLoadError = () => {
@@ -46,8 +47,11 @@ class LoadSchemeForm extends Component {
 
         fileReader.onload = () => {
             try {
-                const schemeData = JSON.parse(fileReader.result);
-                this.validateSchemeData(schemeData) && this.props.onImportScheme(schemeData);
+                const fileData = JSON.parse(fileReader.result);
+                if (!this.validateFileData(fileData)) {
+                    throw new Error("Validation file error");
+                }
+                this.props.onImportScheme(fileData);
                 this.closeForm();
             } catch (error) {
                 console.error(error.message);

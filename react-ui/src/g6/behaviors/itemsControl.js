@@ -3,69 +3,53 @@ const SELECT_ANCHOR_RADIUS = 16;
 const itemsControlBehaviour = {
   getEvents() {
     return {
-      "node:click": "onClick",
+      "node:click": "onNodeClick",
       mousemove: "onMousemove",
       "node:mouseover": "onNodeMouseover",
       "node:mouseout": "onNodeMouseout",
+      "node:contextmenu" : "onNodeContextMenu",
       "node:select": "onNodeSelect",
       "edge:click": "onEdgeClick",
       "edge:mousedown": "onEdgeMousedown",
       "canvas:mousedown": "onCanvasMousedown",
-      "beforemodechange": "onBeforeModeChange"
+      "keydown": "onKeyDown",
+      "beforemodechange": "onBeforeModeChange",
+      "node:drop": "onNodeEndDrag"
     };
   },
-  onClick(evt) {
-    const targetNode = evt.item;
-    const graph = this.graph;
+  onNodeClick(evt) {
+    const node = evt.item;
     const point = {
       x: evt.x,
       y: evt.y
     };
-    const anchorPoint = targetNode.getLinkPoint(point);
+    const anchorPoint = node.getLinkPoint(point);
     const distanceToAnchorPoint = Math.sqrt(Math.pow(point.x - anchorPoint.x, 2) + Math.pow(point.y - anchorPoint.y, 2));
 
     if (distanceToAnchorPoint > SELECT_ANCHOR_RADIUS) {
       if (!this.addingEdge) {
-        this.graph.emit("node:select", {item: targetNode});
+        this.graph.emit("node:select", { item: node });
       }
-
       return;
     }
 
-    const targetNodeModel = targetNode.getModel();
-    const targetNodeAnchorIndex = anchorPoint.anchorIndex;
+    const nodeModel = node.getModel();
+    const nodeAnchorIndex = anchorPoint.anchorIndex;
 
     if (this.addingEdge && this.drivenEdge) {
       const drivenEdgeModel = this.drivenEdge.getModel();
-      const hasSameEdge = this.findExistingEdge(targetNode, targetNodeAnchorIndex, drivenEdgeModel) !== undefined;
-      const isDrivenToSameNode = targetNodeModel.id === drivenEdgeModel.source;
-      const isDrivenBetweenInputAndOutput = targetNodeModel.getInputAnchors().includes(targetNodeAnchorIndex)
+      const hasSameEdge = this.findExistingEdge(node, nodeAnchorIndex, drivenEdgeModel) !== undefined;
+      const isDrivenToSameNode = nodeModel.id === drivenEdgeModel.source;
+      const isDrivenBetweenInputAndOutput = nodeModel.getInputAnchors().includes(nodeAnchorIndex)
         !== this.sourceNode.getModel().getInputAnchors().includes(drivenEdgeModel.sourceAnchor)
 
-      if (hasSameEdge || isDrivenToSameNode || !isDrivenBetweenInputAndOutput) return;
+      if (hasSameEdge || isDrivenToSameNode || !isDrivenBetweenInputAndOutput)
+        return;
 
-      graph.updateItem(this.drivenEdge, {
-        target: targetNodeModel.id,
-        targetAnchor: targetNodeAnchorIndex
-      });
-
-      graph.emit("afteradditem", { item: this.drivenEdge });
-      this.drivenEdge = null;
-      this.addingEdge = false;
+      this.completeDrivenEdge(node, nodeAnchorIndex);
     } else {
       this.deselectAllItems();
-      this.drivenEdge = graph.addItem("edge", {
-        id: ("wire" + this.graph.indexer.getNextIndex("wire")),
-        source: targetNodeModel.id,
-        sourceAnchor: targetNodeAnchorIndex,
-        shape: "wire",
-        target: point,
-        style: {
-          lineWidth: 3
-        }
-      });
-      this.addingEdge = true;
-      this.sourceNode = targetNode;
+      this.addDrivenEdge(node, nodeAnchorIndex, point);
     }
   },
   onNodeSelect(evt) {
@@ -97,6 +81,9 @@ const itemsControlBehaviour = {
 
     this.graph.setItemState(item, "hover", false);
   },
+  onNodeContextMenu(evt) {
+    this.removeDrivenEdge();
+  },
   onEdgeClick(evt) {
     const clickedEdge = evt.item;
     if (this.addingEdge && this.drivenEdge == clickedEdge) {
@@ -113,16 +100,27 @@ const itemsControlBehaviour = {
   },
   onEdgeMousedown(evt) {
     const nativeEvent = evt.event;
-    if (this.addingEdge) {
-      return;
+    if (nativeEvent.which == 3) {
+      if (this.addingEdge) {
+        this.removeDrivenEdge();
+      } else {
+        this.graph.removeItem(evt.item);
+      }
     }
-    if (nativeEvent.which == 3) this.graph.removeItem(evt.item);
   },
   onCanvasMousedown(evt) {
     this.deselectAllItems();
   },
+  onKeyDown(evt) {
+    if (evt.keyCode === 27) {
+      this.removeDrivenEdge();
+    }
+  },
   onBeforeModeChange(evt) {
     this.deselectAllItems();
+  },
+  onNodeEndDrag(evt) {
+    this.graph.emit("editor:log");
   },
   findExistingEdge(targetNode, targetNodeAnchorIndex, drivenEdgeModel) {
     const targetNodeModel = targetNode.getModel();
@@ -148,6 +146,41 @@ const itemsControlBehaviour = {
         )
       );
     })
+  },
+  addDrivenEdge(sourceNode, sourceNodeAnchorIndex, endPoint) {
+    const sourceNodeModel = sourceNode.getModel();
+    this.drivenEdge = this.graph.addItem("edge", {
+      id: ("wire" + this.graph.indexer.getNextIndex("wire")),
+      source: sourceNodeModel.id,
+      sourceAnchor: sourceNodeAnchorIndex,
+      shape: "wire",
+      target: endPoint,
+      style: {
+        lineWidth: 3
+      }
+    });
+    this.addingEdge = true;
+    this.sourceNode = sourceNode;
+  },
+  removeDrivenEdge() {
+    if (this.addingEdge && this.drivenEdge) {
+      this.graph.removeItem(this.drivenEdge);
+      this.drivenEdge = null;
+      this.addingEdge = false;
+    }
+  },
+  completeDrivenEdge(targetNode, targetNodeAnchorIndex) {
+    if (this.addingEdge && this.drivenEdge) {
+      const targetNodeModel = targetNode.getModel();
+      this.graph.updateItem(this.drivenEdge, {
+        target: targetNodeModel.id,
+        targetAnchor: targetNodeAnchorIndex
+      });
+
+      this.graph.emit("afteradditem", { item: this.drivenEdge });
+      this.drivenEdge = null;
+      this.addingEdge = false;
+    }
   },
   deselectAllItems() {
     this.graph.getEdges().forEach(edge => {

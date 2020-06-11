@@ -13,20 +13,9 @@ import NotGate from "./gates/NotGate";
 import XorGate from "./gates/XorGate";
 import { DIRECTION_RIGHT, DIRECTION_LEFT } from "./directions";
 
-const restoreSchemeState = (editor, state) => {
-  editor.restoration = true;
-  editor._graph.read(state);
-  editor.restoration = false;
-}
 
 const bindG6Events = (editor) => {
   const graph = editor._graph;
-
-  graph.on("node:mouseout", evt => {
-    let item = evt.item;
-
-    graph.setItemState(item, "hover", false);
-  });
 
   graph.on("wheel", evt => {
     editor.onWheel(evt);
@@ -116,6 +105,10 @@ const bindG6Events = (editor) => {
     logEditorAction(editor);
   })
 
+  graph.on("editor:log", evt => {
+    logEditorAction(editor);
+  })
+
   const mountNode = graph.get("container");
 
   const canvasResize = debounce(() => {
@@ -130,15 +123,43 @@ const bindG6Events = (editor) => {
   }
 }
 
+const restoreSchemeState = (editor, state) => {
+  editor.restoration = true;
+  editor._graph.read(state);
+  editor.restoration = false;
+}
+
+function simplifySchemeData(schemeData) {
+  const simplidiedSchemeData = {}
+  simplidiedSchemeData.nodes = schemeData.nodes.map(({ id, index, x, y, shape, direction }) => {
+    return { id, index, x, y, shape, direction };
+  });
+  simplidiedSchemeData.edges = schemeData.edges
+    .map(({ id, shape, source, target, sourceAnchor, targetAnchor }) => {
+      return { id, shape, source, target, sourceAnchor, targetAnchor };
+    });
+
+  return simplidiedSchemeData;
+}
+
+function getScheme(editor) {
+  const schemeData = editor._graph.save();
+  schemeData.edges = schemeData.edges
+    .filter(edge => typeof edge.source === "string" && typeof edge.target === "string");
+
+  return simplifySchemeData(schemeData);
+}
+
 function logEditorAction(editor) {
-  const scheme = editor.getScheme();
+  const scheme = getScheme(editor);
   scheme.nodes = scheme.nodes.map(node => {
     const position = { x: node.x, y: node.y };
     const model = createNodeModel(node.shape, node.index, position);
     model.changeDirection(node.direction);
     return model;
   });
-  editor._store.log(scheme);
+  const state = { schemeData: scheme, editorLeftTopCorner: editor._graph.getCanvasByPoint(0, 0) }
+  editor._store.log(state);
 }
 
 const createNodeModel = (type, index, position) => {
@@ -459,6 +480,8 @@ export default class SchemeEditor {
         this._graph.paint();
       }
     });
+
+    logEditorAction(this);
   }
 
   deleteSelectedItems = () => {
@@ -480,32 +503,24 @@ export default class SchemeEditor {
     this._graph.translate(leftTopCorner.x * scale, leftTopCorner.y * scale);
   };
 
-  getScheme = () => {
-    const schemeData = this._graph.save();
-    schemeData.nodes = schemeData.nodes.map(({ id, index, x, y, shape, direction }) => {
-      return { id, index, x, y, shape, direction };
-    });
-
-    return schemeData;
-  }
-
   exportScheme = (name) => {
-    const schemeData = this.getScheme();
-    schemeData.version = FILE_VERSION;
-    schemeData.name = name;
-    schemeData.index = this._graph.indexer.index;
-    schemeData.editorLeftTopCorner = this._graph.getCanvasByPoint(0, 0);
+    const fileData = {};
+    fileData.schemeData = getScheme(this);
+    fileData.version = FILE_VERSION;
+    fileData.name = name;
+    fileData.index = this._graph.indexer.index;
+    fileData.editorLeftTopCorner = this._graph.getCanvasByPoint(0, 0);
 
-    return schemeData;
+    return fileData;
   };
 
-  importScheme = (scheme) => {
-    const editorState = { scheme };
+  importScheme = (fileData) => {
+    const editorState = { fileData };
     editorState.mode = EDITOR_EDITING_MODE;
     editorState.scale = 1;
 
     this.restoreState(editorState);
-    this.afterImportScheme({ schemeName: scheme.name });
+    this.afterImportScheme({ schemeName: fileData.name });
   };
 
   restart = () => {
@@ -519,22 +534,23 @@ export default class SchemeEditor {
   }
 
   restoreState = (editorState) => {
-    const { scale, mode, scheme } = editorState;
+    const { scale, mode, fileData } = editorState;
+    const { schemeData } = fileData;
 
-    scheme.nodes = scheme.nodes.map(node => {
+    schemeData.nodes = schemeData.nodes.map(node => {
       const position = { x: node.x, y: node.y };
       const model = createNodeModel(node.shape, node.index, position);
       model.changeDirection(node.direction);
       return model;
     })
-    restoreSchemeState(this, scheme);
-    this._graph.indexer = new EditorObjIndexer(scheme.index);
-
     this.setScale(scale);
     this.setMode(mode);
-    scheme.editorLeftTopCorner
-      && this._graph.translate(scheme.editorLeftTopCorner.x, scheme.editorLeftTopCorner.y);
 
+    restoreSchemeState(this, fileData.schemeData);
+    fileData.editorLeftTopCorner
+      && this._graph.translate(fileData.editorLeftTopCorner.x, fileData.editorLeftTopCorner.y);
+
+    this._graph.indexer = new EditorObjIndexer(schemeData.index);
     this._store = new SchemeStatesStore();
     logEditorAction(this);
   }
@@ -547,8 +563,10 @@ export default class SchemeEditor {
       return;
 
     this._store.undoStack.push(this._store.doStack.pop());
-    const current = this._store.doStack[this._store.doStack.length - 1];
-    restoreSchemeState(this, current);
+    const current = this._store.getCurrent();
+    restoreSchemeState(this, current.schemeData);
+    current.editorLeftTopCorner
+      && this._graph.translate(current.editorLeftTopCorner.x, current.editorLeftTopCorner.y);
   }
 
   redo() {
@@ -559,8 +577,10 @@ export default class SchemeEditor {
       return;
 
     this._store.doStack.push(this._store.undoStack.pop());
-    const current = this._store.doStack[this._store.doStack.length - 1];
-    restoreSchemeState(this, current);
+    const current = this._store.getCurrent();
+    restoreSchemeState(this, current.schemeData);
+    current.editorLeftTopCorner
+      && this._graph.translate(current.editorLeftTopCorner.x, current.editorLeftTopCorner.y);
   }
 
   // EVENTS
