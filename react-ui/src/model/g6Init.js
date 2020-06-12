@@ -1,6 +1,6 @@
 import G6 from "../g6";
 
-import EditorObjIndexer from "./indexer";
+import EditorObjIndexer from "./schemeEditor/indexer";
 import { EDITOR_EDITING_MODE, EDITOR_SIMULATION_MODE } from "./constants";
 
 

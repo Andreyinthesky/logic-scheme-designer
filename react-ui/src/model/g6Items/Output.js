@@ -1,6 +1,6 @@
 import BaseElement from "./BaseElement";
-import { DIRECTION_LEFT } from "./directions";
-import { isDirection } from "./utils";
+import { DIRECTION_LEFT } from "../enum/directions";
+import { isDirection } from "../utils";
 
 const directionToAnchorPoints = (direction) => {
   if (direction == DIRECTION_LEFT) {

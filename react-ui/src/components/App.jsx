@@ -23,7 +23,7 @@ import ExportSchemeForm from "./ExportSchemeForm";
 import Header from "./Header";
 import EditorArea from "./EditorArea";
 import { EditorContext } from "../contexts/editorContext";
-import SchemeEditor from "../model/SchemeEditor";
+import SchemeEditor from "../model/schemeEditor/SchemeEditor";
 import NotificationsArea from "./NotificationsArea";
 import { EDITOR_EDITING_MODE } from "../model/constants";
 

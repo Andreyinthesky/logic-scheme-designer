@@ -1,6 +1,6 @@
 import XOR_GATE from "@assets/svg_elements/XOR_ANSI.svg";
 import base from "./base";
-import { DIRECTION_LEFT } from "../../model/directions";
+import { DIRECTION_LEFT } from "../../model/enum/directions";
 
 const xor = {
   ...base,

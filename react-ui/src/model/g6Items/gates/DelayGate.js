@@ -1,24 +1,24 @@
 import BaseElement from "../BaseElement";
-import { DIRECTION_LEFT } from "../directions";
-import { isDirection } from "../utils";
+import { DIRECTION_LEFT } from "../../enum/directions";
+import { isDirection } from "../../utils";
 
 const directionToAnchorPoints = (direction) => {
   if (direction == DIRECTION_LEFT) {
-    return [[1, 0.685], [1, 0.315], [0, 0.5]];
+    return [[1, 0.5], [0, 0.5]];
   } else {
-    return [[0, 0.685], [0, 0.315], [1, 0.5]];
+    return [[0, 0.5], [1, 0.5]];
   }
 };
 
-export default class AndGate extends BaseElement {
+export default class DelayGate extends BaseElement {
   constructor(index, position) {
-    super("and" + index, position);
+    super("delay" + index, position);
 
     this.index = index;
-    this.shape = "and";
-    this.label = `И-${index}`;
+    this.shape = "delay";
+    this.label = `ЗАДЕРЖ-${index}`;
     this.anchorPoints = directionToAnchorPoints(this.direction);
-    this.input = [false, false];
+    this.input = [false];
   }
 
   changeDirection(direction) {
@@ -31,12 +31,14 @@ export default class AndGate extends BaseElement {
   }
 
   getInputAnchors() {
-    return this.anchorPoints.map((_, i) => i).slice(0, 2);
+    return this.anchorPoints.map((_, i) => i).slice(0, 1);
   }
 
   getOutputAnchors() {
-    return this.anchorPoints.map((_, i) => i).slice(2, 3);
+    return this.anchorPoints.map((_, i) => i).slice(1, 2);
   }
 
-  evaluate() { return this.input[0] && this.input[1] }
+  evaluate() { 
+    return this.input[0];
+   }
 }

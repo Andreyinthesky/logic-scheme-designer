@@ -1,6 +1,6 @@
 import BaseElement from "../BaseElement";
-import { DIRECTION_LEFT } from "../directions";
-import { isDirection } from "../utils";
+import { DIRECTION_LEFT } from "../../enum/directions";
+import { isDirection } from "../../utils";
 
 const directionToAnchorPoints = (direction) => {
   if (direction == DIRECTION_LEFT) {
@@ -10,13 +10,13 @@ const directionToAnchorPoints = (direction) => {
   }
 };
 
-export default class DelayGate extends BaseElement {
+export default class NotGate extends BaseElement {
   constructor(index, position) {
-    super("delay" + index, position);
+    super("not" + index, position);
 
     this.index = index;
-    this.shape = "delay";
-    this.label = `ЗАДЕРЖ-${index}`;
+    this.shape = "not";
+    this.label = `НЕ-${index}`;
     this.anchorPoints = directionToAnchorPoints(this.direction);
     this.input = [false];
   }
@@ -38,7 +38,5 @@ export default class DelayGate extends BaseElement {
     return this.anchorPoints.map((_, i) => i).slice(1, 2);
   }
 
-  evaluate() { 
-    return this.input[0];
-   }
+  evaluate() { return !this.input[0]; }
 }

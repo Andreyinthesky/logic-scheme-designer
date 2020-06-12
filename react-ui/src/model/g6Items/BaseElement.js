@@ -1,4 +1,4 @@
-import { DIRECTION_RIGHT } from "./directions";
+import { DIRECTION_RIGHT } from "../enum/directions";
 
 export default class BaseElement {
   constructor(id, position) {

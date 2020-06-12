@@ -1,17 +1,17 @@
-import init from "./g6Init";
-import { debounce } from "../utils";
-import { FILE_VERSION, EDITOR_SIMULATION_MODE, EDITOR_EDITING_MODE } from "./constants";
+import init from "../g6Init";
+import { debounce } from "../../utils";
+import { FILE_VERSION, EDITOR_SIMULATION_MODE, EDITOR_EDITING_MODE } from "../constants";
 import EditorObjIndexer from "./indexer";
 import SchemeStatesStore from "./SchemeStatesStore";
 
-import Input from "./Input";
-import Output from "./Output";
-import DelayGate from "./gates/DelayGate";
-import AndGate from "./gates/AndGate";
-import OrGate from "./gates/OrGate";
-import NotGate from "./gates/NotGate";
-import XorGate from "./gates/XorGate";
-import { DIRECTION_RIGHT, DIRECTION_LEFT } from "./directions";
+import Input from "../g6Items/Input";
+import Output from "../g6Items/Output";
+import DelayGate from "../g6Items/gates/DelayGate";
+import AndGate from "../g6Items/gates/AndGate";
+import OrGate from "../g6Items/gates/OrGate";
+import NotGate from "../g6Items/gates/NotGate";
+import XorGate from "../g6Items/gates/XorGate";
+import { DIRECTION_RIGHT, DIRECTION_LEFT } from "../enum/directions";
 
 
 const bindG6Events = (editor) => {

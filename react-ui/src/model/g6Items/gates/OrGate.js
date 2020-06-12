@@ -1,6 +1,6 @@
 import BaseElement from "../BaseElement";
-import { DIRECTION_LEFT } from "../directions";
-import { isDirection } from "../utils";
+import { DIRECTION_LEFT } from "../../enum/directions";
+import { isDirection } from "../../utils";
 
 const directionToAnchorPoints = (direction) => {
   if (direction == DIRECTION_LEFT) {
@@ -11,13 +11,13 @@ const directionToAnchorPoints = (direction) => {
 };
 
 
-export default class XorGate extends BaseElement {
+export default class OrGate extends BaseElement {
   constructor(index, position) {
-    super("xor" + index, position);
+    super("or" + index, position);
 
     this.index = index;
-    this.shape = "xor";
-    this.label = `ИСКЛ.ИЛИ-${index}`;
+    this.shape = "or";
+    this.label = `ИЛИ-${index}`;
     this.anchorPoints = [[0, 0.685], [0, 0.315], [1, 0.5]];
     this.input = [false, false];
   }
@@ -39,5 +39,5 @@ export default class XorGate extends BaseElement {
     return this.anchorPoints.map((_, i) => i).slice(2, 3);
   }
 
-  evaluate() { return !this.input[0] && this.input[1] || this.input[0] && !this.input[1] }
+  evaluate() { return this.input[0] || this.input[1]; }
 }

@@ -1,6 +1,6 @@
 import OR_GATE from "@assets/svg_elements/OR_ANSI.svg";
 import base from "./base";
-import { DIRECTION_LEFT } from "../../model/directions";
+import { DIRECTION_LEFT } from "../../model/enum/directions";
 
 const or = {
   ...base,

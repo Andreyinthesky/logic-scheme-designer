@@ -1,5 +1,5 @@
 import base from "./base";
-import { DIRECTION_LEFT } from "../../model/directions";
+import { DIRECTION_LEFT } from "../../model/enum/directions";
 
 const connectorOffset = 25;
 
