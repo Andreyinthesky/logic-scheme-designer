@@ -1,4 +1,4 @@
-import AND_GATE from "@assets/svg_elements/AND_ANSI.svg";
+import imageStore from "../utils/imageStore";
 import base from "./base";
 import { DIRECTION_LEFT } from "../../model/enum/directions";
 
@@ -13,7 +13,7 @@ const and = {
       attrs: {
         x: -width / 2,
         y: -height / 2,
-        img: AND_GATE,
+        img: imageStore.and,
         width: width,
         height: height,
       }

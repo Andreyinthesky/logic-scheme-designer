@@ -1,4 +1,4 @@
-import OR_GATE from "@assets/svg_elements/OR_ANSI.svg";
+import imageStore from "../utils/imageStore";
 import base from "./base";
 import { DIRECTION_LEFT } from "../../model/enum/directions";
 
@@ -13,7 +13,7 @@ const or = {
       attrs: {
         x: -width / 2,
         y: -height / 2,
-        img: OR_GATE,
+        img: imageStore.or,
         width: width,
         height: height,
       }

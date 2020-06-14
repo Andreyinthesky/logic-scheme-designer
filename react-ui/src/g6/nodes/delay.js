@@ -1,4 +1,4 @@
-import DELAY_GATE from "@assets/svg_elements/Buffer_ANSI.svg";
+import imageStore from "../utils/imageStore";
 import base from "./base";
 import { DIRECTION_LEFT } from "../../model/enum/directions";
 const zMarkOffsetX = 35;
@@ -15,7 +15,7 @@ const delay = {
       attrs: {
         x: -width / 2,
         y: -height / 2,
-        img: DELAY_GATE,
+        img: imageStore.delay,
         width: width,
         height: height,
       }
