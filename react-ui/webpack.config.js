@@ -69,7 +69,7 @@ module.exports = {
     }),
     new CopyWebpack([
       { from: 'assets/favicon', to: 'favicon' },
-      { from: 'src/serviceWorker.js' },
+      // { from: 'src/serviceWorker.js' },
     ]),
     new MiniCssExtractPlugin({
       filename: "index.css",
