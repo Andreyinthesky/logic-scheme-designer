@@ -2,7 +2,7 @@ import AND_GATE from "@assets/svg_elements/AND_ANSI.svg";
 import OR_GATE from "@assets/svg_elements/OR_ANSI.svg";
 import NOT_GATE from "@assets/svg_elements/NOT_ANSI.svg";
 import XOR_GATE from "@assets/svg_elements/XOR_ANSI.svg";
-import DELAY_GATE from "@assets/svg_elements/Buffer_ANSI.svg";
+import DELAY_GATE from "@assets/svg_elements/Delay.svg";
 
 
 const imageURLs = {

@@ -449,7 +449,18 @@ ul.card-body li:hover {
 }
 
 .obj.delay .img {
+  position: relative;
   background-image: url(~@assets/svg_elements/Delay.svg);
+}
+
+.obj.delay .img::after {
+  position: absolute;
+  content: "Z";
+  font-family: "Segoe UI", sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  top: 4px;
+  right: 12px;
 }
 
 .obj.input .img {
