@@ -548,7 +548,7 @@ export default class SchemeEditor {
 
   restoreState = (editorState) => {
     const { scale, mode, fileData } = editorState;
-    const { schemeData } = fileData;
+    const { schemeData, index } = fileData;
 
     schemeData.nodes = schemeData.nodes.map(node => {
       const position = { x: node.x, y: node.y };
@@ -564,7 +564,7 @@ export default class SchemeEditor {
     fileData.editorLeftTopCorner
       && this._graph.translate(fileData.editorLeftTopCorner.x, fileData.editorLeftTopCorner.y);
 
-    this._graph.indexer = new EditorObjIndexer(schemeData.index);
+    this._graph.indexer = new EditorObjIndexer(index);
     this._store = new SchemeStatesStore();
     logEditorAction(this);
   }
