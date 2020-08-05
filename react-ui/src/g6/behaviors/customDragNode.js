@@ -1,5 +1,5 @@
 import setCursorStyle from "../utils/setCursorStyle";
-
+import { GRID_STEP } from "../../model/constants";
 
 const START_DRAG_DELAY = 150;
 
@@ -55,9 +55,17 @@ const customDragNode = {
     const yOffset = y - startCanvasCoords.y;
     const { x: nodeX, y: nodeY } = startNodeCoords;
 
-    node.updatePosition({ x: nodeX + xOffset, y: nodeY + yOffset });
+    node.updatePosition(this.snapPointToGrid({ x: nodeX + xOffset, y: nodeY + yOffset }));
     graph.refreshItem(node);
     this.refreshEdgesByNode(node);
+  },
+  snapPointToGrid(point) {
+    const { x, y } = point;
+
+    return {
+      x: x % GRID_STEP > GRID_STEP / 2 ? x + (GRID_STEP - x % GRID_STEP) : x - x % GRID_STEP,
+      y: y % GRID_STEP > GRID_STEP / 2 ? y + (GRID_STEP - y % GRID_STEP) : y - y % GRID_STEP,
+    }
   },
   refreshEdgesByNode(node) {
     const { graph } = this;
