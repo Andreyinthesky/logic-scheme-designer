@@ -31,7 +31,7 @@ const customDragCanvasBehavior = {
     }
 
     this.translateCanvasByDrag({ x: evt.clientX, y: evt.clientY });
-    this.syncGridPositionByCanvas();
+    // this.syncGridPositionByCanvas();
   },
   startDrag(startMouseCoord) {
     this.startMouseCoord = startMouseCoord;
@@ -53,13 +53,13 @@ const customDragCanvasBehavior = {
     graph.translate(xOffset, yOffset);
     this.startMouseCoord = currentMouseCoords;
   },
-  syncGridPositionByCanvas() {
-    const { graph } = this;
-    const { x: xOrigin, y: yOrigin } = graph.getCanvasByPoint(0, 0);
-    const scale = graph.getZoom();
-    const gridPosition = { x: xOrigin / scale, y: yOrigin / scale };
-    document.querySelector(".g6-grid").style.backgroundPosition = `${gridPosition.x}px ${gridPosition.y}px`;
-  }
+  // syncGridPositionByCanvas() {
+  //   const { graph } = this;
+  //   const { x: xOrigin, y: yOrigin } = graph.getCanvasByPoint(0, 0);
+  //   const scale = graph.getZoom();
+  //   const gridPosition = { x: xOrigin / scale, y: yOrigin / scale };
+  //   document.querySelector(".g6-grid").style.backgroundPosition = `${gridPosition.x}px ${gridPosition.y}px`;
+  // }
 };
 
 export default customDragCanvasBehavior;
