@@ -315,13 +315,14 @@ div.tact-counter {
 .select-obj-list {
   display: flex;
   flex-direction: column;
-  position: absolute;
+  position: relative;
   z-index: 3;
   top: 0;
   left: 0;
   margin-left: 8px;
-  margin-right: 20px;
+  margin-right: 8px;
   width: 300px;
+  min-width: 300px;
   height: calc(100vh - 70px - 8px);
   min-height: 470px;
   font-size: 14px;
@@ -331,6 +332,7 @@ div.tact-counter {
 }
 
 .select-obj-list.hide {
+  position: absolute;
   transform: translateX(-308px);
 }
 
@@ -338,7 +340,7 @@ div.tact-counter {
   position: absolute;
   z-index: 3;
   right: -8px;
-  top: 40%;
+  top: 250px;
   padding: 20px 4px;
   background-color: #ddd;
   border: 1px solid #bbb;

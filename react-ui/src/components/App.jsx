@@ -162,6 +162,10 @@ class App extends Component {
         this.editor.goToOrigin();
     }
 
+    canvasResize = () => {
+        this.editor.canvasResize();
+    }
+
     upScale = () => {
         let scale = this.editor.getScale();
         scale = parseFloat((scale + 0.1).toFixed(1));
@@ -228,7 +232,7 @@ class App extends Component {
             try {
                 this.editor.restoreState(editorState);
                 editorState.filename && this.props.setFilename(editorState.filename);
-            } catch(err) {
+            } catch (err) {
                 localStorage.removeItem("editorState");
                 verdict = false;
             }
@@ -266,6 +270,7 @@ class App extends Component {
                     deleteSelectedCallback: this.deleteSelected,
                     rotateSelectedCallback: this.rotateSelected,
                     goToOriginCallback: this.goToOrigin,
+                    canvasResizeCallback: this.canvasResize,
                     setModeCallback: this.setMode,
                     doTactCallback: this.evaluateScheme,
                     discardInputsCallback: this.discardInputs,
