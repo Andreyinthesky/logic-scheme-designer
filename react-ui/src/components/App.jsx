@@ -51,7 +51,8 @@ class App extends Component {
 
     bindEditorEvents = (editor) => {
         editor.onWheel = (evt) => {
-            const { deltaY } = evt;
+            let { deltaY } = evt;
+            deltaY = deltaY || -evt.wheelDelta;
 
             if (deltaY < 0) {
                 this.upScale();
