@@ -1,7 +1,7 @@
 import base from "./base";
 import { DIRECTION_LEFT } from "../../model/enum/directions";
 
-const connectorOffset = 25;
+const connectorOffset = 30;
 
 const input = {
   ...base,

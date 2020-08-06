@@ -19,7 +19,7 @@ export default class Output extends BaseElement {
     this.shape = "output";
     this.label = `ВЫХОД-${index}`;
     this.anchorPoints = directionToAnchorPoints(this.direction);
-    this.size = [65, 50];
+    this.size = [80, 50];
   }
 
   changeDirection(direction) {

@@ -4,9 +4,9 @@ import { isDirection } from "../../utils";
 
 const directionToAnchorPoints = (direction) => {
   if (direction == DIRECTION_LEFT) {
-    return [[1, 0.685], [1, 0.315], [0, 0.5]];
+    return [[1, 0.7], [1, 0.3], [0, 0.5]];
   } else {
-    return [[0, 0.685], [0, 0.315], [1, 0.5]];
+    return [[0, 0.7], [0, 0.3], [1, 0.5]];
   }
 };
 

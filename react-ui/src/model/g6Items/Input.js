@@ -19,7 +19,7 @@ export default class Input extends BaseElement {
     this.shape = "input";
     this.label = `ВХОД-${index}`;
     this.anchorPoints = directionToAnchorPoints(this.direction);
-    this.size = [75, 50];
+    this.size = [80, 50];
   }
 
   changeDirection(direction) {
