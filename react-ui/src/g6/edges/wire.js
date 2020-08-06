@@ -17,13 +17,13 @@ const wire = {
         path: (endPoint.x - startPoint.x < 0 ?
           [
             ["M", startPoint.x, startPoint.y],
-            ["L", startPoint.x, startPoint.y + normalize(Math.sign(endPoint.y - startPoint.y)) * 45],
-            ["L", endPoint.x, startPoint.y + normalize(Math.sign(endPoint.y - startPoint.y)) * 45],
+            ["L", startPoint.x, startPoint.y + normalize(Math.sign(endPoint.y - startPoint.y)) * 50],
+            ["L", endPoint.x, startPoint.y + normalize(Math.sign(endPoint.y - startPoint.y)) * 50],
             ["L", endPoint.x, endPoint.y]
           ] :
           [
             ["M", startPoint.x, startPoint.y],
-            ["L", endPoint.x, startPoint.y],
+            ["L", startPoint.x, endPoint.y],
             ["L", endPoint.x, endPoint.y]
           ]),
         shadowColor: "#00f",
