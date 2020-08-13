@@ -1,18 +1,22 @@
 import init from "../g6Init";
 import { debounce } from "../../utils";
 import { FILE_VERSION, EDITOR_SIMULATION_MODE, EDITOR_EDITING_MODE } from "../constants";
-import EditorObjIndexer from "./indexer";
+import EditorObjIndexer from "./ItemIndexer";
 import SchemeStatesStore from "./SchemeStatesStore";
-
+import createNodeModel from "./createNodeModel"
 import Input from "../g6Items/Input";
-import Output from "../g6Items/Output";
 import DelayGate from "../g6Items/gates/DelayGate";
-import AndGate from "../g6Items/gates/AndGate";
-import OrGate from "../g6Items/gates/OrGate";
-import NotGate from "../g6Items/gates/NotGate";
-import XorGate from "../g6Items/gates/XorGate";
 import { DIRECTION_RIGHT, DIRECTION_LEFT } from "../enum/directions";
+import SchemeEditorEvaluator from "./SchemeEditorEvaluator";
 
+
+const canvasResize = debounce((graph) => {
+  const mountNode = graph.get("container");
+  const width = mountNode.getBoundingClientRect().width;
+  const height = mountNode.getBoundingClientRect().height;
+
+  graph.changeSize(width, height);
+});
 
 const bindG6Events = (editor) => {
   const graph = editor._graph;
@@ -80,7 +84,6 @@ const bindG6Events = (editor) => {
     logEditorAction(editor);
   })
 
-
   let logDelete = true;
   graph.on("beforeremoveitem", evt => {
     logDelete = true;
@@ -109,17 +112,8 @@ const bindG6Events = (editor) => {
     logEditorAction(editor);
   })
 
-  const mountNode = graph.get("container");
-
-  const canvasResize = debounce(() => {
-    const width = mountNode.getBoundingClientRect().width;
-    const height = mountNode.getBoundingClientRect().height;
-
-    graph.changeSize(width, height);
-  });
-
   window.onresize = () => {
-    canvasResize();
+    canvasResize(graph);
   }
 }
 
@@ -162,216 +156,6 @@ function logEditorAction(editor) {
   editor._store.log(state);
 }
 
-const createNodeModel = (type, index, position) => {
-  const constructors = {
-    "delay": DelayGate,
-    "and": AndGate,
-    "or": OrGate,
-    "xor": XorGate,
-    "not": NotGate,
-    "input": Input,
-    "output": Output,
-  }
-
-  if (!constructors[type])
-    throw new Error(`Unknown node type - ${type}`);
-
-  return new constructors[type](index, position);
-}
-
-function validateScheme(editor, scheme) {
-  const schemeElements = Object.values(scheme);
-  const cycle = findSchemeCycle(schemeElements);
-
-  if (cycle.verdict) {
-    const { path } = cycle;
-    const cycleNodes = [];
-    cycleNodes.push(cycle.start);
-    for (let current = cycle.end; current !== cycle.start; current = path[current]) {
-      cycleNodes.push(current);
-    }
-
-    let timeout = null;
-    const highlightCycleNodes = () => cycleNodes.forEach(nodeId => editor._graph.setItemState(nodeId, "highlight", true));
-    return {
-      valid: false,
-      error: {
-        error: `В цепи обратной связи ${cycleNodes.map(nodeId => scheme[nodeId].label).join(" —> ")} 
-                  отсутствует элемент задержки`,
-        focus: () => {
-          if (timeout)
-            clearTimeout(timeout);
-          editor._graph.focusItem(cycleNodes[0]);
-          highlightCycleNodes();
-          timeout = setTimeout(() => cycleNodes.forEach(nodeId => editor._graph.setItemState(nodeId, "highlight", false)), 5000);
-        }
-      }
-    };
-  }
-
-  return { valid: true };
-}
-
-function createLogicSchemeModel(graph) {
-  const initElement = (element) => {
-    const elementModel = element.getModel();
-    elementModel.input = elementModel.input.map(v => false);
-    elementModel.output = [];
-    elementModel.rank = null;
-
-    graph.setItemState(element, "enable", false);
-  }
-
-  const visitedEdges = {};
-  const elements = {};
-
-  graph.getNodes().forEach(node => {
-    const nodeModel = node.getModel();
-    const nodeId = nodeModel.id;
-    initElement(node);
-
-    for (let edge of node.getEdges()) {
-      const edgeModel = edge.getModel();
-      const edgeId = edgeModel.id;
-
-      if (visitedEdges[edgeId]) {
-        continue;
-      }
-
-      const startNodeAnchorIndex = (edgeModel.target === nodeId ? edgeModel.targetAnchor : edgeModel.sourceAnchor);
-      const endNodeAnchorIndex = (edgeModel.target === nodeId ? edgeModel.sourceAnchor : edgeModel.targetAnchor);
-
-      const isOutputAnchor = nodeModel.getOutputAnchors().includes(startNodeAnchorIndex);
-      if (isOutputAnchor) {
-        const outElement = (edgeModel.target === nodeId ? edge.getSource() : edge.getTarget());
-
-        if (!elements[nodeId]) {
-          elements[nodeId] = nodeModel;
-        }
-
-        const outElementId = outElement.get("id");
-        if (!elements[outElementId]) {
-          elements[outElementId] = outElement.getModel();
-        }
-
-        elements[nodeId].output.push({
-          inputIndex: endNodeAnchorIndex,
-          element: elements[outElementId],
-        });
-        visitedEdges[edgeId] = edge;
-      }
-    }
-  });
-
-  return elements;
-}
-
-function findSchemeCycle(elements) {
-  const stack = [];
-  const color = {};
-  const path = {};
-
-  elements.forEach(element => {
-    if (element instanceof Input || element instanceof DelayGate) {
-      stack.push(element);
-    }
-    color[element.id] = 0;
-  });
-
-  while (stack.length > 0) {
-    const current = stack[stack.length - 1];
-
-    if (color[current.id] === 1) {
-      color[current.id] = 2;
-      stack.pop();
-      continue;
-    }
-    color[current.id] = 1;
-
-    const output = current.output;
-    for (let outputObj of output) {
-      const output = outputObj.element;
-
-      if (color[output.id] === 2 || output instanceof DelayGate) {
-        continue;
-      }
-
-      if (color[output.id] === 1) {
-        console.log("cycle is exist!");
-        console.log(`start is ${output.id}, end is ${current.id}`);
-        return {
-          verdict: true,
-          start: output.id,
-          end: current.id,
-          path: path,
-        };
-      }
-
-      path[output.id] = current.id;
-      stack.push(output);
-    }
-  }
-
-  return { verdict: false };
-}
-
-function rankElements(elements) {
-  const delays = elements.filter(element => element instanceof DelayGate);
-  const inputs = elements.filter(element => element instanceof Input);
-  const stack = delays.concat(inputs);
-  stack.forEach(element => element.rank = 0);
-
-  while (stack.length > 0) {
-    const current = stack.pop();
-    const output = current.output;
-
-    for (let outputObj of output) {
-      const output = outputObj.element;
-
-      if (output instanceof DelayGate) {
-        continue;
-      }
-
-      if (output.rank < current.rank + 1) {
-        output.rank = current.rank + 1;
-      }
-
-      stack.push(output);
-    }
-  }
-
-  const rankedElements = [];
-  rankedElements[0] = delays.concat(inputs);
-  elements.forEach(element => {
-    if (element.rank === 0)
-      return;
-
-    if (!rankedElements[element.rank])
-      rankedElements[element.rank] = [];
-
-    rankedElements[element.rank].push(element);
-  });
-
-  return rankedElements;
-}
-
-function evalScheme(rankedElements) {
-  const maxRank = rankedElements.length - 1;
-
-  for (let rank = 0; rank <= maxRank; rank++) {
-    rankedElements[rank].forEach(element => {
-      const outputs = element.output;
-
-      outputs && outputs.forEach(outputObj => {
-        const output = outputObj.element;
-        output.input[outputObj.inputIndex] = element.evaluate();
-      });
-    });
-  }
-}
-
-const SIDEBAR_X_OFFSET = 320;
-
 export default class SchemeEditor {
   constructor(mountHTMLElement) {
     this._graph = init(mountHTMLElement);
@@ -385,7 +169,7 @@ export default class SchemeEditor {
       return;
 
     const graph = this._graph;
-    const position = graph.getPointByCanvas(100 + SIDEBAR_X_OFFSET, 100);
+    const position = graph.getPointByCanvas(100, 100);
     graph.addItem("node", createNodeModel(type, graph.indexer.getNextIndex(type), position));
   }
 
@@ -405,17 +189,15 @@ export default class SchemeEditor {
 
   setMode = (mode) => {
     if (mode === EDITOR_SIMULATION_MODE) {
-      const scheme = createLogicSchemeModel(this._graph);
-      const validationResult = validateScheme(this, scheme)
-      if (!validationResult.valid) {
-        this.onError(validationResult.error);
+      try {
+        this._schemeEvaluator = new SchemeEditorEvaluator(this);
+      } catch (e) {
+        console.log(e);
+        this.onError(e);
         return;
       }
-
-      this._schemeElements = Object.values(scheme);
-      this._rankedElements = rankElements(this._schemeElements);
     } else {
-      this._rankedElements = null;
+      this._schemeEvaluator = null;
     }
 
     this._graph.setMode(mode);
@@ -423,20 +205,10 @@ export default class SchemeEditor {
   };
 
   evaluateScheme = () => {
-    if (this.getMode() !== EDITOR_SIMULATION_MODE || !this._rankedElements)
+    if (this.getMode() !== EDITOR_SIMULATION_MODE || !this._schemeEvaluator)
       return;
 
-    evalScheme(this._rankedElements);
-
-    this._schemeElements
-      .filter(element => element instanceof Output || element instanceof DelayGate)
-      .forEach(outElement => {
-        const outElementValue = outElement.input[0];
-        const outElementNode = this._graph.findById(outElement.id);
-
-        this._graph.setItemState(outElementNode, "enable", outElementValue);
-      });
-
+    this._schemeEvaluator.evaluate();
     this.afterEvaluateScheme();
   };
 
@@ -515,6 +287,10 @@ export default class SchemeEditor {
     const scale = this._graph.getZoom();
     this._graph.translate(leftTopCorner.x * scale, leftTopCorner.y * scale);
   };
+
+  canvasResize = () => {
+    canvasResize(this._graph);
+  }
 
   exportScheme = (name) => {
     const fileData = {};
