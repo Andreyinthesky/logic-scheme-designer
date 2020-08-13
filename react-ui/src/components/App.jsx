@@ -18,8 +18,8 @@ import {
 } from "../redux/actions";
 import { connect } from "react-redux";
 
-import LoadSchemeForm from "./LoadSchemeForm";
-import ExportSchemeForm from "./ExportSchemeForm";
+import LoadSchemeModal from "./LoadSchemeModal";
+import ExportSchemeModal from "./ExportSchemeModal";
 import Header from "./Header";
 import EditorArea from "./EditorArea";
 import { EditorContext } from "../contexts/editorContext";
@@ -282,8 +282,8 @@ class App extends Component {
                 }}>
                     <Header />
                     <EditorArea />
-                    <LoadSchemeForm onNewScheme={this.initNewScheme} onImportScheme={this.importScheme} />
-                    <ExportSchemeForm onExportScheme={this.exportSchemeToFile} />
+                    <LoadSchemeModal onNewScheme={this.initNewScheme} onImportScheme={this.importScheme} />
+                    <ExportSchemeModal onExportScheme={this.exportSchemeToFile} />
                     <NotificationsArea />
                 </EditorContext.Provider>
             </>

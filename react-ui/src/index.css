@@ -56,7 +56,7 @@ li {
   list-style: none;
 }
 
-.form-wrapper {
+.modal-wrapper {
   display: -ms-flexbox;
   display: -webkit-flex;
   display: flex;
@@ -72,20 +72,24 @@ li {
   height: 100vh;
 }
 
+.modal {
+  display: flex;
+  overflow: hidden;
+  margin: auto;
+  min-width: 500px;
+  min-height: 250px;
+  background-color: #eee;
+  border-radius: 20px;
+}
+
 /* END OF GLOBAL*/
 
 /* LOAD FORM */
 
 .load-form {
   display: flex;
-  overflow: hidden;
-  margin: auto;
-  min-width: 500px;
-  min-height: 250px;
-  width: 65%;
-  height: 50%;
-  background-color: #eee;
-  border-radius: 20px;
+  width: 800px;
+  height: 400px;
   font-size: 26px;
   text-align: center;
 }
@@ -119,11 +123,7 @@ li {
 .export-form {
   display: flex;
   flex-direction: column;
-  margin: auto;
-  min-width: 500px;
-  min-height: 250px;
-  background-color: #eee;
-  border-radius: 20px;
+  width: 100%;
   padding: 16px;
   padding-top: 24px;
 }

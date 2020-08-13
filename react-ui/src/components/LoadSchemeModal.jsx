@@ -2,8 +2,9 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { hideLoadForm, showNotification } from "../redux/actions";
+import Modal from "./base/Modal";
 
-class LoadSchemeForm extends Component {
+class LoadSchemeModal extends Component {
     constructor() {
         super();
     }
@@ -80,6 +81,25 @@ class LoadSchemeForm extends Component {
         this.props.hideLoadForm();
     }
 
+    renderModalBody = () => {
+        return (
+            <div className={"load-form"}>
+                <div className="choise" onClick={this.handleClickNewSchemeArea}>
+                    <div>
+                        <i className="fas fa-file"></i>
+                        <span>Новая схема</span>
+                    </div>
+                </div>
+                <div className="choise" onClick={this.handleClickLoadSchemeArea}>
+                    <div>
+                        <i className="fas fa-cloud-upload-alt"></i>
+                        <span>Загрузить cхему</span>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     render() {
         const { show } = this.props;
 
@@ -88,22 +108,9 @@ class LoadSchemeForm extends Component {
         }
 
         return (
-            <div className={"form-wrapper"} onClick={this.handleClickForeground}>
-                <div className={"load-form"}>
-                    <div className="choise" onClick={this.handleClickNewSchemeArea}>
-                        <div>
-                            <i className="fas fa-file"></i>
-                            <span>Новая схема</span>
-                        </div>
-                    </div>
-                    <div className="choise" onClick={this.handleClickLoadSchemeArea}>
-                        <div>
-                            <i className="fas fa-cloud-upload-alt"></i>
-                            <span>Загрузить cхему</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <Modal onClose={this.closeForm}>
+                {this.renderModalBody()}
+            </Modal>
         );
     }
 }
@@ -117,7 +124,7 @@ const mapDispatchToProps = {
     showNotification,
 };
 
-LoadSchemeForm.propTypes = {
+LoadSchemeModal.propTypes = {
     hideLoadForm: PropTypes.func.isRequired,
     onImportScheme: PropTypes.func.isRequired,
     onNewScheme: PropTypes.func.isRequired,
@@ -125,4 +132,4 @@ LoadSchemeForm.propTypes = {
     show: PropTypes.bool,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(LoadSchemeForm);
+export default connect(mapStateToProps, mapDispatchToProps)(LoadSchemeModal);
