@@ -24,7 +24,7 @@ function syncGridPositionByGraphTranlatePatch(graph) {
 
 export default function init(mountNode) {
   const graph = new G6.Graph({
-    container: "mountNode",
+    container: mountNode,
     width: mountNode.getBoundingClientRect().width,
     height: mountNode.getBoundingClientRect().height,
     maxZoom: 3,

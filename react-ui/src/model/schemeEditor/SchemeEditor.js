@@ -156,6 +156,26 @@ function logEditorAction(editor) {
   editor._store.log(state);
 }
 
+function rotateNode(node) {
+  const nodeModel = node.getModel();
+  if (!nodeModel.direction || !nodeModel.changeDirection) {
+    return;
+  }
+
+  const currentDirection = nodeModel.direction;
+  if (currentDirection === DIRECTION_RIGHT) {
+    nodeModel.changeDirection(DIRECTION_LEFT);
+  } else {
+    nodeModel.changeDirection(DIRECTION_RIGHT);
+  }
+
+  // UPDATE NODE
+  node.update();
+  node.updatePosition({ x: nodeModel.x, y: nodeModel.y });
+  node.getEdges().forEach(edge => edge.update());
+  this._graph.paint();
+}
+
 export default class SchemeEditor {
   constructor(mountHTMLElement) {
     this._graph = init(mountHTMLElement);
@@ -242,29 +262,9 @@ export default class SchemeEditor {
     if (this.getMode() !== EDITOR_EDITING_MODE)
       return;
 
-    this._graph.getNodes().forEach(node => {
-      if (node.hasState("select")) {
-        const nodeModel = node.getModel();
-        if (!nodeModel.direction || !nodeModel.changeDirection) {
-          return;
-        }
-
-        const currentDirection = nodeModel.direction;
-        if (currentDirection === DIRECTION_RIGHT) {
-          nodeModel.changeDirection(DIRECTION_LEFT);
-        } else {
-          nodeModel.changeDirection(DIRECTION_RIGHT);
-        }
-
-        // UPDATE NODE
-        node.update();
-        const xPos = nodeModel.x;
-        const yPos = nodeModel.y;
-        node.updatePosition({ x: xPos, y: yPos });
-        node.getEdges().forEach(edge => edge.update());
-        this._graph.paint();
-      }
-    });
+    this._graph.getNodes()
+      .filter(node => node.hasState("select"))
+      .forEach(node => rotateNode.call(this, node));
 
     logEditorAction(this);
   }
