@@ -1,16 +1,14 @@
 import SchemeEditor from "../model/schemeEditor/SchemeEditor";
+import createMountNode from "./utils/createMountNode";
 
-const mountNode = document.createElement("div");
-mountNode.style.width = "1024px";
-mountNode.style.height = "768px";
-document.body.appendChild(mountNode);
-const editor = new SchemeEditor(mountNode);
+
+const editor = new SchemeEditor(createMountNode());
 
 beforeEach(() => {
   editor.restart();
 })
 
-describe("rotateSelectedItems", () => {
+describe("rotateSelectedItems()", () => {
   test("non-selected node should not rotate", () => {
     editor.addNode("or");
     const addedNode = editor._graph.getNodes()[0];
@@ -19,7 +17,7 @@ describe("rotateSelectedItems", () => {
 
     editor.rotateSelectedItems();
 
-    expect(addedNodeModel.direction).toBe(oldDirection)
+    expect(addedNodeModel.direction).toBe(oldDirection);
   })
 
   test("node after rotate should have correct state", () => {

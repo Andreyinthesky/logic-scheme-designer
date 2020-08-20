@@ -25,44 +25,13 @@ const bindG6Events = (editor) => {
     editor.onWheel(evt);
   });
 
-  const isElementSelected = (element, clickCoords) => {
-    const node = element;
-    const nodeModel = node.getModel();
-
-    const { x, y } = clickCoords;
-    const { x: centerX, y: centerY, size } = nodeModel;
-    const selectBox = {
-      minX: centerX - size[0] / 2,
-      minY: centerY - size[1] / 2,
-      maxX: centerX + size[0] / 2,
-      maxY: centerY + size[1] / 2,
-    };
-
-    const isPointBelongsToSelectBox = x >= selectBox.minX && x <= selectBox.maxX
-      && y >= selectBox.minY && y <= selectBox.maxY;
-
-    return isPointBelongsToSelectBox;
-  };
-
   const closeContextMenu = () => {
     editor.onCloseContextMenu();
     document.removeEventListener("click", closeContextMenu);
   };
 
-  graph.on("node:contextmenu", evt => {
-    evt.preventDefault();
-    evt.stopPropagation();
-
-    if (editor.getMode() !== EDITOR_EDITING_MODE) {
-      return;
-    }
-
-    const { item } = evt;
-    if (!isElementSelected(item, { x: evt.x, y: evt.y })) {
-      return;
-    }
-    graph.emit("node:select", { item });
-    editor.onOpenContextMenu({ x: evt.canvasX, y: evt.canvasY });
+  graph.on("editor:contextmenu", evt => {
+    editor.onOpenContextMenu({ x: evt.x, y: evt.y });
     document.addEventListener("click", closeContextMenu);
   });
 
