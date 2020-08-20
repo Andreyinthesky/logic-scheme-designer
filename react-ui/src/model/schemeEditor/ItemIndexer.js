@@ -9,7 +9,7 @@ const createObjectsIndex = () => ({
   "output" : 0,
 });
 
-export default class EditorObjIndexer {
+export default class ItemIndexer {
   constructor(index) {
     this.index = index || createObjectsIndex();
   }

@@ -1,7 +1,7 @@
 import G6 from "../g6";
 import Grid from "../../lib/g6/grid";
 
-import EditorObjIndexer from "./schemeEditor/ItemIndexer";
+import ItemIndexer from "./schemeEditor/ItemIndexer";
 import { EDITOR_EDITING_MODE, EDITOR_SIMULATION_MODE } from "./constants";
 
 
@@ -41,7 +41,7 @@ export default function init(mountNode) {
 
   syncGridPositionByGraphTranlatePatch(graph);
 
-  graph.indexer = new EditorObjIndexer();
+  graph.indexer = new ItemIndexer();
   graph.setMode(EDITOR_EDITING_MODE);
 
   return graph;

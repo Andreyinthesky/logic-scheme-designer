@@ -1,7 +1,7 @@
 import init from "../g6Init";
 import { debounce } from "../../utils";
 import { FILE_VERSION, EDITOR_SIMULATION_MODE, EDITOR_EDITING_MODE } from "../constants";
-import EditorObjIndexer from "./ItemIndexer";
+import ItemIndexer from "./ItemIndexer";
 import SchemeStatesStore from "./SchemeStatesStore";
 import createNodeModel from "./createNodeModel"
 import Input from "../g6Items/Input";
@@ -309,7 +309,7 @@ export default class SchemeEditor {
     fileData.editorLeftTopCorner
       && this._graph.translate(fileData.editorLeftTopCorner.x, fileData.editorLeftTopCorner.y);
 
-    this._graph.indexer = new EditorObjIndexer(index);
+    this._graph.indexer = new ItemIndexer(index);
     this._store = new SchemeStatesStore();
     logEditorAction(this);
   }
