@@ -15,8 +15,8 @@ function syncGridPositionByGraphTranlatePatch(graph) {
     document.querySelector(".g6-grid").style.backgroundPosition = `${gridPosition.x}px ${gridPosition.y}px`;
   }
 
-  graph.translate = function (x, y) {
-    oldTranslateFn.call(graph, x, y);
+  graph.translate = function () {
+    oldTranslateFn.apply(graph, arguments);
     syncGridPositionByCanvas(graph);
   }
 }

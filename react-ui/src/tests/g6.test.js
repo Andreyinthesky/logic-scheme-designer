@@ -30,6 +30,16 @@ beforeEach(() => {
   graph.read(graphItems);
 })
 
+describe("translate()", () => {
+  test("after translate grid position should according with canvas", () => {
+    graph.translate(200, 300);
+    
+    expect(document.querySelector(".g6-grid")).not.toBeUndefined();
+    expect(graph.getCanvasByPoint(0, 0)).toEqual({x: 200, y: 300});
+    expect(document.querySelector(".g6-grid").style.backgroundPosition).toBe("200px 300px");
+  })
+})
+
 describe("context-menu behaviour", () => {
   const generateClickCoordsOnNode = (node, near = false) => {
     const { x, y, size } = node.getModel();
