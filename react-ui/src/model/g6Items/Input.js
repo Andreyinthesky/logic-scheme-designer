@@ -1,4 +1,4 @@
-import BaseElement from "./BaseElement";
+import SchemeElement from "./SchemeElement";
 import { DIRECTION_LEFT } from "../enum/directions";
 import { isDirection } from "../utils";
 
@@ -10,13 +10,14 @@ const directionToAnchorPoints = (direction) => {
   }
 };
 
-export default class Input extends BaseElement {
+const shape = "input";
+
+export default class Input extends SchemeElement {
   constructor(index, position) {
-    super("input" + index, position);
+    super("input" + index, shape, position);
 
     this.index = index;
     this.input = [false];
-    this.shape = "input";
     this.label = `ВХОД-${index}`;
     this.anchorPoints = directionToAnchorPoints(this.direction);
     this.size = [80, 50];

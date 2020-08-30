@@ -1,4 +1,4 @@
-import BaseElement from "../BaseElement";
+import SchemeElement from "../SchemeElement";
 import { DIRECTION_LEFT } from "../../enum/directions";
 import { isDirection } from "../../utils";
 
@@ -10,13 +10,13 @@ const directionToAnchorPoints = (direction) => {
   }
 };
 
+const shape = "xor";
 
-export default class XorGate extends BaseElement {
+export default class XorGate extends SchemeElement {
   constructor(index, position) {
-    super("xor" + index, position);
+    super("xor" + index, shape, position);
 
     this.index = index;
-    this.shape = "xor";
     this.label = `ИСКЛ.ИЛИ-${index}`;
     this.anchorPoints = directionToAnchorPoints(this.direction);
     this.input = [false, false];

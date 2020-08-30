@@ -40,7 +40,7 @@ describe("translate()", () => {
   })
 })
 
-describe("context-menu behaviour", () => {
+describe("context-menu behavior", () => {
   const generateClickCoordsOnNode = (node, near = false) => {
     const { x, y, size } = node.getModel();
     const [width, height] = size;

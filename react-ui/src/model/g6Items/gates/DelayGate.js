@@ -1,4 +1,4 @@
-import BaseElement from "../BaseElement";
+import SchemeElement from "../SchemeElement";
 import { DIRECTION_LEFT } from "../../enum/directions";
 import { isDirection } from "../../utils";
 
@@ -10,12 +10,13 @@ const directionToAnchorPoints = (direction) => {
   }
 };
 
-export default class DelayGate extends BaseElement {
+const shape = "delay";
+
+export default class DelayGate extends SchemeElement {
   constructor(index, position) {
-    super("delay" + index, position);
+    super("delay" + index, shape, position);
 
     this.index = index;
-    this.shape = "delay";
     this.label = `ЗАДЕРЖ-${index}`;
     this.anchorPoints = directionToAnchorPoints(this.direction);
     this.input = [false];

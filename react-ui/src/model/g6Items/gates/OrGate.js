@@ -1,4 +1,4 @@
-import BaseElement from "../BaseElement";
+import SchemeElement from "../SchemeElement";
 import { DIRECTION_LEFT } from "../../enum/directions";
 import { isDirection } from "../../utils";
 
@@ -10,13 +10,14 @@ const directionToAnchorPoints = (direction) => {
   }
 };
 
+const shape = "or";
 
-export default class OrGate extends BaseElement {
+
+export default class OrGate extends SchemeElement {
   constructor(index, position) {
-    super("or" + index, position);
+    super("or" + index, shape, position);
 
     this.index = index;
-    this.shape = "or";
     this.label = `ИЛИ-${index}`;
     this.anchorPoints = directionToAnchorPoints(this.direction);
     this.input = [false, false];

@@ -1,4 +1,4 @@
-class SchemeStatesStore {
+class SchemeEditorStatesStore {
   constructor() {
     this.doStack = [];
     this.undoStack = [];
@@ -16,4 +16,4 @@ class SchemeStatesStore {
   }
 }
 
-export default SchemeStatesStore;
+export default SchemeEditorStatesStore;

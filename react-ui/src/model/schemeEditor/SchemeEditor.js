@@ -1,13 +1,14 @@
 import init from "../g6Init";
 import { debounce } from "../../utils";
 import { FILE_VERSION, EDITOR_SIMULATION_MODE, EDITOR_EDITING_MODE } from "../constants";
-import ItemIndexer from "./ItemIndexer";
-import SchemeStatesStore from "./SchemeStatesStore";
-import createNodeModel from "./createNodeModel"
+import SchemeEditorStatesStore from "./SchemeEditorStatesStore";
+import ItemFactory from "./ItemFactory";
 import Input from "../g6Items/Input";
 import DelayGate from "../g6Items/gates/DelayGate";
 import { DIRECTION_RIGHT, DIRECTION_LEFT } from "../enum/directions";
 import SchemeEditorEvaluator from "./SchemeEditorEvaluator";
+import SchemeEditorState from "./SchemeEditorState";
+
 
 
 const canvasResize = debounce((graph) => {
@@ -39,46 +40,8 @@ const bindG6Events = (editor) => {
     editor.onMouseMove(evt);
   });
 
-  graph.on("afteradditem", evt => {
-    if (editor.restoration)
-      return;
-
-    const { item } = evt;
-    if (item.get("type") === "edge") {
-      if (!item.getSource().get || !item.getTarget().get) {
-        return;
-      }
-    }
-
-    logEditorAction(editor);
-  })
-
-  let logDelete = true;
-  graph.on("beforeremoveitem", evt => {
-    logDelete = true;
-    const { item } = evt;
-    if (item.get("type") === "node") {
-      const edges = item.getEdges();
-      for (let i = edges.length; i >= 0; i--) {
-        graph.removeItem(edges[i]);
-      }
-    } else if (item.get("type") === "edge") {
-      if (!item.getSource().get || !item.getTarget().get) {
-        logDelete = false;
-      }
-    }
-  })
-
-  graph.on("afterremoveitem", evt => {
-    if (!logDelete) {
-      return;
-    }
-
-    logEditorAction(editor);
-  })
-
   graph.on("editor:log", evt => {
-    logEditorAction(editor);
+    logEditorState(editor);
   })
 
   window.onresize = () => {
@@ -86,42 +49,42 @@ const bindG6Events = (editor) => {
   }
 }
 
-const restoreSchemeState = (editor, state) => {
-  editor.restoration = true;
-  editor._graph.read(state);
-  editor.restoration = false;
+const restoreSchemeState = (editor, schemeData) => {
+  const scheme = {
+    nodes: schemeData.nodes
+      .map(nodeData => ItemFactory.createNodeModelFromData(nodeData)),
+
+    edges: schemeData.edges
+      .map(edgeData => ItemFactory.createEdgeModelFromData(edgeData))
+  }
+
+  editor._graph.read(scheme);
 }
 
-function simplifySchemeData(schemeData) {
-  const simplidiedSchemeData = {}
-  simplidiedSchemeData.nodes = schemeData.nodes.map(({ id, index, x, y, shape, direction }) => {
-    return { id, index, x, y, shape, direction };
-  });
-  simplidiedSchemeData.edges = schemeData.edges
-    .map(({ id, shape, source, target, sourceAnchor, targetAnchor }) => {
-      return { id, shape, source, target, sourceAnchor, targetAnchor };
-    });
-
-  return simplidiedSchemeData;
+function restoreCanvasLeftTopCornerPosition(editor, position) {
+  const currentLeftTopCornerPosition = editor._graph.getCanvasByPoint(0, 0);
+  const dx = position.x - currentLeftTopCornerPosition.x;
+  const dy = position.y - currentLeftTopCornerPosition.y;
+  editor._graph.translate(dx, dy);
 }
 
 function getScheme(editor) {
-  const schemeData = editor._graph.save();
-  schemeData.edges = schemeData.edges
-    .filter(edge => typeof edge.source === "string" && typeof edge.target === "string");
+  const graph = editor._graph;
+  const schemeData = {};
 
-  return simplifySchemeData(schemeData);
+  schemeData.edges = graph.getEdges()
+    .map(edge => edge.getModel())
+    .filter(edgeModel => edgeModel.isCompleted())
+    .map(edgeModel => edgeModel.getData());
+
+  schemeData.nodes = graph.getNodes()
+    .map(node => node.getModel().getData());
+
+  return schemeData;
 }
 
-function logEditorAction(editor) {
-  const scheme = getScheme(editor);
-  scheme.nodes = scheme.nodes.map(node => {
-    const position = { x: node.x, y: node.y };
-    const model = createNodeModel(node.shape, node.index, position);
-    model.changeDirection(node.direction);
-    return model;
-  });
-  const state = { schemeData: scheme, editorLeftTopCorner: editor._graph.getCanvasByPoint(0, 0) }
+function logEditorState(editor) {
+  const state = editor.getCurrentState();
   editor._store.log(state);
 }
 
@@ -148,9 +111,9 @@ function rotateNode(node) {
 export default class SchemeEditor {
   constructor(mountHTMLElement) {
     this._graph = init(mountHTMLElement);
+    this._store = new SchemeEditorStatesStore();
     bindG6Events(this);
-    this._store = new SchemeStatesStore();
-    logEditorAction(this);
+    logEditorState(this);
   }
 
   addNode = (type) => {
@@ -159,7 +122,8 @@ export default class SchemeEditor {
 
     const graph = this._graph;
     const position = graph.getPointByCanvas(100, 100);
-    graph.addItem("node", createNodeModel(type, graph.indexer.getNextIndex(type), position));
+    graph.addItem("node", ItemFactory.createNodeModel(type, graph.indexer.getNextIndex(type), position));
+    logEditorState(this);
   }
 
   getScale = () => this._graph.getZoom();
@@ -174,7 +138,7 @@ export default class SchemeEditor {
     this.onUpdateScale({ scale });
   };
 
-  getMode = () => { return this._graph.getCurrentMode() };
+  getMode = () => this._graph.getCurrentMode();
 
   setMode = (mode) => {
     if (mode === EDITOR_SIMULATION_MODE) {
@@ -193,8 +157,19 @@ export default class SchemeEditor {
     this.onChangeMode({ mode });
   };
 
+  getCurrentState = () => {
+    return new SchemeEditorState(
+      {
+        leftTopCornerPosition: this._graph.getCanvasByPoint(0, 0),
+        schemeData: getScheme(this),
+        scale: this.getScale(),
+        mode: this.getMode(),
+        index: { ...this._graph.indexer.index },
+      });
+  }
+
   evaluateScheme = () => {
-    if (this.getMode() !== EDITOR_SIMULATION_MODE || !this._schemeEvaluator)
+    if (this.getMode() !== EDITOR_SIMULATION_MODE)
       return;
 
     this._schemeEvaluator.evaluate();
@@ -235,7 +210,7 @@ export default class SchemeEditor {
       .filter(node => node.hasState("select"))
       .forEach(node => rotateNode.call(this, node));
 
-    logEditorAction(this);
+    logEditorState(this);
   }
 
   deleteSelectedItems = () => {
@@ -249,6 +224,8 @@ export default class SchemeEditor {
     this._graph.getNodes().forEach(node => {
       node.hasState("select") && this._graph.removeItem(node);
     });
+
+    logEditorState(this);
   };
 
   goToOrigin = () => {
@@ -287,31 +264,18 @@ export default class SchemeEditor {
     this._graph = init(container);
     bindG6Events(this);
 
-    this._store = new SchemeStatesStore();
-    logEditorAction(this);
+    this._store = new SchemeEditorStatesStore();
+    logEditorState(this);
   }
 
   restoreState = (editorState) => {
-    const { scale, mode, fileData } = editorState;
-    const { schemeData, index } = fileData;
+    const { scale, mode, schemeData, index, leftTopCornerPosition } = editorState;
 
-    schemeData.nodes = schemeData.nodes.map(node => {
-      const position = { x: node.x, y: node.y };
-      const model = createNodeModel(node.shape, node.index, position);
-      model.changeDirection(node.direction);
-      return model;
-    })
-
-    restoreSchemeState(this, fileData.schemeData);
+    restoreSchemeState(this, schemeData);
     this.setScale(scale);
     this.setMode(mode);
-
-    fileData.editorLeftTopCorner
-      && this._graph.translate(fileData.editorLeftTopCorner.x, fileData.editorLeftTopCorner.y);
-
-    this._graph.indexer = new ItemIndexer(index);
-    this._store = new SchemeStatesStore();
-    logEditorAction(this);
+    leftTopCornerPosition && restoreCanvasLeftTopCornerPosition(this, leftTopCornerPosition);
+    this._graph.indexer.index = index;
   }
 
   undo() {
@@ -322,10 +286,7 @@ export default class SchemeEditor {
       return;
 
     this._store.undoStack.push(this._store.doStack.pop());
-    const current = this._store.getCurrent();
-    restoreSchemeState(this, current.schemeData);
-    current.editorLeftTopCorner
-      && this._graph.translate(current.editorLeftTopCorner.x, current.editorLeftTopCorner.y);
+    this.restoreState(this._store.getCurrent());
   }
 
   redo() {
@@ -336,10 +297,7 @@ export default class SchemeEditor {
       return;
 
     this._store.doStack.push(this._store.undoStack.pop());
-    const current = this._store.getCurrent();
-    restoreSchemeState(this, current.schemeData);
-    current.editorLeftTopCorner
-      && this._graph.translate(current.editorLeftTopCorner.x, current.editorLeftTopCorner.y);
+    this.restoreState(this._store.getCurrent());
   }
 
   // EVENTS

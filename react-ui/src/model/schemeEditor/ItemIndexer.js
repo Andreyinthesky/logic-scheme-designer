@@ -1,4 +1,4 @@
-const createObjectsIndex = () => ({
+const createItemIndex = () => ({
   "wire": 0,
   "and" : 0,
   "or" : 0,
@@ -11,14 +11,14 @@ const createObjectsIndex = () => ({
 
 export default class ItemIndexer {
   constructor(index) {
-    this.index = index || createObjectsIndex();
+    this.index = index || createItemIndex();
   }
 
-  getNextIndex(objName) {
-    if (this.index[objName] === undefined) {
-      throw new Error(`Unknown object with name - ${objName}`);
+  getNextIndex(itemName) {
+    if (this.index[itemName] === undefined) {
+      throw new Error(`Unknown item with name - ${itemName}`);
     }
 
-    return ++this.index[objName];
+    return ++this.index[itemName];
   }
 }

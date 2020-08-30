@@ -177,7 +177,7 @@ const itemsControlBehaviour = {
         targetAnchor: targetNodeAnchorIndex
       });
 
-      this.graph.emit("afteradditem", { item: this.drivenEdge });
+      this.graph.emit("editor:log");
       this.drivenEdge = null;
       this.addingEdge = false;
     }

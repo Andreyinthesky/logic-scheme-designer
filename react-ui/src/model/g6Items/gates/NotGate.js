@@ -1,4 +1,4 @@
-import BaseElement from "../BaseElement";
+import SchemeElement from "../SchemeElement";
 import { DIRECTION_LEFT } from "../../enum/directions";
 import { isDirection } from "../../utils";
 
@@ -10,12 +10,13 @@ const directionToAnchorPoints = (direction) => {
   }
 };
 
-export default class NotGate extends BaseElement {
+const shape = "not";
+
+export default class NotGate extends SchemeElement {
   constructor(index, position) {
-    super("not" + index, position);
+    super("not" + index, shape, position);
 
     this.index = index;
-    this.shape = "not";
     this.label = `НЕ-${index}`;
     this.anchorPoints = directionToAnchorPoints(this.direction);
     this.input = [false];

@@ -1,4 +1,4 @@
-import BaseElement from "../BaseElement";
+import SchemeElement from "../SchemeElement";
 import { DIRECTION_LEFT } from "../../enum/directions";
 import { isDirection } from "../../utils";
 
@@ -10,12 +10,13 @@ const directionToAnchorPoints = (direction) => {
   }
 };
 
-export default class AndGate extends BaseElement {
+const shape = "and";
+
+export default class AndGate extends SchemeElement {
   constructor(index, position) {
-    super("and" + index, position);
+    super("and" + index, shape, position);
 
     this.index = index;
-    this.shape = "and";
     this.label = `И-${index}`;
     this.anchorPoints = directionToAnchorPoints(this.direction);
     this.input = [false, false];
