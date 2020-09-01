@@ -2,6 +2,7 @@ import G6 from "../g6";
 import g6init from "../model/g6Init";
 import createMountNode from "./utils/createMountNode";
 import OrGate from "../model/g6Items/gates/OrGate";
+import Wire from "../model/g6Items/Wire";
 
 const Event = G6.G.Event;
 const graph = g6init(createMountNode());
@@ -14,14 +15,13 @@ const nodes = [
 const graphItems = {
   nodes,
   edges: [
-    {
-      id: "wire1",
-      shape: "wire",
+    new Wire({
+      index: 1,
       source: nodes[0].id,
       sourceAnchor: nodes[0].getOutputAnchors()[0],
       target: nodes[1].id,
       targetAnchor: nodes[1].getInputAnchors()[0],
-    }
+    })
   ]
 };
 

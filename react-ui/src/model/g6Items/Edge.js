@@ -24,4 +24,4 @@ export default class Edge extends Item {
       targetAnchor: this.targetAnchor,
     }
   }
-};
+}

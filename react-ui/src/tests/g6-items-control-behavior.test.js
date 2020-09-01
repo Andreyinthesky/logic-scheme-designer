@@ -14,7 +14,7 @@ describe("completeDrivenEdge()", () => {
         itemsControlBehavior[prop] = null;
       }
     }
-    
+
     graph.clear();
     itemsControlBehavior.graph = graph;
   });
@@ -22,7 +22,12 @@ describe("completeDrivenEdge()", () => {
   test("should emit editor:log event", () => {
     itemsControlBehavior.addingEdge = true;
     graph.addItem("node", new OrGate(1, { x: 300, y: 100 }));
-    itemsControlBehavior.drivenEdge = graph.addItem("edge", new Wire("wire1", "or1", 1, { x: 0, y: 0 }));
+    itemsControlBehavior.drivenEdge = graph.addItem("edge", new Wire({
+      index: 1,
+      source: "or1",
+      sourceAnchor: 1,
+      target: { x: 0, y: 0 }
+    }));
     const node = graph.addItem("node", new OrGate(2, { x: 100, y: 100 }));
 
     itemsControlBehavior.completeDrivenEdge(node, 0);

@@ -37,6 +37,6 @@ export default class ItemFactory {
       throw new Error(`Unknown edge type - ${type}`);
     }
     
-    return Object.assign(new Wire(), edgeData);
+    return Object.assign(new Wire({}), edgeData);
   }
 }

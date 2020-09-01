@@ -3,8 +3,8 @@ import Edge from "./Edge";
 const shape = "wire";
 
 export default class Wire extends Edge {
-  constructor(id, source, sourceAnchor, target, targetAnchor) {
-    super(id, shape, source, sourceAnchor, target, targetAnchor);
+  constructor({ index, source, sourceAnchor, target, targetAnchor }) {
+    super("wire" + index, shape, source, sourceAnchor, target, targetAnchor);
   }
 
 }

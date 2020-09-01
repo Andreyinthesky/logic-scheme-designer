@@ -21,12 +21,12 @@ describe("SchemeEditor", () => {
 
       const editor = new SchemeEditor(createMountNode());
 
-      expect(editor._store.doStack.length).toBe(1);
-      expect(editor._store.undoStack.length).toBe(0);
-      expect(editor._store.doStack[0] instanceof SchemeEditorState).toBeTruthy();
-      expect(editor._store.doStack[0].leftTopCornerPosition)
+      expect(editor._statesStore._doStack.length).toBe(1);
+      expect(editor._statesStore._undoStack.length).toBe(0);
+      expect(editor._statesStore._doStack.peek() instanceof SchemeEditorState).toBeTruthy();
+      expect(editor._statesStore._doStack.peek().leftTopCornerPosition)
         .toMatchObject(expectedInitialEditorState.leftTopCornerPosition);
-      expect(editor._store.doStack[0].schemeData)
+      expect(editor._statesStore._doStack.peek().schemeData)
         .toMatchObject(expectedInitialEditorState.schemeData);
     })
   })
@@ -35,9 +35,9 @@ describe("SchemeEditor", () => {
     test("after add node editor state should be logged", () => {
       editor.addNode("or");
 
-      expect(editor._store.doStack.length).toBe(2);
-      expect(editor._store.undoStack.length).toBe(0);
-      expect(editor._store.doStack[1].schemeData.nodes.length).toBe(1);
+      expect(editor._statesStore._doStack.length).toBe(2);
+      expect(editor._statesStore._undoStack.length).toBe(0);
+      expect(editor._statesStore._doStack.peek().schemeData.nodes.length).toBe(1);
     })
   })
 
@@ -50,9 +50,9 @@ describe("SchemeEditor", () => {
 
       editor.deleteSelectedItems();
 
-      expect(editor._store.doStack.length).toBe(3);
-      expect(editor._store.undoStack.length).toBe(0);
-      expect(editor._store.doStack[2].schemeData.nodes.length).toBe(0);
+      expect(editor._statesStore._doStack.length).toBe(3);
+      expect(editor._statesStore._undoStack.length).toBe(0);
+      expect(editor._statesStore._doStack.peek().schemeData.nodes.length).toBe(0);
     });
   })
 
@@ -109,9 +109,9 @@ describe("SchemeEditor", () => {
 
         editor.undo();
 
-        expect(editor._store.doStack.length).toBe(1);
-        expect(editor._store.undoStack.length).toBe(1);
-        expect(editor._store.doStack[0].schemeData).toMatchObject({ nodes: [], edges: [] });
+        expect(editor._statesStore._doStack.length).toBe(1);
+        expect(editor._statesStore._undoStack.length).toBe(1);
+        expect(editor._statesStore._doStack.peek().schemeData).toMatchObject({ nodes: [], edges: [] });
         expect(editor._graph.getNodes().length).toBe(0);
         expect(editor._graph.getEdges().length).toBe(0);
       })
@@ -125,8 +125,8 @@ describe("SchemeEditor", () => {
 
         editor.undo();
 
-        expect(editor._store.doStack.length).toBe(2);
-        expect(editor._store.undoStack.length).toBe(1);
+        expect(editor._statesStore._doStack.length).toBe(2);
+        expect(editor._statesStore._undoStack.length).toBe(1);
         expect(editor._graph.getCanvasByPoint(0, 0)).toMatchObject({ x: 1, y: 1 });
       })
     })
@@ -141,9 +141,9 @@ describe("SchemeEditor", () => {
 
         editor.redo();
 
-        expect(editor._store.doStack.length).toBe(2);
-        expect(editor._store.undoStack.length).toBe(0);
-        expect(editor._store.doStack[1].schemeData)
+        expect(editor._statesStore._doStack.length).toBe(2);
+        expect(editor._statesStore._undoStack.length).toBe(0);
+        expect(editor._statesStore._doStack.peek().schemeData)
           .toMatchObject({ nodes: [addedNodeModel.getData()], edges: [] });
         expect(editor._graph.getNodes().length).toBe(1);
         expect(editor._graph.getEdges().length).toBe(0);
@@ -157,8 +157,8 @@ describe("SchemeEditor", () => {
         
         editor.redo();
 
-        expect(editor._store.doStack.length).toBe(2);
-        expect(editor._store.undoStack.length).toBe(0);
+        expect(editor._statesStore._doStack.length).toBe(2);
+        expect(editor._statesStore._undoStack.length).toBe(0);
         expect(editor._graph.getCanvasByPoint(0, 0)).toMatchObject({ x: 100, y: 100 });
       })
     })

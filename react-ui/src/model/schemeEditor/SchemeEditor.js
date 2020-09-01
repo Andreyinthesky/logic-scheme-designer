@@ -10,7 +10,6 @@ import SchemeEditorEvaluator from "./SchemeEditorEvaluator";
 import SchemeEditorState from "./SchemeEditorState";
 
 
-
 const canvasResize = debounce((graph) => {
   const mountNode = graph.get("container");
   const width = mountNode.getBoundingClientRect().width;
@@ -41,7 +40,7 @@ const bindG6Events = (editor) => {
   });
 
   graph.on("editor:log", evt => {
-    logEditorState(editor);
+    editor._logEditorState();
   })
 
   window.onresize = () => {
@@ -73,7 +72,7 @@ function getScheme(editor) {
   const schemeData = {};
 
   schemeData.edges = graph.getEdges()
-    .map(edge => edge.getModel())
+    .map(edge => edge.get("model"))
     .filter(edgeModel => edgeModel.isCompleted())
     .map(edgeModel => edgeModel.getData());
 
@@ -81,11 +80,6 @@ function getScheme(editor) {
     .map(node => node.getModel().getData());
 
   return schemeData;
-}
-
-function logEditorState(editor) {
-  const state = editor.getCurrentState();
-  editor._store.log(state);
 }
 
 function rotateNode(node) {
@@ -111,9 +105,8 @@ function rotateNode(node) {
 export default class SchemeEditor {
   constructor(mountHTMLElement) {
     this._graph = init(mountHTMLElement);
-    this._store = new SchemeEditorStatesStore();
     bindG6Events(this);
-    logEditorState(this);
+    this._statesStore = new SchemeEditorStatesStore(this.getCurrentState());
   }
 
   addNode = (type) => {
@@ -123,7 +116,7 @@ export default class SchemeEditor {
     const graph = this._graph;
     const position = graph.getPointByCanvas(100, 100);
     graph.addItem("node", ItemFactory.createNodeModel(type, graph.indexer.getNextIndex(type), position));
-    logEditorState(this);
+    this._logEditorState();
   }
 
   getScale = () => this._graph.getZoom();
@@ -210,7 +203,7 @@ export default class SchemeEditor {
       .filter(node => node.hasState("select"))
       .forEach(node => rotateNode.call(this, node));
 
-    logEditorState(this);
+    this._logEditorState();
   }
 
   deleteSelectedItems = () => {
@@ -225,7 +218,7 @@ export default class SchemeEditor {
       node.hasState("select") && this._graph.removeItem(node);
     });
 
-    logEditorState(this);
+    this._logEditorState();
   };
 
   goToOrigin = () => {
@@ -264,8 +257,7 @@ export default class SchemeEditor {
     this._graph = init(container);
     bindG6Events(this);
 
-    this._store = new SchemeEditorStatesStore();
-    logEditorState(this);
+    this._statesStore = new SchemeEditorStatesStore(this.getCurrentState());
   }
 
   restoreState = (editorState) => {
@@ -282,22 +274,24 @@ export default class SchemeEditor {
     if (this.getMode() !== EDITOR_EDITING_MODE)
       return;
 
-    if (this._store.doStack.length <= 1)
+    if (!this._statesStore.pop()) {
       return;
+    }
 
-    this._store.undoStack.push(this._store.doStack.pop());
-    this.restoreState(this._store.getCurrent());
+    this.restoreState(this._statesStore.getLast());
   }
 
   redo() {
     if (this.getMode() !== EDITOR_EDITING_MODE)
       return;
 
-    if (this._store.undoStack.length <= 0)
-      return;
+    const stateToRestore = this._statesStore.restore();
+    stateToRestore && this.restoreState(stateToRestore);
+  }
 
-    this._store.doStack.push(this._store.undoStack.pop());
-    this.restoreState(this._store.getCurrent());
+  _logEditorState = () => {
+    const state = this.getCurrentState();
+    this._statesStore.push(state);
   }
 
   // EVENTS
