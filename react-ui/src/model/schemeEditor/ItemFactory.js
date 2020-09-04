@@ -27,8 +27,8 @@ export default class ItemFactory {
   }
 
   static createNodeModelFromData(nodeData) {
-    const { shape: type } = nodeData;
-    return Object.assign(this.createNodeModel(type, null, null), nodeData);
+    const { shape: type, index } = nodeData;
+    return Object.assign(this.createNodeModel(type, index, null), nodeData);
   }
 
   static createEdgeModelFromData(edgeData) {

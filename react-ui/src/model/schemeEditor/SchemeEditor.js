@@ -8,6 +8,7 @@ import DelayGate from "../g6Items/gates/DelayGate";
 import { DIRECTION_RIGHT, DIRECTION_LEFT } from "../enum/directions";
 import SchemeEditorEvaluator from "./SchemeEditorEvaluator";
 import SchemeEditorState from "./SchemeEditorState";
+import SchemeEditorFileData from "./SchemeEditorFileData";
 
 
 const canvasResize = debounce((graph) => {
@@ -90,9 +91,9 @@ function rotateNode(node) {
 
   const currentDirection = nodeModel.direction;
   if (currentDirection === DIRECTION_RIGHT) {
-    nodeModel.changeDirection(DIRECTION_LEFT);
+    nodeModel.direction = DIRECTION_LEFT;
   } else {
-    nodeModel.changeDirection(DIRECTION_RIGHT);
+    nodeModel.direction = DIRECTION_RIGHT;
   }
 
   // UPDATE NODE
@@ -231,31 +232,41 @@ export default class SchemeEditor {
     canvasResize(this._graph);
   }
 
-  exportScheme = (name) => {
-    const fileData = {};
-    fileData.schemeData = getScheme(this);
-    fileData.version = FILE_VERSION;
-    fileData.name = name;
-    fileData.index = this._graph.indexer.index;
-    fileData.editorLeftTopCorner = this._graph.getCanvasByPoint(0, 0);
+  exportScheme = (fileName) => {
+    const { schemeData, index, leftTopCornerPosition } = this.getCurrentState();
+
+    const fileData = new SchemeEditorFileData({
+      schemeData: schemeData,
+      version: FILE_VERSION,
+      name: fileName,
+      index: index,
+      editorLeftTopCorner: leftTopCornerPosition,
+    });
 
     return fileData;
   };
 
   importScheme = (fileData) => {
-    const editorState = { fileData };
-    editorState.mode = EDITOR_EDITING_MODE;
-    editorState.scale = 1;
+    const { schemeData, index, editorLeftTopCorner } = fileData;
+    const editorState = new SchemeEditorState({
+      schemeData,
+      leftTopCornerPosition: editorLeftTopCorner,
+      index,
+      mode: EDITOR_EDITING_MODE,
+      scale: 1
+    });
 
     this.restoreState(editorState);
     this.afterImportScheme({ schemeName: fileData.name });
   };
 
-  restart = () => {
+  restart = (newEditorState = null) => {
     const container = this._graph.get("container");
     this._graph.destroy();
     this._graph = init(container);
     bindG6Events(this);
+
+    newEditorState && this.restoreState(newEditorState);
 
     this._statesStore = new SchemeEditorStatesStore(this.getCurrentState());
   }
@@ -265,7 +276,7 @@ export default class SchemeEditor {
 
     restoreSchemeState(this, schemeData);
     this.setScale(scale);
-    this.setMode(mode);
+    this.setMode(EDITOR_EDITING_MODE);
     leftTopCornerPosition && restoreCanvasLeftTopCornerPosition(this, leftTopCornerPosition);
     this._graph.indexer.index = index;
   }
