@@ -1,4 +1,4 @@
-class LinkedListItem {
+class LinkedStackItem {
   constructor(value, prevItem, nextItem) {
     this.value = value;
     this.prevItem = prevItem;
@@ -20,7 +20,7 @@ export default class LinkedStack {
   }
 
   push(item) {
-    const listItem = new LinkedListItem(item, this._tail);
+    const listItem = new LinkedStackItem(item, this._tail);
 
     if (this.length === 0) {
       this._head = listItem;
@@ -60,18 +60,43 @@ export default class LinkedStack {
     }
 
     let itemToRemove = this._head;
-    while (index-- <= 0) {
+    while (index-- > 0) {
       itemToRemove = itemToRemove.nextItem;
     }
 
     if (itemToRemove.prevItem) {
       itemToRemove.prevItem.nextItem = itemToRemove.nextItem;
+    } else {
+      this._head = itemToRemove.nextItem;
     }
 
     if (itemToRemove.nextItem) {
       itemToRemove.nextItem.prevItem = itemToRemove.prevItem;
+    } else {
+      this._tail = itemToRemove.prevItem;
     }
 
     this._length--;
+  }
+
+  [Symbol.iterator]() {
+    return {
+      current: this._head,
+
+      next() {
+        const { current } = this;
+
+        if (current) {
+          this.current = current.nextItem;
+          return { done: false, value: current.value };
+        } else {
+          return { done: true };
+        }
+      }
+    }
+  }
+
+  toArray() {
+    return Array.from(this);
   }
 }
