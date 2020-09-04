@@ -1,5 +1,6 @@
-import { DIRECTION_RIGHT } from "../enum/directions";
 import Node from "./Node";
+import { isDirection } from "../utils";
+import { DIRECTION_RIGHT, DIRECTION_LEFT } from "../enum/directions";
 
 const defaultSize = [100, 50];
 
@@ -9,11 +10,28 @@ export default class SchemeElement extends Node {
 
     this.input = [];
     this.output = [];
-    this.direction = DIRECTION_RIGHT;
+    this._direction = DIRECTION_RIGHT;
   }
 
-  changeDirection() {
-    return null;
+  get direction() {
+    return this._direction;
+  }
+
+  set direction(direction) {
+    if (!isDirection(direction)) {
+      throw new Error("Unknown direction - " + direction);
+    }
+
+    this._changeAnchorPointsByDirection(direction);
+    this._direction = direction;
+  }
+
+  _changeAnchorPointsByDirection = (direction) => {
+    if (direction === this.direction || !this.anchorPoints) return;
+
+    if (direction === DIRECTION_RIGHT || direction === DIRECTION_LEFT) {
+      this.anchorPoints = this.anchorPoints.map(point => [1 - point[0], point[1]]);
+    }
   }
 
   getInputAnchors() {
