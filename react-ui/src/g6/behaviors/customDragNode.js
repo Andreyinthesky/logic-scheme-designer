@@ -10,6 +10,7 @@ const customDragNode = {
       "mouseup": "handleMouseUp",
       "mousemove": "handleMouseMove",
       "canvas:mouseleave": "handleMouseLeave",
+      "node:drop": "handleNodeDrop"
     };
   },
   handleNodeMouseDown(evt) {
@@ -34,6 +35,9 @@ const customDragNode = {
   },
   handleMouseLeave(evt) {
     this.endDragNode();
+  },
+  handleNodeDrop(evt) {
+    this.graph.emit("editor:log");
   },
   startDragNode(node, startCanvasCoords) {
     this.startCanvasCoords = startCanvasCoords;

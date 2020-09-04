@@ -33,7 +33,7 @@ export default function init(mountNode) {
       type: "schemeLayout"
     },
     modes: {
-      [EDITOR_EDITING_MODE]: ["custom-drag-node", "items-control", "custom-drag-canvas", "context-menu"],
+      [EDITOR_EDITING_MODE]: ["custom-drag-node", "add-wire", "select-items",  "custom-drag-canvas", "context-menu"],
       [EDITOR_SIMULATION_MODE]: ["change-input-state", "custom-drag-canvas", "custom-drag-node"],
     },
     plugins: [new Grid()]

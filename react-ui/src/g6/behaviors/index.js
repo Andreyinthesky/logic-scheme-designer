@@ -1,15 +1,17 @@
 import changeInputState from "./changeInputState";
-import itemsControl from "./itemsControl";
+import addWire from "./addWire";
 import customDragCanvas from "./customDragCanvas";
 import customDragNode from "./customDragNode";
 import contextMenu from "./contextMenu";
+import selectItems from "./selectItems";
 
 const behaviours = {
   "change-input-state": changeInputState,
-  "items-control": itemsControl,
+  "add-wire": addWire,
   "custom-drag-canvas": customDragCanvas,
   "custom-drag-node": customDragNode,
   "context-menu": contextMenu,
+  "select-items": selectItems,
 }
 
 export default function registerBehaviors(G6) {

@@ -2,7 +2,7 @@ import Wire from "../../model/g6Items/Wire";
 
 const SELECT_ANCHOR_RADIUS = 16;
 
-const itemsControlBehaviour = {
+const addWireBehaviour = {
   getEvents() {
     return {
       "node:click": "onNodeClick",
@@ -10,13 +10,9 @@ const itemsControlBehaviour = {
       "node:mouseover": "onNodeMouseover",
       "node:mouseout": "onNodeMouseout",
       "node:contextmenu": "onNodeContextMenu",
-      "node:select": "onNodeSelect",
       "edge:click": "onEdgeClick",
       "edge:mousedown": "onEdgeMousedown",
-      "canvas:mousedown": "onCanvasMousedown",
       "keydown": "onKeyDown",
-      "beforemodechange": "onBeforeModeChange",
-      "node:drop": "onNodeEndDrag"
     };
   },
   onNodeClick(evt) {
@@ -50,14 +46,8 @@ const itemsControlBehaviour = {
 
       this.completeDrivenEdge(node, nodeAnchorIndex);
     } else {
-      this.deselectAllItems();
       this.addDrivenEdge(node, nodeAnchorIndex, point);
     }
-  },
-  onNodeSelect(evt) {
-    this.deselectAllItems();
-    const isSelect = evt.item.hasState("select");
-    this.graph.setItemState(evt.item, "select", !isSelect);
   },
   onMousemove(evt) {
     const point = {
@@ -96,8 +86,7 @@ const itemsControlBehaviour = {
     }
 
     if (!this.addingEdge) {
-      this.deselectAllItems();
-      this.graph.setItemState(clickedEdge, "select", true);
+      this.graph.emit("edge:select", {item: clickedEdge});
     }
   },
   onEdgeMousedown(evt) {
@@ -110,19 +99,10 @@ const itemsControlBehaviour = {
       }
     }
   },
-  onCanvasMousedown(evt) {
-    this.deselectAllItems();
-  },
   onKeyDown(evt) {
     if (evt.keyCode === 27) {
       this.removeDrivenEdge();
     }
-  },
-  onBeforeModeChange(evt) {
-    this.deselectAllItems();
-  },
-  onNodeEndDrag(evt) {
-    this.graph.emit("editor:log");
   },
   findExistingEdge(targetNode, targetNodeAnchorIndex, drivenEdgeModel) {
     const targetNodeModel = targetNode.getModel();
@@ -181,15 +161,6 @@ const itemsControlBehaviour = {
       this.addingEdge = false;
     }
   },
-  deselectAllItems() {
-    this.graph.getEdges().forEach(edge => {
-      this.graph.setItemState(edge, "select", false);
-    });
-
-    this.graph.getNodes().forEach(node => {
-      this.graph.setItemState(node, "select", false);
-    });
-  },
 };
 
-export default itemsControlBehaviour;
+export default addWireBehaviour;
