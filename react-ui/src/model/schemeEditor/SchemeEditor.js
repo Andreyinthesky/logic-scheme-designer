@@ -212,6 +212,8 @@ export default class SchemeEditor {
     const leftTopCorner = this._graph.getPointByCanvas(0, 0);
     const scale = this._graph.getZoom();
     this._graph.translate(leftTopCorner.x * scale, leftTopCorner.y * scale);
+    
+    this._logEditorState();
   };
 
   canvasResize = () => {
