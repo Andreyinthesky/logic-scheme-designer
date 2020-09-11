@@ -222,4 +222,21 @@ export default class SchemeEditorEvaluator {
     evaluateScheme(this._rankedElements);
     updateItemsState.call(this);
   }
+
+  discardInputsState() {
+    this._discardElementsState(Input);
+  }
+
+  discardDelaysState() {
+    this._discardElementsState(DelayGate);
+  }
+
+  _discardElementsState(elementType) {
+    this._schemeElements
+      .filter(element => element instanceof elementType)
+      .forEach(element => {
+        element.input = element.input.map(v => false);
+        this._graph.setItemState(this._graph.findById(element.id), "enable", false);
+      });
+  }
 }

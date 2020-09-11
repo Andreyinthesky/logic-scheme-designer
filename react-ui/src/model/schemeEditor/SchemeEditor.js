@@ -3,8 +3,6 @@ import { debounce } from "../../utils";
 import { FILE_VERSION, EDITOR_SIMULATION_MODE, EDITOR_EDITING_MODE } from "../constants";
 import SchemeEditorStatesStore from "./SchemeEditorStatesStore";
 import ItemFactory from "./ItemFactory";
-import Input from "../g6Items/Input";
-import DelayGate from "../g6Items/gates/DelayGate";
 import { DIRECTION_RIGHT, DIRECTION_LEFT } from "../enum/directions";
 import SchemeEditorEvaluator from "./SchemeEditorEvaluator";
 import SchemeEditorState from "./SchemeEditorState";
@@ -171,29 +169,17 @@ export default class SchemeEditor {
   };
 
   discardSchemeInputsState = () => {
-    const elements = this._schemeElements;
-    if (this.getMode() !== EDITOR_SIMULATION_MODE || !elements)
+    if (this.getMode() !== EDITOR_SIMULATION_MODE || !this._schemeEvaluator)
       return;
 
-    elements
-      .filter(element => element instanceof Input)
-      .forEach(input => {
-        input.input = input.input.map(v => false);
-        this._graph.setItemState(this._graph.findById(input.id), "enable", false);
-      });
+    this._schemeEvaluator.discardInputsState();
   };
 
   discardSchemeDelaysState = () => {
-    const elements = this._schemeElements;
-    if (this.getMode() !== EDITOR_SIMULATION_MODE || !elements)
+    if (this.getMode() !== EDITOR_SIMULATION_MODE || !this._schemeEvaluator)
       return;
 
-    elements
-      .filter(element => element instanceof DelayGate)
-      .forEach(delay => {
-        delay.input = delay.input.map(v => false);
-        this._graph.setItemState(this._graph.findById(delay.id), "enable", false);
-      });
+    this._schemeEvaluator.discardDelaysState();
   };
 
   rotateSelectedItems = () => {
