@@ -5,11 +5,11 @@ const TerserJSPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const path = require("path");
 
-const isDev = process.env.NODE_ENV === "development";
+const isDev = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 
 const optimization = () => {
   return isDev
-    ? false
+    ? {}
     : {
       minimizer: [new TerserJSPlugin({}), new OptimizeCSSAssetsPlugin({})],
     };
@@ -30,7 +30,9 @@ module.exports = {
     rules: [
       {
         test: /\.jsx?$/,
-        exclude: /(node_modules|lib)/,
+        include: [
+          path.resolve(__dirname, "src"),
+        ],
         use: ["babel-loader", "eslint-loader"]
       },
       {
@@ -69,7 +71,6 @@ module.exports = {
     }),
     new CopyWebpack([
       { from: 'assets/favicon', to: 'favicon' },
-      // { from: 'src/serviceWorker.js' },
     ]),
     new MiniCssExtractPlugin({
       filename: "index.css",

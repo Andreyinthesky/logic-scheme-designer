@@ -39,7 +39,7 @@ export default {
               opacity: opacity
             };
           },
-        }, 250, "easeLinear");
+        }, 625, "easeLinear");
       } else {
         shape.stopAnimate();
         shape.attr("opacity", 1);

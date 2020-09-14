@@ -1,18 +1,21 @@
 import init from "../g6Init";
 import { debounce } from "../../utils";
 import { FILE_VERSION, EDITOR_SIMULATION_MODE, EDITOR_EDITING_MODE } from "../constants";
-import EditorObjIndexer from "./indexer";
-import SchemeStatesStore from "./SchemeStatesStore";
-
-import Input from "../g6Items/Input";
-import Output from "../g6Items/Output";
-import DelayGate from "../g6Items/gates/DelayGate";
-import AndGate from "../g6Items/gates/AndGate";
-import OrGate from "../g6Items/gates/OrGate";
-import NotGate from "../g6Items/gates/NotGate";
-import XorGate from "../g6Items/gates/XorGate";
+import SchemeEditorStatesStore from "./SchemeEditorStatesStore";
+import ItemFactory from "./ItemFactory";
 import { DIRECTION_RIGHT, DIRECTION_LEFT } from "../enum/directions";
+import SchemeEditorEvaluator from "./SchemeEditorEvaluator";
+import SchemeEditorState from "./SchemeEditorState";
+import SchemeEditorFileData from "./SchemeEditorFileData";
 
+
+const canvasResize = debounce((graph) => {
+  const mountNode = graph.get("container");
+  const width = mountNode.getBoundingClientRect().width;
+  const height = mountNode.getBoundingClientRect().height;
+
+  graph.changeSize(width, height);
+});
 
 const bindG6Events = (editor) => {
   const graph = editor._graph;
@@ -21,44 +24,13 @@ const bindG6Events = (editor) => {
     editor.onWheel(evt);
   });
 
-  const isElementSelected = (element, clickCoords) => {
-    const node = element;
-    const nodeModel = node.getModel();
-
-    const { x, y } = clickCoords;
-    const { x: centerX, y: centerY, size } = nodeModel;
-    const selectBox = {
-      minX: centerX - size[0] / 2,
-      minY: centerY - size[1] / 2,
-      maxX: centerX + size[0] / 2,
-      maxY: centerY + size[1] / 2,
-    };
-
-    const isPointBelongsToSelectBox = x >= selectBox.minX && x <= selectBox.maxX
-      && y >= selectBox.minY && y <= selectBox.maxY;
-
-    return isPointBelongsToSelectBox;
-  };
-
   const closeContextMenu = () => {
     editor.onCloseContextMenu();
     document.removeEventListener("click", closeContextMenu);
   };
 
-  graph.on("node:contextmenu", evt => {
-    evt.preventDefault();
-    evt.stopPropagation();
-
-    if (editor.getMode() !== EDITOR_EDITING_MODE) {
-      return;
-    }
-
-    const { item } = evt;
-    if (!isElementSelected(item, { x: evt.x, y: evt.y })) {
-      return;
-    }
-    graph.emit("node:select", { item });
-    editor.onOpenContextMenu({ x: evt.canvasX, y: evt.canvasY });
+  graph.on("editor:contextmenu", evt => {
+    editor.onOpenContextMenu({ x: evt.x, y: evt.y });
     document.addEventListener("click", closeContextMenu);
   });
 
@@ -66,318 +38,74 @@ const bindG6Events = (editor) => {
     editor.onMouseMove(evt);
   });
 
-  graph.on("afteradditem", evt => {
-    if (editor.restoration)
-      return;
-
-    const { item } = evt;
-    if (item.get("type") === "edge") {
-      if (!item.getSource().get || !item.getTarget().get) {
-        return;
-      }
-    }
-
-    logEditorAction(editor);
-  })
-
-
-  let logDelete = true;
-  graph.on("beforeremoveitem", evt => {
-    logDelete = true;
-    const { item } = evt;
-    if (item.get("type") === "node") {
-      const edges = item.getEdges();
-      for (let i = edges.length; i >= 0; i--) {
-        graph.removeItem(edges[i]);
-      }
-    } else if (item.get("type") === "edge") {
-      if (!item.getSource().get || !item.getTarget().get) {
-        logDelete = false;
-      }
-    }
-  })
-
-  graph.on("afterremoveitem", evt => {
-    if (!logDelete) {
-      return;
-    }
-
-    logEditorAction(editor);
-  })
-
   graph.on("editor:log", evt => {
-    logEditorAction(editor);
+    editor._logEditorState();
   })
-
-  const mountNode = graph.get("container");
-
-  const canvasResize = debounce(() => {
-    const width = mountNode.getBoundingClientRect().width;
-    const height = mountNode.getBoundingClientRect().height;
-
-    graph.changeSize(width, height);
-  });
 
   window.onresize = () => {
-    canvasResize();
+    canvasResize(graph);
   }
 }
 
-const restoreSchemeState = (editor, state) => {
-  editor.restoration = true;
-  editor._graph.read(state);
-  editor.restoration = false;
+const restoreSchemeState = (editor, schemeData) => {
+  const scheme = {
+    nodes: schemeData.nodes
+      .map(nodeData => ItemFactory.createNodeModelFromData(nodeData)),
+
+    edges: schemeData.edges
+      .map(edgeData => ItemFactory.createEdgeModelFromData(edgeData))
+  }
+
+  editor._graph.read(scheme);
 }
 
-function simplifySchemeData(schemeData) {
-  const simplidiedSchemeData = {}
-  simplidiedSchemeData.nodes = schemeData.nodes.map(({ id, index, x, y, shape, direction }) => {
-    return { id, index, x, y, shape, direction };
-  });
-  simplidiedSchemeData.edges = schemeData.edges
-    .map(({ id, shape, source, target, sourceAnchor, targetAnchor }) => {
-      return { id, shape, source, target, sourceAnchor, targetAnchor };
-    });
-
-  return simplidiedSchemeData;
+function restoreCanvasLeftTopCornerPosition(editor, position) {
+  const currentLeftTopCornerPosition = editor._graph.getCanvasByPoint(0, 0);
+  const dx = position.x - currentLeftTopCornerPosition.x;
+  const dy = position.y - currentLeftTopCornerPosition.y;
+  editor._graph.translate(dx, dy);
 }
 
 function getScheme(editor) {
-  const schemeData = editor._graph.save();
-  schemeData.edges = schemeData.edges
-    .filter(edge => typeof edge.source === "string" && typeof edge.target === "string");
+  const graph = editor._graph;
+  const schemeData = {};
 
-  return simplifySchemeData(schemeData);
+  schemeData.edges = graph.getEdges()
+    .map(edge => edge.get("model"))
+    .filter(edgeModel => edgeModel.isCompleted())
+    .map(edgeModel => edgeModel.getData());
+
+  schemeData.nodes = graph.getNodes()
+    .map(node => node.getModel().getData());
+
+  return schemeData;
 }
 
-function logEditorAction(editor) {
-  const scheme = getScheme(editor);
-  scheme.nodes = scheme.nodes.map(node => {
-    const position = { x: node.x, y: node.y };
-    const model = createNodeModel(node.shape, node.index, position);
-    model.changeDirection(node.direction);
-    return model;
-  });
-  const state = { schemeData: scheme, editorLeftTopCorner: editor._graph.getCanvasByPoint(0, 0) }
-  editor._store.log(state);
-}
-
-const createNodeModel = (type, index, position) => {
-  const constructors = {
-    "delay": DelayGate,
-    "and": AndGate,
-    "or": OrGate,
-    "xor": XorGate,
-    "not": NotGate,
-    "input": Input,
-    "output": Output,
+function rotateNode(node) {
+  const nodeModel = node.getModel();
+  if (!nodeModel.direction || !nodeModel.changeDirection) {
+    return;
   }
 
-  if (!constructors[type])
-    throw new Error(`Unknown node type - ${type}`);
-
-  return new constructors[type](index, position);
-}
-
-function validateScheme(editor, scheme) {
-  const schemeElements = Object.values(scheme);
-  const cycle = findSchemeCycle(schemeElements);
-
-  if (cycle.verdict) {
-    const { path } = cycle;
-    const cycleNodes = [];
-    cycleNodes.push(cycle.start);
-    for (let current = cycle.end; current !== cycle.start; current = path[current]) {
-      cycleNodes.push(current);
-    }
-
-    let timeout = null;
-    const highlightCycleNodes = () => cycleNodes.forEach(nodeId => editor._graph.setItemState(nodeId, "highlight", true));
-    return {
-      valid: false,
-      error: {
-        error: `В цепи обратной связи ${cycleNodes.map(nodeId => scheme[nodeId].label).join(" —> ")} 
-                  отсутствует элемент задержки`,
-        focus: () => {
-          if (timeout)
-            clearTimeout(timeout);
-          editor._graph.focusItem(cycleNodes[0]);
-          highlightCycleNodes();
-          timeout = setTimeout(() => cycleNodes.forEach(nodeId => editor._graph.setItemState(nodeId, "highlight", false)), 5000);
-        }
-      }
-    };
+  const currentDirection = nodeModel.direction;
+  if (currentDirection === DIRECTION_RIGHT) {
+    nodeModel.direction = DIRECTION_LEFT;
+  } else {
+    nodeModel.direction = DIRECTION_RIGHT;
   }
 
-  return { valid: true };
+  // UPDATE NODE
+  node.update();
+  node.updatePosition({ x: nodeModel.x, y: nodeModel.y });
+  node.getEdges().forEach(edge => edge.update());
+  this._graph.paint();
 }
-
-function createLogicSchemeModel(graph) {
-  const initElement = (element) => {
-    const elementModel = element.getModel();
-    elementModel.input = elementModel.input.map(v => false);
-    elementModel.output = [];
-    elementModel.rank = null;
-
-    graph.setItemState(element, "enable", false);
-  }
-
-  const visitedEdges = {};
-  const elements = {};
-
-  graph.getNodes().forEach(node => {
-    const nodeModel = node.getModel();
-    const nodeId = nodeModel.id;
-    initElement(node);
-
-    for (let edge of node.getEdges()) {
-      const edgeModel = edge.getModel();
-      const edgeId = edgeModel.id;
-
-      if (visitedEdges[edgeId]) {
-        continue;
-      }
-
-      const startNodeAnchorIndex = (edgeModel.target === nodeId ? edgeModel.targetAnchor : edgeModel.sourceAnchor);
-      const endNodeAnchorIndex = (edgeModel.target === nodeId ? edgeModel.sourceAnchor : edgeModel.targetAnchor);
-
-      const isOutputAnchor = nodeModel.getOutputAnchors().includes(startNodeAnchorIndex);
-      if (isOutputAnchor) {
-        const outElement = (edgeModel.target === nodeId ? edge.getSource() : edge.getTarget());
-
-        if (!elements[nodeId]) {
-          elements[nodeId] = nodeModel;
-        }
-
-        const outElementId = outElement.get("id");
-        if (!elements[outElementId]) {
-          elements[outElementId] = outElement.getModel();
-        }
-
-        elements[nodeId].output.push({
-          inputIndex: endNodeAnchorIndex,
-          element: elements[outElementId],
-        });
-        visitedEdges[edgeId] = edge;
-      }
-    }
-  });
-
-  return elements;
-}
-
-function findSchemeCycle(elements) {
-  const stack = [];
-  const color = {};
-  const path = {};
-
-  elements.forEach(element => {
-    if (element instanceof Input || element instanceof DelayGate) {
-      stack.push(element);
-    }
-    color[element.id] = 0;
-  });
-
-  while (stack.length > 0) {
-    const current = stack[stack.length - 1];
-
-    if (color[current.id] === 1) {
-      color[current.id] = 2;
-      stack.pop();
-      continue;
-    }
-    color[current.id] = 1;
-
-    const output = current.output;
-    for (let outputObj of output) {
-      const output = outputObj.element;
-
-      if (color[output.id] === 2 || output instanceof DelayGate) {
-        continue;
-      }
-
-      if (color[output.id] === 1) {
-        console.log("cycle is exist!");
-        console.log(`start is ${output.id}, end is ${current.id}`);
-        return {
-          verdict: true,
-          start: output.id,
-          end: current.id,
-          path: path,
-        };
-      }
-
-      path[output.id] = current.id;
-      stack.push(output);
-    }
-  }
-
-  return { verdict: false };
-}
-
-function rankElements(elements) {
-  const delays = elements.filter(element => element instanceof DelayGate);
-  const inputs = elements.filter(element => element instanceof Input);
-  const stack = delays.concat(inputs);
-  stack.forEach(element => element.rank = 0);
-
-  while (stack.length > 0) {
-    const current = stack.pop();
-    const output = current.output;
-
-    for (let outputObj of output) {
-      const output = outputObj.element;
-
-      if (output instanceof DelayGate) {
-        continue;
-      }
-
-      if (output.rank < current.rank + 1) {
-        output.rank = current.rank + 1;
-      }
-
-      stack.push(output);
-    }
-  }
-
-  const rankedElements = [];
-  rankedElements[0] = delays.concat(inputs);
-  elements.forEach(element => {
-    if (element.rank === 0)
-      return;
-
-    if (!rankedElements[element.rank])
-      rankedElements[element.rank] = [];
-
-    rankedElements[element.rank].push(element);
-  });
-
-  return rankedElements;
-}
-
-function evalScheme(rankedElements) {
-  const maxRank = rankedElements.length - 1;
-
-  for (let rank = 0; rank <= maxRank; rank++) {
-    rankedElements[rank].forEach(element => {
-      const outputs = element.output;
-
-      outputs && outputs.forEach(outputObj => {
-        const output = outputObj.element;
-        output.input[outputObj.inputIndex] = element.evaluate();
-      });
-    });
-  }
-}
-
-const SIDEBAR_X_OFFSET = 320;
 
 export default class SchemeEditor {
   constructor(mountHTMLElement) {
     this._graph = init(mountHTMLElement);
     bindG6Events(this);
-    this._store = new SchemeStatesStore();
-    logEditorAction(this);
+    this._statesStore = new SchemeEditorStatesStore(this.getCurrentState());
   }
 
   addNode = (type) => {
@@ -385,8 +113,9 @@ export default class SchemeEditor {
       return;
 
     const graph = this._graph;
-    const position = graph.getPointByCanvas(100 + SIDEBAR_X_OFFSET, 100);
-    graph.addItem("node", createNodeModel(type, graph.indexer.getNextIndex(type), position));
+    const position = graph.getPointByCanvas(100, 100);
+    graph.addItem("node", ItemFactory.createNodeModel(type, graph.indexer.getNextIndex(type), position));
+    this._logEditorState();
   }
 
   getScale = () => this._graph.getZoom();
@@ -401,100 +130,67 @@ export default class SchemeEditor {
     this.onUpdateScale({ scale });
   };
 
-  getMode = () => { return this._graph.getCurrentMode() };
+  getMode = () => this._graph.getCurrentMode();
 
   setMode = (mode) => {
     if (mode === EDITOR_SIMULATION_MODE) {
-      const scheme = createLogicSchemeModel(this._graph);
-      const validationResult = validateScheme(this, scheme)
-      if (!validationResult.valid) {
-        this.onError(validationResult.error);
+      try {
+        this._schemeEvaluator = new SchemeEditorEvaluator(this);
+      } catch (e) {
+        console.log(e);
+        this.onError(e);
         return;
       }
-
-      this._schemeElements = Object.values(scheme);
-      this._rankedElements = rankElements(this._schemeElements);
     } else {
-      this._rankedElements = null;
+      this._schemeEvaluator = null;
     }
 
     this._graph.setMode(mode);
     this.onChangeMode({ mode });
   };
 
+  getCurrentState = () => {
+    return new SchemeEditorState(
+      {
+        leftTopCornerPosition: this._graph.getCanvasByPoint(0, 0),
+        schemeData: getScheme(this),
+        scale: this.getScale(),
+        mode: this.getMode(),
+        index: { ...this._graph.indexer.index },
+      });
+  }
+
   evaluateScheme = () => {
-    if (this.getMode() !== EDITOR_SIMULATION_MODE || !this._rankedElements)
+    if (this.getMode() !== EDITOR_SIMULATION_MODE)
       return;
 
-    evalScheme(this._rankedElements);
-
-    this._schemeElements
-      .filter(element => element instanceof Output || element instanceof DelayGate)
-      .forEach(outElement => {
-        const outElementValue = outElement.input[0];
-        const outElementNode = this._graph.findById(outElement.id);
-
-        this._graph.setItemState(outElementNode, "enable", outElementValue);
-      });
-
+    this._schemeEvaluator.evaluate();
     this.afterEvaluateScheme();
   };
 
   discardSchemeInputsState = () => {
-    const elements = this._schemeElements;
-    if (this.getMode() !== EDITOR_SIMULATION_MODE || !elements)
+    if (this.getMode() !== EDITOR_SIMULATION_MODE || !this._schemeEvaluator)
       return;
 
-    elements
-      .filter(element => element instanceof Input)
-      .forEach(input => {
-        input.input = input.input.map(v => false);
-        this._graph.setItemState(this._graph.findById(input.id), "enable", false);
-      });
+    this._schemeEvaluator.discardInputsState();
   };
 
   discardSchemeDelaysState = () => {
-    const elements = this._schemeElements;
-    if (this.getMode() !== EDITOR_SIMULATION_MODE || !elements)
+    if (this.getMode() !== EDITOR_SIMULATION_MODE || !this._schemeEvaluator)
       return;
 
-    elements
-      .filter(element => element instanceof DelayGate)
-      .forEach(delay => {
-        delay.input = delay.input.map(v => false);
-        this._graph.setItemState(this._graph.findById(delay.id), "enable", false);
-      });
+    this._schemeEvaluator.discardDelaysState();
   };
 
   rotateSelectedItems = () => {
     if (this.getMode() !== EDITOR_EDITING_MODE)
       return;
 
-    this._graph.getNodes().forEach(node => {
-      if (node.hasState("select")) {
-        const nodeModel = node.getModel();
-        if (!nodeModel.direction || !nodeModel.changeDirection) {
-          return;
-        }
+    this._graph.getNodes()
+      .filter(node => node.hasState("select"))
+      .forEach(node => rotateNode.call(this, node));
 
-        const currentDirection = nodeModel.direction;
-        if (currentDirection === DIRECTION_RIGHT) {
-          nodeModel.changeDirection(DIRECTION_LEFT);
-        } else {
-          nodeModel.changeDirection(DIRECTION_RIGHT);
-        }
-
-        // UPDATE NODE
-        node.update();
-        const xPos = nodeModel.x;
-        const yPos = nodeModel.y;
-        node.updatePosition({ x: xPos, y: yPos });
-        node.getEdges().forEach(edge => edge.update());
-        this._graph.paint();
-      }
-    });
-
-    logEditorAction(this);
+    this._logEditorState();
   }
 
   deleteSelectedItems = () => {
@@ -508,93 +204,93 @@ export default class SchemeEditor {
     this._graph.getNodes().forEach(node => {
       node.hasState("select") && this._graph.removeItem(node);
     });
+
+    this._logEditorState();
   };
 
   goToOrigin = () => {
     const leftTopCorner = this._graph.getPointByCanvas(0, 0);
     const scale = this._graph.getZoom();
     this._graph.translate(leftTopCorner.x * scale, leftTopCorner.y * scale);
+    
+    this._logEditorState();
   };
 
-  exportScheme = (name) => {
-    const fileData = {};
-    fileData.schemeData = getScheme(this);
-    fileData.version = FILE_VERSION;
-    fileData.name = name;
-    fileData.index = this._graph.indexer.index;
-    fileData.editorLeftTopCorner = this._graph.getCanvasByPoint(0, 0);
+  canvasResize = () => {
+    canvasResize(this._graph);
+  }
+
+  exportScheme = (fileName) => {
+    const { schemeData, index, leftTopCornerPosition } = this.getCurrentState();
+
+    const fileData = new SchemeEditorFileData({
+      schemeData: schemeData,
+      version: FILE_VERSION,
+      name: fileName,
+      index: index,
+      editorLeftTopCorner: leftTopCornerPosition,
+    });
 
     return fileData;
   };
 
   importScheme = (fileData) => {
-    const editorState = { fileData };
-    editorState.mode = EDITOR_EDITING_MODE;
-    editorState.scale = 1;
+    const { schemeData, index, editorLeftTopCorner } = fileData;
+    const editorState = new SchemeEditorState({
+      schemeData,
+      leftTopCornerPosition: editorLeftTopCorner,
+      index,
+      mode: EDITOR_EDITING_MODE,
+      scale: 1
+    });
 
     this.restoreState(editorState);
     this.afterImportScheme({ schemeName: fileData.name });
   };
 
-  restart = () => {
+  restart = (newEditorState = null) => {
     const container = this._graph.get("container");
     this._graph.destroy();
     this._graph = init(container);
     bindG6Events(this);
 
-    this._store = new SchemeStatesStore();
-    logEditorAction(this);
+    newEditorState && this.restoreState(newEditorState);
+
+    this._statesStore = new SchemeEditorStatesStore(this.getCurrentState());
   }
 
   restoreState = (editorState) => {
-    const { scale, mode, fileData } = editorState;
-    const { schemeData, index } = fileData;
+    const { scale, mode, schemeData, index, leftTopCornerPosition } = editorState;
 
-    schemeData.nodes = schemeData.nodes.map(node => {
-      const position = { x: node.x, y: node.y };
-      const model = createNodeModel(node.shape, node.index, position);
-      model.changeDirection(node.direction);
-      return model;
-    })
-
-    restoreSchemeState(this, fileData.schemeData);
+    restoreSchemeState(this, schemeData);
     this.setScale(scale);
-    this.setMode(mode);
-
-    fileData.editorLeftTopCorner
-      && this._graph.translate(fileData.editorLeftTopCorner.x, fileData.editorLeftTopCorner.y);
-
-    this._graph.indexer = new EditorObjIndexer(index);
-    this._store = new SchemeStatesStore();
-    logEditorAction(this);
+    this.setMode(EDITOR_EDITING_MODE);
+    leftTopCornerPosition && restoreCanvasLeftTopCornerPosition(this, leftTopCornerPosition);
+    this._graph.indexer.index = index;
   }
 
   undo() {
     if (this.getMode() !== EDITOR_EDITING_MODE)
       return;
 
-    if (this._store.doStack.length <= 1)
+    if (!this._statesStore.pop()) {
       return;
+    }
 
-    this._store.undoStack.push(this._store.doStack.pop());
-    const current = this._store.getCurrent();
-    restoreSchemeState(this, current.schemeData);
-    current.editorLeftTopCorner
-      && this._graph.translate(current.editorLeftTopCorner.x, current.editorLeftTopCorner.y);
+    this.restoreState(this._statesStore.getLast());
   }
 
   redo() {
     if (this.getMode() !== EDITOR_EDITING_MODE)
       return;
 
-    if (this._store.undoStack.length <= 0)
-      return;
+    const stateToRestore = this._statesStore.restore();
+    stateToRestore && this.restoreState(stateToRestore);
+  }
 
-    this._store.doStack.push(this._store.undoStack.pop());
-    const current = this._store.getCurrent();
-    restoreSchemeState(this, current.schemeData);
-    current.editorLeftTopCorner
-      && this._graph.translate(current.editorLeftTopCorner.x, current.editorLeftTopCorner.y);
+  _logEditorState = () => {
+    const state = this.getCurrentState();
+    this._statesStore.push(state);
   }
 
   // EVENTS

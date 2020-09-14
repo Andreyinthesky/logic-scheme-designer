@@ -1,51 +1,57 @@
+import setCursorStyle from "../utils/setCursorStyle";
+
+
 const customDragCanvasBehavior = {
   getEvents() {
     return {
-      "canvas:mousedown": "onMouseDown",
-      "mouseup": "onMouseUp",
-      "mousemove": "onMouseMove",
-      "canvas:mouseleave": "onMouseLeave",
+      "canvas:mousedown": "handleMouseDown",
+      "mouseup": "handleMouseUp",
+      "mousemove": "handleMouseMove",
+      "canvas:mouseleave": "handleMouseLeave",
     };
   },
 
-  onMouseDown(evt) {
-    this.dragCanvasCoord = { x: evt.x, y: evt.y };
-    this.startDrag = true;
-    this.isFirstMove = true;
+  handleMouseDown(evt) {
+    this.startDrag({ x: evt.clientX, y: evt.clientY });
   },
-  onMouseUp(evt) {
+  handleMouseUp(evt) {
     this.endDrag();
   },
-  onMouseLeave(evt) {
+  handleMouseLeave(evt) {
     this.endDrag();
   },
-  onMouseMove(evt) {
-    const { graph } = this;
-    const { startDrag, dragCanvasCoord } = this;
-    if (!startDrag || !dragCanvasCoord) return;
+  handleMouseMove(evt) {
+    if (!this.isStartDrag) {
+      return;
+    }
+
     if (this.isFirstMove) {
       this.isFirstMove = false;
-      this.setCursorStyle("move");
+      setCursorStyle.call(this, "move");
     }
-    const scale = graph.getZoom();
-    graph.translate((evt.x - dragCanvasCoord.x) * scale, (evt.y - dragCanvasCoord.y) * scale);
+
+    this.translateCanvasByDrag({ x: evt.clientX, y: evt.clientY });
+  },
+  startDrag(startMouseCoord) {
+    this.startMouseCoord = startMouseCoord;
+    this.isStartDrag = true;
+    this.isFirstMove = true;
   },
   endDrag() {
-    if (this.startDrag && !this.isFirstMove)
+    if (this.isStartDrag && !this.isFirstMove)
       this.graph.emit("editor:log");
     this.isFirstMove = true;
-    this.startDrag = false;
-    this.setCursorStyle("default");
+    this.isStartDrag = false;
+    setCursorStyle.call(this, "default");
   },
-  setCursorStyle(style) {
-    const container = this.graph.get("container");
-    for (var i = 0; i < container.children.length; i++) {
-      if (container.children[i].tagName === "CANVAS") {
-        container.children[i].style.cursor = style;
-        return;
-      }
-    }
-  }
+  translateCanvasByDrag(currentMouseCoords) {
+    const { graph, startMouseCoord } = this;
+    const { x, y } = currentMouseCoords;
+    const xOffset = x - startMouseCoord.x;
+    const yOffset = y - startMouseCoord.y;
+    graph.translate(xOffset, yOffset);
+    this.startMouseCoord = currentMouseCoords;
+  },
 };
 
 export default customDragCanvasBehavior;

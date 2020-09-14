@@ -1,33 +1,15 @@
-import BaseElement from "../BaseElement";
-import { DIRECTION_LEFT } from "../../enum/directions";
-import { isDirection } from "../../utils";
+import SchemeElement from "../SchemeElement";
 
-const directionToAnchorPoints = (direction) => {
-  if (direction == DIRECTION_LEFT) {
-    return [[1, 0.685], [1, 0.315], [0, 0.5]];
-  } else {
-    return [[0, 0.685], [0, 0.315], [1, 0.5]];
-  }
-};
+const shape = "and";
 
-export default class AndGate extends BaseElement {
+export default class AndGate extends SchemeElement {
   constructor(index, position) {
-    super("and" + index, position);
+    super("and" + index, shape, position);
 
     this.index = index;
-    this.shape = "and";
     this.label = `И-${index}`;
-    this.anchorPoints = directionToAnchorPoints(this.direction);
+    this.anchorPoints = [[0, 0.7], [0, 0.3], [1, 0.5]];
     this.input = [false, false];
-  }
-
-  changeDirection(direction) {
-    if (!isDirection(direction)) {
-      throw new Error("Unknown direction - " + direction);
-    }
-
-    this.anchorPoints = directionToAnchorPoints(direction);
-    this.direction = direction;
   }
 
   getInputAnchors() {

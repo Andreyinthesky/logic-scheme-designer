@@ -18,8 +18,8 @@ import {
 } from "../redux/actions";
 import { connect } from "react-redux";
 
-import LoadSchemeForm from "./LoadSchemeForm";
-import ExportSchemeForm from "./ExportSchemeForm";
+import LoadSchemeModal from "./LoadSchemeModal";
+import ExportSchemeModal from "./ExportSchemeModal";
 import Header from "./Header";
 import EditorArea from "./EditorArea";
 import { EditorContext } from "../contexts/editorContext";
@@ -43,7 +43,7 @@ class App extends Component {
         this.bindEditorEvents(this.editor);
 
         window.onbeforeunload = (evt) => {
-            this.saveEditorState();
+            this.saveAppState();
         }
 
         this.tryRestoreEditorState() || this.props.showLoadForm();
@@ -51,7 +51,8 @@ class App extends Component {
 
     bindEditorEvents = (editor) => {
         editor.onWheel = (evt) => {
-            const { deltaY } = evt;
+            let { deltaY } = evt;
+            deltaY = deltaY || -evt.wheelDelta;
 
             if (deltaY < 0) {
                 this.upScale();
@@ -138,7 +139,7 @@ class App extends Component {
 
     initNewScheme = () => {
         this.editor.restart();
-        localStorage.removeItem("editorState");
+        localStorage.removeItem("appState");
         this.props.reInitEditor();
     }
 
@@ -160,6 +161,10 @@ class App extends Component {
 
     goToOrigin = () => {
         this.editor.goToOrigin();
+    }
+
+    canvasResize = () => {
+        this.editor.canvasResize();
     }
 
     upScale = () => {
@@ -191,61 +196,70 @@ class App extends Component {
     }
 
     importScheme = (fileData) => {
-        this.editor.importScheme(fileData);
+        try {
+            this.editor.importScheme(fileData);
+        } catch(err) {
+            console.error(err);
+            this.props.showNotification({ message: "Схему импортировать не удалось. Попробуйте еще раз", type: "error" });
+        }
     }
 
     exportSchemeToFile = (filename) => {
-        const schemeData = this.editor.exportScheme(filename);
-        const file = new Blob([JSON.stringify(schemeData)], { type: "application/json" });
+        const fileData = this.editor.exportScheme(filename);
+        const file = new Blob([JSON.stringify(fileData)], { type: "application/json" });
 
-        // MS browsers
-        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-            window.navigator.msSaveOrOpenBlob(file, `${schemeData.name}.json`);
-        }
-        else {
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(file);
-            link.download = schemeData.name;
-            link.click();
-            setTimeout(() => URL.revokeObjectURL(link.href), 100);
+        try {
+            // MS browsers
+            if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+                window.navigator.msSaveOrOpenBlob(file, `${fileData.name}.json`);
+            }
+            else {
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(file);
+                link.download = fileData.name;
+                link.click();
+                setTimeout(() => URL.revokeObjectURL(link.href), 100);
+            }
+        } catch (err) {
+            this.props.showNotification({ message: "Схему экспортировать не удалось. Попробуйте еще раз", type: "error" });
+            return;
         }
 
         this.props.showNotification({ message: "Схема успешно экспортирована", type: "success" });
     }
 
     tryRestoreEditorState = () => {
-        const editorState = JSON.parse(localStorage.getItem("editorState"));
-        if (!editorState)
+        const appState = JSON.parse(localStorage.getItem("appState"));
+        if (!appState)
             return;
         const timeout = 15 * 60 * 1000;
-        const passed = Math.abs(new Date(editorState.timeStamp) - Date.now());
+        const passed = Math.abs(new Date(appState.timeStamp) - Date.now());
 
         if (passed >= timeout) {
-            localStorage.removeItem("editorState");
+            localStorage.removeItem("appState");
             return false;
         } else {
             let verdict = true;
             try {
-                this.editor.restoreState(editorState);
-                editorState.filename && this.props.setFilename(editorState.filename);
-            } catch(err) {
-                localStorage.removeItem("editorState");
+                const { editorState } = appState
+                this.editor.restart(editorState);
+                appState.filename && this.props.setFilename(appState.filename);
+            } catch (err) {
+                localStorage.removeItem("appState");
                 verdict = false;
             }
             return verdict;
         }
     }
 
-    saveEditorState = () => {
-        const editorState = {
-            mode: this.editor.getMode(),
-            scale: this.editor.getScale(),
-            filename: this.props.filename
+    saveAppState = () => {
+        const appState = {
+            editorState: this.editor.getCurrentState(),
+            filename: this.props.filename,
+            timeStamp: Date.now(),
         };
-        editorState.fileData = this.editor.exportScheme(editorState.filename);
-        editorState.timeStamp = Date.now();
 
-        localStorage.setItem("editorState", JSON.stringify(editorState));
+        localStorage.setItem("appState", JSON.stringify(appState));
     }
 
     undo = () => {
@@ -266,6 +280,7 @@ class App extends Component {
                     deleteSelectedCallback: this.deleteSelected,
                     rotateSelectedCallback: this.rotateSelected,
                     goToOriginCallback: this.goToOrigin,
+                    canvasResizeCallback: this.canvasResize,
                     setModeCallback: this.setMode,
                     doTactCallback: this.evaluateScheme,
                     discardInputsCallback: this.discardInputs,
@@ -276,8 +291,8 @@ class App extends Component {
                 }}>
                     <Header />
                     <EditorArea />
-                    <LoadSchemeForm onNewScheme={this.initNewScheme} onImportScheme={this.importScheme} />
-                    <ExportSchemeForm onExportScheme={this.exportSchemeToFile} />
+                    <LoadSchemeModal onNewScheme={this.initNewScheme} onImportScheme={this.importScheme} />
+                    <ExportSchemeModal onExportScheme={this.exportSchemeToFile} />
                     <NotificationsArea />
                 </EditorContext.Provider>
             </>

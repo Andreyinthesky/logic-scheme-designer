@@ -1,34 +1,16 @@
-import BaseElement from "../BaseElement";
-import { DIRECTION_LEFT } from "../../enum/directions";
-import { isDirection } from "../../utils";
+import SchemeElement from "../SchemeElement";
 
-const directionToAnchorPoints = (direction) => {
-  if (direction == DIRECTION_LEFT) {
-    return [[1, 0.685], [1, 0.315], [0, 0.5]];
-  } else {
-    return [[0, 0.685], [0, 0.315], [1, 0.5]];
-  }
-};
+const shape = "or";
 
 
-export default class OrGate extends BaseElement {
+export default class OrGate extends SchemeElement {
   constructor(index, position) {
-    super("or" + index, position);
+    super("or" + index, shape, position);
 
     this.index = index;
-    this.shape = "or";
     this.label = `ИЛИ-${index}`;
-    this.anchorPoints = [[0, 0.685], [0, 0.315], [1, 0.5]];
+    this.anchorPoints = [[0, 0.7], [0, 0.3], [1, 0.5]];
     this.input = [false, false];
-  }
-
-  changeDirection(direction) {
-    if (!isDirection(direction)) {
-      throw new Error("Unknown direction - " + direction);
-    }
-
-    this.anchorPoints = directionToAnchorPoints(direction);
-    this.direction = direction;
   }
 
   getInputAnchors() {

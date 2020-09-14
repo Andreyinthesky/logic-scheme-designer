@@ -31,8 +31,10 @@ export default class SideBar extends Component {
         }
     }
 
-    handleClickToggle = () => {
-        this.setState({ toggle: !this.state.toggle });
+    handleClickToggle = (onClickToggle) => {
+        onClickToggle();
+        this.setState({ toggle: !this.state.toggle }, () => {
+        });
     }
 
     render() {
@@ -41,9 +43,10 @@ export default class SideBar extends Component {
 
         return (
             <EditorContext.Consumer>
-                {({ addNodeCallback }) => (
+                {({ addNodeCallback, canvasResizeCallback }) => (
                     <ul className={`select-obj-list ${toggle ? "hide" : ""}`}>
-                        <div className="select-obj-list__toggler" onClick={this.handleClickToggle}>
+                        <div className="select-obj-list__toggler"
+                            onClick={this.handleClickToggle.bind(this, canvasResizeCallback)}>
                             <i className="fas fa-caret-left"></i>
                         </div>
                         {

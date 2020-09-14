@@ -1,20 +1,18 @@
+import Wire from "../../model/g6Items/Wire";
+
 const SELECT_ANCHOR_RADIUS = 16;
 
-const itemsControlBehaviour = {
+const addWireBehaviour = {
   getEvents() {
     return {
       "node:click": "onNodeClick",
-      mousemove: "onMousemove",
+      "mousemove": "onMousemove",
       "node:mouseover": "onNodeMouseover",
       "node:mouseout": "onNodeMouseout",
-      "node:contextmenu" : "onNodeContextMenu",
-      "node:select": "onNodeSelect",
+      "node:contextmenu": "onNodeContextMenu",
       "edge:click": "onEdgeClick",
       "edge:mousedown": "onEdgeMousedown",
-      "canvas:mousedown": "onCanvasMousedown",
       "keydown": "onKeyDown",
-      "beforemodechange": "onBeforeModeChange",
-      "node:drop": "onNodeEndDrag"
     };
   },
   onNodeClick(evt) {
@@ -48,14 +46,8 @@ const itemsControlBehaviour = {
 
       this.completeDrivenEdge(node, nodeAnchorIndex);
     } else {
-      this.deselectAllItems();
       this.addDrivenEdge(node, nodeAnchorIndex, point);
     }
-  },
-  onNodeSelect(evt) {
-    this.deselectAllItems();
-    const isSelect = evt.item.hasState("select");
-    this.graph.setItemState(evt.item, "select", !isSelect);
   },
   onMousemove(evt) {
     const point = {
@@ -94,8 +86,7 @@ const itemsControlBehaviour = {
     }
 
     if (!this.addingEdge) {
-      this.deselectAllItems();
-      this.graph.setItemState(clickedEdge, "select", true);
+      this.graph.emit("edge:select", {item: clickedEdge});
     }
   },
   onEdgeMousedown(evt) {
@@ -108,19 +99,10 @@ const itemsControlBehaviour = {
       }
     }
   },
-  onCanvasMousedown(evt) {
-    this.deselectAllItems();
-  },
   onKeyDown(evt) {
     if (evt.keyCode === 27) {
       this.removeDrivenEdge();
     }
-  },
-  onBeforeModeChange(evt) {
-    this.deselectAllItems();
-  },
-  onNodeEndDrag(evt) {
-    this.graph.emit("editor:log");
   },
   findExistingEdge(targetNode, targetNodeAnchorIndex, drivenEdgeModel) {
     const targetNodeModel = targetNode.getModel();
@@ -149,16 +131,12 @@ const itemsControlBehaviour = {
   },
   addDrivenEdge(sourceNode, sourceNodeAnchorIndex, endPoint) {
     const sourceNodeModel = sourceNode.getModel();
-    this.drivenEdge = this.graph.addItem("edge", {
-      id: ("wire" + this.graph.indexer.getNextIndex("wire")),
+    this.drivenEdge = this.graph.addItem("edge", new Wire({
+      index: this.graph.indexer.getNextIndex("wire"),
       source: sourceNodeModel.id,
       sourceAnchor: sourceNodeAnchorIndex,
-      shape: "wire",
       target: endPoint,
-      style: {
-        lineWidth: 3
-      }
-    });
+    }));
     this.addingEdge = true;
     this.sourceNode = sourceNode;
   },
@@ -172,25 +150,17 @@ const itemsControlBehaviour = {
   completeDrivenEdge(targetNode, targetNodeAnchorIndex) {
     if (this.addingEdge && this.drivenEdge) {
       const targetNodeModel = targetNode.getModel();
-      this.graph.updateItem(this.drivenEdge, {
-        target: targetNodeModel.id,
-        targetAnchor: targetNodeAnchorIndex
-      });
 
-      this.graph.emit("afteradditem", { item: this.drivenEdge });
+      const edgeModel = this.drivenEdge.get("model");
+      edgeModel.target = targetNodeModel.id;
+      edgeModel.targetAnchor = targetNodeAnchorIndex;
+      this.graph.updateItem(this.drivenEdge, edgeModel);
+
+      this.graph.emit("editor:log");
       this.drivenEdge = null;
       this.addingEdge = false;
     }
   },
-  deselectAllItems() {
-    this.graph.getEdges().forEach(edge => {
-      this.graph.setItemState(edge, "select", false);
-    });
-
-    this.graph.getNodes().forEach(node => {
-      this.graph.setItemState(node, "select", false);
-    });
-  },
 };
 
-export default itemsControlBehaviour;
+export default addWireBehaviour;
